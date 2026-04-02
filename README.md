@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ANI.DEV - Developer Command Center Portfolio
 
-## Getting Started
+Cinematic futuristic portfolio website built with Next.js (App Router), TypeScript, and Tailwind-compatible global styling.
 
-First, run the development server:
+## Features
+
+- Full-screen system boot loading interface with progress sequence
+- Cinematic hero section with fullscreen looping background video
+- Scroll-driven transitions: hero darken/blur and cinematic text reveal
+- Transparent-to-glass navigation bar on scroll
+- About, Learning Journey timeline, Technical Arsenal, Workflow pipeline
+- Project showcase cards with glow/elevation interactions
+- Glassmorphism contact section and minimal futuristic footer
+
+## Run Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Required Video Asset
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Add your hero video at:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`public/videos/developer-cinematic.mp4`
 
-## Learn More
+A helper note is included at:
 
-To learn more about Next.js, take a look at the following resources:
+`public/videos/README.txt`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Main Files
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/page.tsx`
+- `app/globals.css`
+- `app/layout.tsx`
