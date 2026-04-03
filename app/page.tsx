@@ -1,13 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+
+const frameSources = [
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/02.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/03.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/04.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/05.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/06.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/07.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/08.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/09.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/10.png"
+];
 
 export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [bootText, setBootText] = useState(0);
   const [scrollY, setScrollY] = useState(0);
-  const [heroDuration, setHeroDuration] = useState(0);
-  const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const [frameIndex, setFrameIndex] = useState(0);
 
   const bootMessages = [
     "Booting developer workspace...",
@@ -35,54 +46,19 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
-    const videoEl = heroVideoRef.current;
-    if (!videoEl) return;
-
-    const setupVideo = () => {
-      if (videoEl.duration && !isNaN(videoEl.duration)) {
-        setHeroDuration(videoEl.duration);
-        // Force the first frame to render
-        videoEl.currentTime = 0;
-      }
-      videoEl.pause();
-    };
-
-    if (videoEl.readyState >= 1 && videoEl.duration && !isNaN(videoEl.duration)) {
-      setupVideo();
-    } else {
-      videoEl.addEventListener("loadedmetadata", setupVideo);
-      videoEl.addEventListener("durationchange", setupVideo);
-      videoEl.addEventListener("canplay", setupVideo);
-      return () => {
-        videoEl.removeEventListener("loadedmetadata", setupVideo);
-        videoEl.removeEventListener("durationchange", setupVideo);
-        videoEl.removeEventListener("canplay", setupVideo);
-      };
-    }
+    frameSources.forEach((src) => {
+      const image = new window.Image();
+      image.src = src;
+    });
   }, []);
 
   useEffect(() => {
-    const videoEl = heroVideoRef.current;
-    if (!videoEl) return;
-    
-    const duration = videoEl.duration && !isNaN(videoEl.duration) && videoEl.duration !== Infinity 
-                     ? videoEl.duration 
-                     : 10; // Fallback to 10s if metadata fails to load to ensure it moves
-    if (!duration || duration === Infinity) return;
-
-    // Use a multiplier to spread the video over the actual length of the hero section container
-    const scrollRange = window.innerHeight * 5.5; // Adjusted to match the larger container structure
+    const scrollRange = window.innerHeight * 5.5;
     const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
-    const nextTime = duration * progress;
+    const nextIndex = Math.min(frameSources.length - 1, Math.floor(progress * frameSources.length));
 
-    // Use requestAnimationFrame for smoother and immediate video updates
-    requestAnimationFrame(() => {
-      // Small threshold to prevent thrashing
-      if (Math.abs(videoEl.currentTime - nextTime) > 0.01) {
-        videoEl.currentTime = nextTime;
-      }
-    });
-  }, [scrollY, heroDuration]);
+    setFrameIndex(nextIndex);
+  }, [scrollY]);
 
   // Cinematic scroll & scale for hero (removed darkening)
   const maxScroll = typeof window !== "undefined" ? window.innerHeight * 4 : 3200;
@@ -156,21 +132,15 @@ export default function Portfolio() {
         <section id="home" className="relative w-full h-[600vh] lg:h-[700vh]">
           {/* Sticky Video Background */}
           <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[#0a0a0c]">
-            <video
-              ref={heroVideoRef}
-              muted
-              playsInline
-              preload="auto"
+            <img
+              src={frameSources[frameIndex]}
+              alt="Scrolling frame sequence"
               className="absolute inset-0 w-full h-full object-cover object-[center_30%] transform-gpu will-change-[transform,opacity,filter]"
               style={{ 
                 opacity: videoOpacity, 
-                /* Removed darkening effect to keep the video bright and visible */
                 transform: `scale(${videoScale})`
               }}
-            >
-              {/* Added the original file from the workspace */}
-              <source src="/videos/Developer_typing_on_202604021819.mp4" type="video/mp4" />
-            </video>
+            />
             
             {/* Dark vignette gradient overlay for text readability later */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0c_0%,transparent_30%,transparent_100%)] opacity-50" />
