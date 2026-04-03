@@ -84,15 +84,15 @@ export default function Portfolio() {
     });
   }, [scrollY, heroDuration]);
 
-  // Cinematic scroll darken & scale fade for hero
+  // Cinematic scroll & scale for hero (removed darkening)
   const maxScroll = typeof window !== "undefined" ? window.innerHeight * 4 : 3200;
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
-  const videoOpacity = 1 - scrollProgress * 0.8; // start fully visible, darken down
+  const videoOpacity = 1; // stay fully visible
   const videoScale = 1 + scrollProgress * 0.15; // gradual cinematic scale-in (zoom) as you scroll
   
-  // Delay the text overlay so the video plays out pure first, then the text moves up
-  const textStartScroll = typeof window !== "undefined" ? window.innerHeight * 1.5 : 1200;
-  const heroTextOpacity = Math.max(0, Math.min((scrollY - textStartScroll) / 800, 1)); 
+  // Bring the text up as we scroll
+  const textTranslateY = Math.max(0, 200 - scrollY * 0.5); // Starts lower, moves up smoothly as you scroll
+  const heroTextOpacity = Math.min(1, scrollY / 400); // Fades in quickly as you scroll down
   const statementOpacity = scrollProgress > 0.8 ? Math.min((scrollProgress - 0.8) * 5, 1) : 0;
 
 
@@ -124,7 +124,7 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans selection:bg-cyan-900 selection:text-cyan-100 overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans selection:bg-cyan-900 selection:text-cyan-100 overflow-x-clip">
       {/* Background Ambience / Grid */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen" />
@@ -164,7 +164,7 @@ export default function Portfolio() {
               className="absolute inset-0 w-full h-full object-cover object-[center_30%] transform-gpu will-change-[transform,opacity,filter]"
               style={{ 
                 opacity: videoOpacity, 
-                filter: `brightness(${Math.max(0.4, 1 - scrollProgress * 1.5)})`,
+                /* Removed darkening effect to keep the video bright and visible */
                 transform: `scale(${videoScale})`
               }}
             >
@@ -174,13 +174,13 @@ export default function Portfolio() {
             
             {/* Dark vignette gradient overlay for text readability later */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0c_0%,transparent_30%,transparent_100%)] opacity-50" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_60%,#0a0a0c_100%)] opacity-80" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_60%,#0a0a0c_100%)] opacity-60" />
 
             {/* Reveal Hero Text - Placed inside the sticky container so it hovers during scroll */}
             <div className="absolute inset-0 flex items-center w-full max-w-7xl mx-auto px-6 z-10 pointer-events-none">
               <div 
-                className="max-w-2xl pl-0 py-8 lg:pl-8 transition-all duration-300 transform-gpu pointer-events-auto"
-                style={{ opacity: heroTextOpacity, transform: `translateY(${70 - heroTextOpacity * 70}px)` }}
+                className="max-w-2xl pl-0 py-8 lg:pl-8 transition-transform duration-75 transform-gpu pointer-events-auto will-change-transform"
+                style={{ opacity: heroTextOpacity, transform: `translateY(${textTranslateY}px)` }}
               >
                 <div className="inline-flex items-center px-4 py-1.5 mb-6 rounded-full bg-cyan-500/10 text-cyan-300 text-xs font-mono tracking-wide shadow-[0_0_15px_rgba(34,211,238,0.15)]">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse" /> SYSTEM ONLINE
