@@ -51,6 +51,17 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     let isCancelled = false;
     let preloadTimer: number | undefined;
 
@@ -212,7 +223,7 @@ export default function Portfolio() {
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrollY > 50 ? 'bg-[#0a0a0c]/80 backdrop-blur-md border-white/5 shadow-lg' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${isMobileMenuOpen ? 'bg-[#0a0a0c] border-transparent' : scrollY > 50 ? 'bg-[#0a0a0c]/90 backdrop-blur-xl border-white/5 shadow-lg' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative">
           <div className="text-base sm:text-xl font-bold tracking-tighter text-white glow-text relative z-50">ANI.DEV</div>
           
@@ -233,9 +244,10 @@ export default function Portfolio() {
           <div className="flex items-center gap-4 sm:gap-8 relative z-50">
             <a
               href="/resume.pdf"
-              className="hidden sm:block text-sm font-medium text-slate-300 hover:text-cyan-300 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all duration-300"
+              className="hidden sm:block relative text-sm font-medium text-slate-300 hover:text-white hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all duration-300 py-1 group"
             >
               View My Resume
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
             </a>
             <a
               href="#contact"
@@ -261,41 +273,40 @@ export default function Portfolio() {
 
         {/* Mobile Overlay Menu */}
         <div 
-          className={`fixed inset-0 bg-[#0a0a0c]/95 backdrop-blur-2xl z-40 flex flex-col items-center justify-center transition-all duration-500 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
+          className={`fixed inset-0 bg-[#0a0a0c] z-40 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
         >
           {/* Background ambient glow inside the menu */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.05)_0%,transparent_60%)] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.1)_0%,transparent_60%)] pointer-events-none" />
 
-          <div className={`flex flex-col items-center gap-8 w-full px-6 transition-all duration-500 delay-100 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="flex flex-col items-center gap-8 text-2xl sm:text-3xl font-bold tracking-wide">
+          <div className={`flex flex-col items-center gap-6 w-full px-6 transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 translate-y-0 delay-100' : 'opacity-0 translate-y-8'}`}>
+            <div className="flex flex-col items-center gap-6 text-lg sm:text-xl font-bold tracking-wide w-full">
               {["Home", "About", "Skills", "Projects", "Contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="group relative text-slate-300 hover:text-white active:text-cyan-300 active:scale-95 transition-all duration-300 hover:-translate-y-1 hover:drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                  className="relative text-slate-300 hover:text-white active:text-white hover:-translate-y-1 active:-translate-y-1 hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] active:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300 py-2 group"
                 >
                   {item}
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full group-active:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
                 </a>
               ))}
             </div>
 
             <div className="w-16 h-px bg-white/10 my-2" />
 
-            <div className="flex flex-col items-center gap-5 w-full max-w-xs">
+            <div className="flex flex-col items-center gap-5 w-full max-w-[200px] mt-2">
               <a
                 href="/resume.pdf"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-4 flex items-center justify-center gap-3 text-base font-medium border border-white/10 bg-white/5 text-slate-200 rounded-full hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 active:scale-95 transition-all duration-300"
+                className="w-full py-3 text-center text-sm font-medium bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 hover:border-cyan-500/50 hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:text-cyan-300 active:bg-white/10 active:scale-95 transition-all duration-300 shadow-sm"
               >
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                 View My Resume
               </a>
               <a
                 href="#contact"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-4 flex items-center justify-center text-base font-bold bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-full hover:bg-cyan-400 hover:text-black active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+                className="w-full py-3 text-center text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full hover:bg-cyan-500 hover:text-black hover:-translate-y-1 active:bg-cyan-500 active:text-black active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.5)]"
               >
                 Connect Now
               </a>
