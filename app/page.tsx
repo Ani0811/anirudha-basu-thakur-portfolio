@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 
 const frameSources = [
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/02.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/03.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/04.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/05.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/06.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/07.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/08.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/09.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-03%2022_08_56%20GMT%2B5_30/10.png"
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/01.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/09.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/17.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/25.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/33.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/41.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/49.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/57.png",
+  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/65.png"
 ];
 
 export default function Portfolio() {
@@ -63,8 +63,9 @@ export default function Portfolio() {
   // Cinematic scroll & scale for hero (removed darkening)
   const maxScroll = typeof window !== "undefined" ? window.innerHeight * 4 : 3200;
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
+  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
   const videoOpacity = 1; // stay fully visible
-  const videoScale = 1 + scrollProgress * 0.15; // gradual cinematic scale-in (zoom) as you scroll
+  const videoScale = isDesktop ? 1 + scrollProgress * 0.04 : 1 + scrollProgress * 0.15;
   
   // Bring the text up as we scroll
   const textTranslateY = Math.max(0, 200 - scrollY * 0.5); // Starts lower, moves up smoothly as you scroll
@@ -135,7 +136,7 @@ export default function Portfolio() {
             <img
               src={frameSources[frameIndex]}
               alt="Scrolling frame sequence"
-              className="absolute inset-0 w-full h-full object-cover object-[center_30%] transform-gpu will-change-[transform,opacity,filter]"
+              className="absolute inset-0 w-full h-full object-cover lg:object-contain object-center transform-gpu will-change-[transform,opacity,filter]"
               style={{ 
                 opacity: videoOpacity, 
                 transform: `scale(${videoScale})`
