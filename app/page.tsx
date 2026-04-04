@@ -12,8 +12,10 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [bootText, setBootText] = useState(0);
   const [scrollY, setScrollY] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(1280);
   const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(9);
   const [frameIndex, setFrameIndex] = useState(9);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const bootMessages = [
     "Booting developer workspace...",
@@ -36,8 +38,16 @@ export default function Portfolio() {
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
+    const handleResize = () => setViewportWidth(window.innerWidth);
+
+    handleResize();
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -128,18 +138,40 @@ export default function Portfolio() {
   }, [scrollY, heroStartFrameIndex]);
 
   // Cinematic scroll & scale for hero (removed darkening)
-  const maxScroll = typeof window !== "undefined" ? window.innerHeight * 4 : 3200;
+  const isDesktop = viewportWidth >= 1024;
+  const isTablet = viewportWidth >= 640 && viewportWidth < 1024;
+  const isMobile = viewportWidth < 640;
+
+  const maxScroll = typeof window !== "undefined" ? window.innerHeight * (isDesktop ? 4 : 3) : 3200;
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
-  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
   const videoOpacity = 1; // stay fully visible
-  const videoScale = isDesktop ? 1 + scrollProgress * 0.04 : 1 + scrollProgress * 0.15;
+  const videoScale = isMobile
+    ? 0.96 + scrollProgress * 0.025
+    : isTablet
+      ? 1 + scrollProgress * 0.05
+      : 1 + scrollProgress * 0.07;
+  const videoObjectPosition = isMobile ? "center 30%" : isTablet ? "center 30%" : "center center";
   const currentFrameSrc = frameSources[frameIndex];
   const topOverlayOpacity = 0.18 + scrollProgress * 0.22;
   const bottomOverlayOpacity = 0.22 + scrollProgress * 0.2;
+
+  const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
+  const revealByProgress = (start: number, end: number) => {
+    if (scrollProgress <= start) return 0;
+    if (scrollProgress >= end) return 1;
+    return clamp01((scrollProgress - start) / (end - start));
+  };
+
+  const badgeReveal = revealByProgress(isMobile ? 0.02 : 0.04, isMobile ? 0.08 : 0.12);
+  const nameReveal = revealByProgress(isMobile ? 0.07 : 0.1, isMobile ? 0.15 : 0.2);
+  const roleReveal = revealByProgress(isMobile ? 0.14 : 0.18, isMobile ? 0.24 : 0.3);
+  const introReveal = revealByProgress(isMobile ? 0.22 : 0.28, isMobile ? 0.34 : 0.42);
+  const actionReveal = revealByProgress(isMobile ? 0.3 : 0.38, isMobile ? 0.46 : 0.56);
   
   // Bring the text up as we scroll
-  const textTranslateY = Math.max(0, 200 - scrollY * 0.5); // Starts lower, moves up smoothly as you scroll
-  const heroTextOpacity = Math.min(1, scrollY / 400); // Fades in quickly as you scroll down
+  const textStartOffset = isMobile ? 120 : isTablet ? 150 : 200;
+  const textScrollFactor = isMobile ? 0.34 : isTablet ? 0.42 : 0.5;
+  const textTranslateY = Math.max(0, textStartOffset - scrollY * textScrollFactor); // Starts lower, moves up smoothly as you scroll
   const statementOpacity = scrollProgress > 0.8 ? Math.min((scrollProgress - 0.8) * 5, 1) : 0;
 
 
@@ -180,27 +212,101 @@ export default function Portfolio() {
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-40 transition-all duration-500 border-b ${scrollY > 50 ? 'bg-[#0a0a0c]/80 backdrop-blur-md border-white/5 shadow-lg' : 'bg-transparent border-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="text-xl font-bold tracking-tighter text-white glow-text">ANI.DEV</div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#home" className="hover:text-cyan-400 transition-colors">Home</a>
-            <a href="#about" className="hover:text-cyan-400 transition-colors">About</a>
-            <a href="#skills" className="hover:text-cyan-400 transition-colors">Skills</a>
-            <a href="#projects" className="hover:text-cyan-400 transition-colors">Projects</a>
-            <a href="#contact" className="hover:text-cyan-400 transition-colors">Contact</a>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrollY > 50 ? 'bg-[#0a0a0c]/80 backdrop-blur-md border-white/5 shadow-lg' : 'bg-transparent border-transparent'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative">
+          <div className="text-base sm:text-xl font-bold tracking-tighter text-white glow-text relative z-50">ANI.DEV</div>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center justify-center gap-6 lg:gap-10 text-base lg:text-lg font-medium absolute left-1/2 -translate-x-1/2">
+            {["Home", "About", "Skills", "Projects", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="relative text-slate-300 hover:text-white hover:-translate-y-1 hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300 py-2 group"
+              >
+                {item}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+              </a>
+            ))}
           </div>
-          <div className="flex items-center gap-3">
-            <a href="https://github.com" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-400 transition-all text-xs font-mono">GH</a>
-            <a href="https://linkedin.com" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-400 transition-all text-xs font-mono">IN</a>
-            <a href="#contact" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-400 transition-all text-xs font-mono">@</a>
+
+          <div className="flex items-center gap-4 sm:gap-8 relative z-50">
+            <a
+              href="/resume.pdf"
+              className="hidden sm:block text-sm font-medium text-slate-300 hover:text-cyan-300 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all duration-300"
+            >
+              View My Resume
+            </a>
+            <a
+              href="#contact"
+              className="hidden sm:flex px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full hover:bg-cyan-500 hover:text-black hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-300"
+            >
+              Connect Now
+            </a>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="md:hidden text-white p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              <div className="w-6 flex flex-col gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+                <span className={`w-full h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`w-full h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`w-full h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Overlay Menu */}
+        <div 
+          className={`fixed inset-0 bg-[#0a0a0c]/95 backdrop-blur-2xl z-40 flex flex-col items-center justify-center transition-all duration-500 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
+        >
+          {/* Background ambient glow inside the menu */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.05)_0%,transparent_60%)] pointer-events-none" />
+
+          <div className={`flex flex-col items-center gap-8 w-full px-6 transition-all duration-500 delay-100 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="flex flex-col items-center gap-8 text-2xl sm:text-3xl font-bold tracking-wide">
+              {["Home", "About", "Skills", "Projects", "Contact"].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="group relative text-slate-300 hover:text-white active:text-cyan-300 active:scale-95 transition-all duration-300 hover:-translate-y-1 hover:drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                >
+                  {item}
+                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                </a>
+              ))}
+            </div>
+
+            <div className="w-16 h-px bg-white/10 my-2" />
+
+            <div className="flex flex-col items-center gap-5 w-full max-w-xs">
+              <a
+                href="/resume.pdf"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full py-4 flex items-center justify-center gap-3 text-base font-medium border border-white/10 bg-white/5 text-slate-200 rounded-full hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 active:scale-95 transition-all duration-300"
+              >
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                View My Resume
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full py-4 flex items-center justify-center text-base font-bold bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-full hover:bg-cyan-400 hover:text-black active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+              >
+                Connect Now
+              </a>
+            </div>
           </div>
         </div>
       </nav>
 
-      <main className="relative z-10 flex flex-col gap-32 pb-32">
+      <main className="relative z-10 flex flex-col gap-24 sm:gap-32 pb-24 sm:pb-32">
         {/* HERO SECTION - Scroll controls video playback */}
-        <section id="home" className="relative w-full h-[600vh] lg:h-[700vh]">
+        <section id="home" className="relative w-full h-[560vh] sm:h-[600vh] lg:h-[700vh]">
           {/* Sticky Video Background */}
           <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[radial-gradient(circle_at_50%_30%,#1a2442_0%,#0a0a0c_75%)]">
             <img
@@ -213,11 +319,12 @@ export default function Portfolio() {
             <img
               src={currentFrameSrc}
               alt="Scrolling frame sequence"
-              className="absolute inset-0 w-full h-full object-cover lg:object-contain object-center transform-gpu will-change-[transform,opacity,filter]"
+              className="absolute inset-0 w-full h-full object-cover object-center transform-gpu will-change-[transform,opacity,filter]"
               loading="eager"
               fetchPriority="high"
               style={{ 
                 opacity: videoOpacity, 
+                objectPosition: videoObjectPosition,
                 transform: `scale(${videoScale})`
               }}
             />
@@ -233,31 +340,47 @@ export default function Portfolio() {
             />
 
             {/* Reveal Hero Text - Placed inside the sticky container so it hovers during scroll */}
-            <div className="absolute inset-0 flex items-center w-full max-w-7xl mx-auto px-6 z-10 pointer-events-none">
+            <div className="absolute inset-0 flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 z-10 pointer-events-none">
               <div 
-                className="max-w-2xl pl-0 py-8 lg:pl-8 transition-transform duration-75 transform-gpu pointer-events-auto will-change-transform"
-                style={{ opacity: heroTextOpacity, transform: `translateY(${textTranslateY}px)` }}
+                className="max-w-2xl py-6 sm:py-8 lg:pl-8 transition-transform duration-75 transform-gpu pointer-events-auto will-change-transform text-center lg:text-left mx-auto lg:mx-0"
+                style={{ transform: `translateY(${textTranslateY}px)` }}
               >
-                <div className="inline-flex items-center px-4 py-1.5 mb-6 rounded-full bg-cyan-500/10 text-cyan-300 text-xs font-mono tracking-wide shadow-[0_0_15px_rgba(34,211,238,0.15)]">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse" /> SYSTEM ONLINE
+                <div
+                  className="inline-flex items-center px-4 sm:px-5 py-1.5 sm:py-2 mb-5 sm:mb-6 rounded-full bg-black/20 backdrop-blur-md text-slate-200 text-xs sm:text-sm font-mono tracking-[0.12em] border border-white/10 transition-all duration-300"
+                  style={{ opacity: badgeReveal, transform: `translateY(${(1 - badgeReveal) * 20}px)` }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2" /> SYSTEM ONLINE
                 </div>
-                <h1 className="text-6xl md:text-8xl font-black text-white tracking-tight leading-none mb-6 drop-shadow-2xl">
-                  Ani
+                <h1
+                  className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-[0.95] mb-4 sm:mb-5 drop-shadow-md transition-all duration-300"
+                  style={{ opacity: nameReveal, transform: `translateY(${(1 - nameReveal) * 22}px)` }}
+                >
+                  <span className="block drop-shadow-lg">Anirudha</span>
+                  <span className="block text-slate-200 drop-shadow-lg">Basu Thakur</span>
                 </h1>
-                <h2 className="text-2xl md:text-4xl font-black mb-4 tracking-tight drop-shadow-lg">
-                  <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500">Full Stack Developer</span>
+                <h2
+                  className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 tracking-tight text-slate-300 drop-shadow-md transition-all duration-300"
+                  style={{ opacity: roleReveal, transform: `translateY(${(1 - roleReveal) * 24}px)` }}
+                >
+                  Full Stack Developer <span className="opacity-50">||</span> Software Engineer
                 </h2>
-                <p className="text-lg text-slate-300 font-light mb-10 max-w-xl drop-shadow-lg">
+                <p
+                  className="text-base sm:text-lg md:text-xl text-slate-200 font-light mb-8 sm:mb-10 max-w-xl mx-auto lg:mx-0 drop-shadow-md transition-all duration-300 leading-relaxed"
+                  style={{ opacity: introReveal, transform: `translateY(${(1 - introReveal) * 26}px)` }}
+                >
                   Building modern web systems. <br />
-                  <span className="text-slate-400 mt-2 block">
+                  <span className="text-slate-400 mt-2 block text-sm sm:text-base md:text-lg">
                     I construct interactive web experiences, scalable backend structures, and high-performance tools driving today's web ecosystems.
                   </span>
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)]">
+                <div
+                  className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 transition-all duration-300"
+                  style={{ opacity: actionReveal, transform: `translateY(${(1 - actionReveal) * 28}px)` }}
+                >
+                  <a href="#projects" className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-white text-black font-bold rounded-lg hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)]">
                     View Projects
                   </a>
-                  <a href="#contact" className="px-8 py-4 bg-[#0a0a0c]/80 text-white font-bold rounded-lg hover:bg-[#111116] backdrop-blur-md transition-all shadow-xl">
+                  <a href="#contact" className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-[#0a0a0c]/80 text-white font-bold rounded-lg hover:bg-[#111116] backdrop-blur-md transition-all shadow-xl">
                     Contact Me
                   </a>
                 </div>
@@ -266,7 +389,7 @@ export default function Portfolio() {
 
             {/* "Scroll to start" initial prompt that vanishes on scroll */}
             <div 
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 text-cyan-400 font-mono text-sm tracking-widest flex flex-col items-center gap-2 animate-bounce transition-opacity duration-300"
+              className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 text-cyan-400 font-mono text-xs sm:text-sm tracking-[0.25em] sm:tracking-widest flex flex-col items-center gap-2 animate-bounce transition-opacity duration-300"
               style={{ opacity: scrollY > 50 ? 0 : 1 }}
             >
               SCROLL <span className="w-px h-8 bg-cyan-500/50 block"></span>
@@ -275,10 +398,10 @@ export default function Portfolio() {
         </section>
 
         {/* CINEMATIC TRANSITION STATEMENT */}
-        <section className="py-32 flex items-center justify-center relative mt-[-20vh]">
+        <section className="py-20 sm:py-32 flex items-center justify-center relative mt-[-16vh] sm:mt-[-20vh]">
           <div className="absolute top-1/2 left-0 w-full h-px bg-[linear-gradient(to_right,transparent,var(--tw-gradient-stops),transparent)] from-cyan-500/50 to-transparent" />
           <h2
-            className="text-4xl md:text-7xl font-black text-center text-white/90 tracking-tight relative z-10 px-6 glow-text transition-opacity duration-500"
+            className="text-3xl sm:text-4xl md:text-7xl font-black text-center text-white/90 tracking-tight relative z-10 px-4 sm:px-6 glow-text transition-opacity duration-500"
             style={{ opacity: statementOpacity }}
           >
             Crafting modern web experiences.
@@ -286,35 +409,35 @@ export default function Portfolio() {
         </section>
 
         {/* ABOUT SECTION */}
-        <section id="about" className="max-w-7xl mx-auto px-6 w-full fade-in-section">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+        <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 w-full fade-in-section">
+          <div className="grid md:grid-cols-2 gap-10 sm:gap-16 items-center">
             <div>
               <div className="w-12 h-1 bg-linear-to-r from-cyan-500 to-blue-500 mb-8 rounded-full" />
-              <h3 className="text-4xl font-bold text-white mb-6 leading-tight">
+              <h3 className="text-3xl sm:text-4xl font-bold text-white mb-6 leading-tight">
                 Developer focused on building <br />
                 <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500">interactive modern web experiences.</span>
               </h3>
-              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+              <p className="text-slate-400 text-base sm:text-lg mb-8 leading-relaxed">
                 My digital workspace fuses cutting-edge frontend interactions with deep, robust backend architectures. By abstracting complexity, I craft modular systems that look elegant and scale efficiently on the cloud.
               </p>
-              <div className="flex gap-4">
-                <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <button className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
                   Download Resume
                 </button>
-                <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
+                <button className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
                   View GitHub
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { label: "Projects Built", value: "38+", color: "from-cyan-500/10" },
                 { label: "Technologies Used", value: "24+", color: "from-blue-500/10" },
                 { label: "Years Learning", value: "5+", color: "from-indigo-500/10" },
                 { label: "Commits", value: "2K+", color: "from-purple-500/10" }
               ].map((stat, i) => (
-                <div key={i} className={`p-8 rounded-xl border border-white/5 bg-linear-to-br ${stat.color} to-transparent backdrop-blur-md hover:border-cyan-500/30 transition-all hover:-translate-y-1 group shadow-[inset_0_1px_rgba(255,255,255,0.1)]`}>
-                  <div className="text-4xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors glow-text">
+                <div key={i} className={`p-6 sm:p-8 rounded-xl border border-white/5 bg-linear-to-br ${stat.color} to-transparent backdrop-blur-md hover:border-cyan-500/30 transition-all hover:-translate-y-1 group shadow-[inset_0_1px_rgba(255,255,255,0.1)]`}>
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors glow-text">
                     {stat.value}
                   </div>
                   <div className="text-sm font-mono text-slate-400">{stat.label}</div>
@@ -325,11 +448,11 @@ export default function Portfolio() {
         </section>
 
         {/* LEARNING JOURNEY */}
-        <section className="max-w-4xl mx-auto px-6 w-full relative pt-20">
-          <h3 className="text-sm font-mono text-cyan-400 mb-16 tracking-[0.2em] text-center flex items-center justify-center gap-4 before:h-1px before:w-16 before:bg-cyan-500/30 after:h-1px after:w-16 after:bg-cyan-500/30">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 w-full relative pt-12 sm:pt-20">
+          <h3 className="text-xs sm:text-sm font-mono text-cyan-400 mb-12 sm:mb-16 tracking-[0.16em] sm:tracking-[0.2em] text-center flex items-center justify-center gap-3 sm:gap-4 before:h-1px before:w-8 sm:before:w-16 before:bg-cyan-500/30 after:h-1px after:w-8 sm:after:w-16 after:bg-cyan-500/30">
             LEARNING JOURNEY
           </h3>
-          <div className="relative border-l border-cyan-500/20 pl-8 space-y-12 before:absolute before:inset-y-0 before:left--1px before:w-2px before:bg-linear-to-b before:from-cyan-500/80 before:via-blue-500/50 before:to-transparent">
+          <div className="relative border-l border-cyan-500/20 pl-5 sm:pl-8 space-y-8 sm:space-y-12 before:absolute before:inset-y-0 before:-left-px before:w-0.5 before:bg-linear-to-b before:from-cyan-500/80 before:via-blue-500/50 before:to-transparent">
             {[
               { year: "Present", title: "Master of Computer Applications", desc: "Focusing on advanced system architecture, cloud computing, and full-stack engineering." },
               { year: "2022 - 2025", title: "Bachelor of Computer Applications", desc: "Core programming, database management, web technologies, and software development lifecycle." },
@@ -337,11 +460,11 @@ export default function Portfolio() {
               { year: "2020", title: "Secondary Education", desc: "Introduction to programming principles and analytical problem-solving." }
             ].map((milestone, i) => (
               <div key={i} className="relative group">
-                <div className="absolute w-3 h-3 rounded-full bg-cyan-400 -left-9.5 top-1.5 group-hover:scale-[1.7] group-hover:shadow-[0_0_15px_#06b6d4] group-hover:bg-white transition-all duration-300" />
-                <div className="bg-[#111116] border border-white/5 p-6 rounded-xl backdrop-blur-md hover:bg-[#15151c] hover:border-cyan-500/30 transition-all shadow-lg">
+                <div className="absolute w-3 h-3 rounded-full bg-cyan-400 left-[-1.6rem] sm:left-[-2.3rem] top-1.5 group-hover:scale-[1.7] group-hover:shadow-[0_0_15px_#06b6d4] group-hover:bg-white transition-all duration-300" />
+                <div className="bg-[#111116] border border-white/5 p-5 sm:p-6 rounded-xl backdrop-blur-md hover:bg-[#15151c] hover:border-cyan-500/30 transition-all shadow-lg">
                   <span className="text-xs font-mono text-cyan-400 mb-2 block tracking-wider">{milestone.year}</span>
-                  <h4 className="text-xl font-bold text-white mb-2">{milestone.title}</h4>
-                  <p className="text-slate-400">{milestone.desc}</p>
+                  <h4 className="text-lg sm:text-xl font-bold text-white mb-2">{milestone.title}</h4>
+                  <p className="text-sm sm:text-base text-slate-400">{milestone.desc}</p>
                 </div>
               </div>
             ))}
@@ -349,8 +472,8 @@ export default function Portfolio() {
         </section>
 
         {/* TECHNICAL ARSENAL */}
-        <section id="skills" className="max-w-7xl mx-auto px-6 w-full pt-20">
-          <h3 className="text-sm font-mono text-cyan-400 mb-16 tracking-[0.2em] text-center flex items-center justify-center gap-4 before:h-1px before:w-16 before:bg-cyan-500/30 after:h-1px after:w-16 after:bg-cyan-500/30">
+        <section id="skills" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
+          <h3 className="text-xs sm:text-sm font-mono text-cyan-400 mb-12 sm:mb-16 tracking-[0.16em] sm:tracking-[0.2em] text-center flex items-center justify-center gap-3 sm:gap-4 before:h-1px before:w-8 sm:before:w-16 before:bg-cyan-500/30 after:h-1px after:w-8 sm:after:w-16 after:bg-cyan-500/30">
             TECHNICAL ARSENAL
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -362,8 +485,8 @@ export default function Portfolio() {
               { category: "DevOps", skills: ["Docker", "AWS", "Vercel", "Linux", "CI/CD"] },
               { category: "Core", skills: ["Data Structures", "Algorithms", "System Design", "Agile", "OOP"] }
             ].map((group, i) => (
-               <div key={i} className="bg-[#111116] border border-white/5 rounded-xl p-8 hover:border-cyan-500/30 transition-all group shadow-xl">
-                 <h4 className="text-white font-bold text-xl mb-6 flex items-center gap-3">
+               <div key={i} className="bg-[#111116] border border-white/5 rounded-xl p-6 sm:p-8 hover:border-cyan-500/30 transition-all group shadow-xl">
+                 <h4 className="text-white font-bold text-lg sm:text-xl mb-6 flex items-center gap-3">
                    <div className="w-2 h-2 rounded-full bg-cyan-500 glow-pulse" />
                    {group.category}
                  </h4>
@@ -385,8 +508,8 @@ export default function Portfolio() {
         </section>
 
         {/* WORKFLOW */}
-        <section className="max-w-7xl mx-auto px-6 w-full pt-20">
-          <h3 className="text-sm font-mono text-cyan-400 mb-16 tracking-[0.2em] text-center flex items-center justify-center gap-4 before:h-1px before:w-16 before:bg-cyan-500/30 after:h-px after:w-16 after:bg-cyan-500/30">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
+          <h3 className="text-xs sm:text-sm font-mono text-cyan-400 mb-12 sm:mb-16 tracking-[0.16em] sm:tracking-[0.2em] text-center flex items-center justify-center gap-3 sm:gap-4 before:h-1px before:w-8 sm:before:w-16 before:bg-cyan-500/30 after:h-px after:w-8 sm:after:w-16 after:bg-cyan-500/30">
             WORKING PROCESS
           </h3>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative">
@@ -409,11 +532,11 @@ export default function Portfolio() {
         </section>
 
         {/* PROJECT SHOWCASE */}
-        <section id="projects" className="max-w-7xl mx-auto px-6 w-full pt-20">
+        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
               <h3 className="text-sm font-mono text-cyan-400 tracking-[0.2em] mb-4">SELECTED WORK</h3>
-              <h2 className="text-4xl md:text-5xl font-black text-white">System Case Studies</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white">System Case Studies</h2>
             </div>
             <a href="https://github.com" className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-mono text-sm hover:underline underline-offset-4">
               VIEW GITHUB ARCHIVE →
@@ -444,16 +567,16 @@ export default function Portfolio() {
               }
             ].map((proj, i) => (
               <div key={i} className="group relative rounded-2xl border border-white/5 bg-[#111116] overflow-hidden hover:border-cyan-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-20px_rgba(34,211,238,0.2)] block">
-                <div className="aspect-video] bg-[#0a0a0c] overflow-hidden relative">
+                <div className="aspect-video bg-[#0a0a0c] overflow-hidden relative">
                   <div className="absolute inset-0 bg-linear-to-t from-[#111116] to-transparent z-10 opacity-90" />
                   <div className="absolute inset-0 bg-blue-500/10 group-hover:bg-transparent transition-colors z-10 duration-500" />
                   <div className="w-full h-full bg-[linear-gradient(45deg,#0a0a0c_25%,#111116_25%,#111116_50%,#0a0a0c_50%,#0a0a0c_75%,#111116_75%,#111116_100%)] bg-size-[20px_20px] opacity-40 group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
-                    <span className="text-white/20 font-black text-2xl tracking-[0.5em]">{proj.title.toUpperCase()}</span>
+                    <span className="text-white/20 font-black text-base sm:text-2xl tracking-[0.22em] sm:tracking-[0.5em] px-3 text-center">{proj.title.toUpperCase()}</span>
                   </div>
                   {/* Glowing edges inside the image wrapper */}
                   <div className="absolute bottom-0 left-10 w-32 h-1 bg-cyan-500/50 blur-md z-20" />
                 </div>
-                <div className="p-8 relative z-20 bg-[#111116]">
+                <div className="p-6 sm:p-8 relative z-20 bg-[#111116]">
                   <div className="flex flex-wrap gap-2 mb-5">
                     {proj.tags.map((tag) => (
                       <span key={tag} className="text-xs font-mono px-2 py-1 bg-white/5 text-cyan-300 border border-cyan-500/20 rounded-md">
@@ -461,13 +584,13 @@ export default function Portfolio() {
                       </span>
                     ))}
                   </div>
-                  <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                  <h4 className="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
                     {proj.title}
                   </h4>
                   <p className="text-slate-400 mb-8 leading-relaxed text-sm">
                     {proj.desc}
                   </p>
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <a href="https://github.com" className="flex-1 py-3 bg-white/5 border border-white/10 rounded-lg font-medium text-white hover:bg-white/10 hover:border-cyan-500/30 transition-all text-center shadow-sm">
                       GitHub
                     </a>
@@ -482,38 +605,38 @@ export default function Portfolio() {
         </section>
 
         {/* CONTACT SECTION */}
-        <section id="contact" className="max-w-7xl mx-auto px-6 w-full pt-10">
-          <div className="bg-[#111116] border border-white/10 rounded-3xl p-8 md:p-16 relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-125 h-125 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-100 h-100 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
+        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-8 sm:pt-10">
+          <div className="bg-[#111116] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-16 relative overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 w-72 h-72 sm:w-124 sm:h-124 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-56 h-56 sm:w-100 sm:h-100 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
             
-            <div className="grid md:grid-cols-2 gap-16 relative z-10">
+            <div className="grid md:grid-cols-2 gap-10 sm:gap-16 relative z-10">
               <div>
                 <div className="w-12 h-1 bg-linear-to-r from-purple-500 to-cyan-500 mb-8 rounded-full" />
-                <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6">
                   Let's build something meaningful.
                 </h2>
-                <p className="text-slate-400 text-lg mb-10 leading-relaxed">
+                <p className="text-slate-400 text-base sm:text-lg mb-10 leading-relaxed">
                   Looking to architect a robust backend, build a fluid frontend, or design an entire scalable system? My terminal is ready for incoming connections.
                 </p>
                 
                 <div className="space-y-6 text-slate-300 font-mono text-sm">
-                  <a href="mailto:hello@ani.dev" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-max group group-hover:scale-105">
+                  <a href="mailto:hello@ani.dev" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-full max-w-full break-all group">
                     <div className="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center bg-[#1a1a24] group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all">✉</div>
                     hello@ani.dev
                   </a>
-                  <a href="https://github.com" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-max group group-hover:scale-105">
+                  <a href="https://github.com" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-full max-w-full break-all group">
                     <div className="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center bg-[#1a1a24] group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all">GH</div>
                     github.com/ani
                   </a>
-                  <a href="https://linkedin.com" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-max group group-hover:scale-105">
+                  <a href="https://linkedin.com" className="flex items-center gap-4 hover:text-cyan-400 cursor-pointer transition-colors w-full max-w-full break-all group">
                     <div className="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center bg-[#1a1a24] group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all">IN</div>
                     linkedin.com/in/ani
                   </a>
                 </div>
               </div>
 
-              <div className="bg-[#0a0a0c]/80 p-8 rounded-2xl border border-white/5 backdrop-blur-xl shadow-[inset_0_1px_rgba(255,255,255,0.05)]">
+              <div className="bg-[#0a0a0c]/80 p-5 sm:p-8 rounded-2xl border border-white/5 backdrop-blur-xl shadow-[inset_0_1px_rgba(255,255,255,0.05)]">
                 <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                   <div>
                     <label className="block text-xs font-mono text-slate-500 mb-2 uppercase tracking-wide">Interface / Name</label>
@@ -539,8 +662,8 @@ export default function Portfolio() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 bg-[#0a0a0c] py-8 relative z-10 pt-12 mt-20">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="border-t border-white/5 bg-[#0a0a0c] py-8 relative z-10 pt-10 sm:pt-12 mt-16 sm:mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
           <div className="text-xl font-black text-white glow-text opacity-90">ANI.DEV</div>
           <div className="text-sm font-mono text-slate-500 flex flex-wrap justify-center gap-6">
             <a href="#about" className="hover:text-cyan-400 transition-colors">About</a>
@@ -568,12 +691,12 @@ export default function Portfolio() {
         .glow-text {
           text-shadow: 0 0 15px rgba(34,211,238,0.4);
         }
-        
+
         .pulse-anim {
           box-shadow: 0 0 10px rgba(34,211,238,0.8);
           animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.5; transform: scale(0.9); }
