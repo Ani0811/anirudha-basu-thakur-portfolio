@@ -2,23 +2,18 @@
 
 import { useState, useEffect } from "react";
 
-const frameSources = [
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/01.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/09.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/17.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/25.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/33.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/41.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/49.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/57.png",
-  "/videos/Video%20Frame%20Extractor%202026-04-04%2014_34_18%20GMT%2B5_30/65.png"
-];
+const framesFolder = "hero-frames";
+const frameSources = Array.from(
+  { length: 70 },
+  (_, index) => `/${framesFolder}/${String(index + 1).padStart(2, "0")}.png`
+);
 
 export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [bootText, setBootText] = useState(0);
   const [scrollY, setScrollY] = useState(0);
-  const [frameIndex, setFrameIndex] = useState(0);
+  const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(9);
+  const [frameIndex, setFrameIndex] = useState(9);
 
   const bootMessages = [
     "Booting developer workspace...",
@@ -46,19 +41,91 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
-    frameSources.forEach((src) => {
-      const image = new window.Image();
-      image.src = src;
-    });
+    let isCancelled = false;
+    let preloadTimer: number | undefined;
+
+    const getFrameBrightness = (src: string) =>
+      new Promise<number>((resolve) => {
+        const image = new window.Image();
+        image.decoding = "async";
+        image.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            const sampleWidth = 24;
+            const sampleHeight = 24;
+            canvas.width = sampleWidth;
+            canvas.height = sampleHeight;
+            const context = canvas.getContext("2d", { willReadFrequently: true });
+
+            if (!context) {
+              resolve(0);
+              return;
+            }
+
+            context.drawImage(image, 0, 0, sampleWidth, sampleHeight);
+            const data = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
+            let sum = 0;
+
+            for (let i = 0; i < data.length; i += 4) {
+              // Relative luminance approximation from RGB channels.
+              sum += data[i] * 0.2126 + data[i + 1] * 0.7152 + data[i + 2] * 0.0722;
+            }
+
+            resolve(sum / (data.length / 4));
+          } catch {
+            resolve(0);
+          }
+        };
+        image.onerror = () => resolve(0);
+        image.src = src;
+      });
+
+    const bootstrapFrames = async () => {
+      let detectedStart = 0;
+
+      for (let i = 0; i < frameSources.length; i++) {
+        const brightness = await getFrameBrightness(frameSources[i]);
+        if (brightness > 14) {
+          detectedStart = i;
+          break;
+        }
+      }
+
+      if (isCancelled) return;
+
+      setHeroStartFrameIndex(detectedStart);
+      setFrameIndex(detectedStart);
+
+      const firstFrame = new window.Image();
+      firstFrame.src = frameSources[detectedStart];
+
+      preloadTimer = window.setTimeout(() => {
+        for (let i = 0; i < frameSources.length; i++) {
+          if (i === detectedStart) continue;
+          const image = new window.Image();
+          image.src = frameSources[i];
+        }
+      }, 50);
+    };
+
+    void bootstrapFrames();
+
+    return () => {
+      isCancelled = true;
+      if (preloadTimer !== undefined) {
+        window.clearTimeout(preloadTimer);
+      }
+    };
   }, []);
 
   useEffect(() => {
     const scrollRange = window.innerHeight * 5.5;
     const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
-    const nextIndex = Math.min(frameSources.length - 1, Math.floor(progress * frameSources.length));
+    const playableFrameCount = frameSources.length - heroStartFrameIndex;
+    const nextIndex = heroStartFrameIndex + Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
 
     setFrameIndex(nextIndex);
-  }, [scrollY]);
+  }, [scrollY, heroStartFrameIndex]);
 
   // Cinematic scroll & scale for hero (removed darkening)
   const maxScroll = typeof window !== "undefined" ? window.innerHeight * 4 : 3200;
@@ -66,6 +133,9 @@ export default function Portfolio() {
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
   const videoOpacity = 1; // stay fully visible
   const videoScale = isDesktop ? 1 + scrollProgress * 0.04 : 1 + scrollProgress * 0.15;
+  const currentFrameSrc = frameSources[frameIndex];
+  const topOverlayOpacity = 0.18 + scrollProgress * 0.22;
+  const bottomOverlayOpacity = 0.22 + scrollProgress * 0.2;
   
   // Bring the text up as we scroll
   const textTranslateY = Math.max(0, 200 - scrollY * 0.5); // Starts lower, moves up smoothly as you scroll
@@ -132,11 +202,20 @@ export default function Portfolio() {
         {/* HERO SECTION - Scroll controls video playback */}
         <section id="home" className="relative w-full h-[600vh] lg:h-[700vh]">
           {/* Sticky Video Background */}
-          <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[#0a0a0c]">
+          <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[radial-gradient(circle_at_50%_30%,#1a2442_0%,#0a0a0c_75%)]">
             <img
-              src={frameSources[frameIndex]}
+              src={currentFrameSrc}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-70 transform-gpu"
+              loading="eager"
+            />
+            <img
+              src={currentFrameSrc}
               alt="Scrolling frame sequence"
               className="absolute inset-0 w-full h-full object-cover lg:object-contain object-center transform-gpu will-change-[transform,opacity,filter]"
+              loading="eager"
+              fetchPriority="high"
               style={{ 
                 opacity: videoOpacity, 
                 transform: `scale(${videoScale})`
@@ -144,8 +223,14 @@ export default function Portfolio() {
             />
             
             {/* Dark vignette gradient overlay for text readability later */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0c_0%,transparent_30%,transparent_100%)] opacity-50" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_60%,#0a0a0c_100%)] opacity-60" />
+            <div
+              className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0c_0%,transparent_30%,transparent_100%)]"
+              style={{ opacity: topOverlayOpacity }}
+            />
+            <div
+              className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_60%,#0a0a0c_100%)]"
+              style={{ opacity: bottomOverlayOpacity }}
+            />
 
             {/* Reveal Hero Text - Placed inside the sticky container so it hovers during scroll */}
             <div className="absolute inset-0 flex items-center w-full max-w-7xl mx-auto px-6 z-10 pointer-events-none">
