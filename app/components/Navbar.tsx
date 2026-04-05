@@ -41,10 +41,14 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
         <div className="flex items-center gap-4 sm:gap-8 relative z-50">
           <a
             href="/resume.pdf"
-            className="hidden sm:block relative text-sm font-medium text-slate-300 hover:text-white hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all duration-300 py-1 group"
+            className="hidden sm:flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-semibold rounded-full
+              bg-white/[0.05] backdrop-blur-md border border-white/[0.1] text-slate-200
+              shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]
+              hover:bg-white/[0.1] hover:border-cyan-500/40 hover:text-cyan-300
+              hover:shadow-[0_0_22px_rgba(34,211,238,0.18),inset_0_1px_0_rgba(34,211,238,0.08)]
+              active:scale-[0.97] transition-all duration-300"
           >
             View My Resume
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
           </a>
           <a
             href="#contact"

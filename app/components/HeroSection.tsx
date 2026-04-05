@@ -20,6 +20,40 @@ export default function HeroSection({
   textTranslateY,
   statementOpacity,
 }: Props) {
+  // Typewriter effect logic
+  const roles = React.useMemo(() => ["Full Stack Developer", "Software Engineer"], []);
+  const [text, setText] = React.useState("");
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [loopNum, setLoopNum] = React.useState(0);
+
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const i = loopNum % roles.length;
+    const fullText = roles[i];
+
+    const handleType = () => {
+      setText((prev) =>
+        isDeleting
+          ? fullText.substring(0, prev.length - 1)
+          : fullText.substring(0, prev.length + 1)
+      );
+    };
+
+    let typingSpeed = isDeleting ? 40 : 100;
+
+    if (!isDeleting && text === fullText) {
+      timer = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && text === "") {
+      setIsDeleting(false);
+      setLoopNum((prev) => prev + 1);
+      timer = setTimeout(() => {}, 500);
+    } else {
+      timer = setTimeout(handleType, typingSpeed);
+    }
+
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, loopNum, roles]);
+
   return (
     <>
       {/* HERO SECTION – scroll controls frame playback */}
@@ -83,10 +117,11 @@ export default function HeroSection({
 
               {/* Role */}
               <h2
-                className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 tracking-tight text-slate-300 drop-shadow-md transition-all duration-300"
+                className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-[40px] sm:min-h-[48px]"
                 style={{ opacity: roleReveal, transform: `translateY(${(1 - roleReveal) * 24}px)` }}
               >
-                Full Stack Developer <span className="opacity-50">||</span> Software Engineer
+                <span>{text || "\u00A0"}</span>
+                <span className="w-[2px] sm:w-[3px] h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
               </h2>
 
               {/* Intro */}
