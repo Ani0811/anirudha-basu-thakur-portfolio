@@ -186,11 +186,11 @@ export function useScrollAnimation(): ScrollValues {
     return clamp01((scrollProgress - start) / (end - start));
   };
 
-  const badgeReveal = revealByProgress(isMobile ? 0.02 : 0.04, isMobile ? 0.08 : 0.12);
-  const nameReveal = revealByProgress(isMobile ? 0.07 : 0.1, isMobile ? 0.15 : 0.2);
-  const roleReveal = revealByProgress(isMobile ? 0.14 : 0.18, isMobile ? 0.24 : 0.3);
-  const introReveal = revealByProgress(isMobile ? 0.22 : 0.28, isMobile ? 0.34 : 0.42);
-  const actionReveal = revealByProgress(isMobile ? 0.3 : 0.38, isMobile ? 0.46 : 0.56);
+  const badgeReveal = revealByProgress(isMobile ? 0.02 : 0.05, isMobile ? 0.12 : 0.18);
+  const nameReveal = revealByProgress(isMobile ? 0.10 : 0.15, isMobile ? 0.22 : 0.30);
+  const roleReveal = revealByProgress(isMobile ? 0.20 : 0.28, isMobile ? 0.35 : 0.45);
+  const introReveal = revealByProgress(isMobile ? 0.32 : 0.42, isMobile ? 0.48 : 0.60);
+  const actionReveal = revealByProgress(isMobile ? 0.45 : 0.58, isMobile ? 0.65 : 0.75);
 
   const textStartOffset = isMobile ? 120 : isTablet ? 150 : 200;
   const textScrollFactor = isMobile ? 0.34 : isTablet ? 0.42 : 0.5;
