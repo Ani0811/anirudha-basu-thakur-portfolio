@@ -21,7 +21,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative">
         <div className="text-base sm:text-xl font-bold tracking-tighter text-white glow-text relative z-50">
-          ANI.DEV
+          ANIRUDHA.DEV
         </div>
 
         {/* Desktop Menu */}
@@ -40,11 +40,13 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
 
         <div className="flex items-center gap-4 sm:gap-8 relative z-50">
           <a
-            href="/resume.pdf"
+            href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
+            target="_blank"
+            download="Anirudha_Basu_Thakur_Resume.pdf"
             className="hidden sm:flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-semibold rounded-full
-              bg-white/[0.05] backdrop-blur-md border border-white/[0.1] text-slate-200
+              bg-white/5 backdrop-blur-md border border-white/10 text-slate-200
               shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]
-              hover:bg-white/[0.1] hover:border-cyan-500/40 hover:text-cyan-300
+              hover:bg-white/10 hover:border-cyan-500/40 hover:text-cyan-300
               hover:shadow-[0_0_22px_rgba(34,211,238,0.18),inset_0_1px_0_rgba(34,211,238,0.08)]
               active:scale-[0.97] transition-all duration-300"
           >
@@ -123,20 +125,21 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
             isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-2" />
+          <div className="w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent mb-2" />
 
           <a
-            href="/resume.pdf"
+            href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
+            download="Anirudha_Basu_Thakur_Resume.pdf"
             onClick={() => setIsMobileMenuOpen(false)}
             className="w-full py-4 text-center text-sm font-semibold rounded-2xl
-              bg-white/[0.05] backdrop-blur-md
-              border border-white/[0.1]
+              bg-white/5 backdrop-blur-md
+              border border-white/10
               text-slate-200
               shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]
-              hover:bg-white/[0.1] hover:border-cyan-500/40
+              hover:bg-white/10 hover:border-cyan-500/40
               hover:text-cyan-300
               hover:shadow-[0_0_22px_rgba(34,211,238,0.18),inset_0_1px_0_rgba(34,211,238,0.08)]
-              active:scale-[0.97] active:bg-white/[0.1]
+              active:scale-[0.97] active:bg-white/10
               transition-all duration-300"
           >
             View My Resume
@@ -146,7 +149,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
             href="#contact"
             onClick={() => setIsMobileMenuOpen(false)}
             className="w-full py-4 text-center text-sm font-bold rounded-2xl
-              bg-cyan-500/[0.12] backdrop-blur-md
+              bg-cyan-500/12 backdrop-blur-md
               border border-cyan-500/40
               text-cyan-300
               shadow-[0_0_22px_rgba(34,211,238,0.12),inset_0_1px_0_rgba(34,211,238,0.1)]

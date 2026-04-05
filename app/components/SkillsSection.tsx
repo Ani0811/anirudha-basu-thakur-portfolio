@@ -4,34 +4,29 @@ import React from "react";
 
 const milestones = [
   {
-    year: "Present",
-    title: "Master of Computer Applications",
-    desc: "Focusing on advanced system architecture, cloud computing, and full-stack engineering.",
-  },
-  {
     year: "2022 - 2025",
-    title: "Bachelor of Computer Applications",
-    desc: "Core programming, database management, web technologies, and software development lifecycle.",
+    title: "Netaji Subhash Engineering College",
+    desc: "CGPA: 7.86. Studied core engineering principles, full-stack web development, and software engineering.",
   },
   {
     year: "2020 - 2022",
-    title: "Higher Secondary Education",
-    desc: "Computer Science major. Built foundational logic, algorithms, and mathematics.",
+    title: "Narayana Group of Schools",
+    desc: "Percentage: 77.7%. Higher Secondary Education focusing on science and mathematics.",
   },
   {
-    year: "2020",
-    title: "Secondary Education",
-    desc: "Introduction to programming principles and analytical problem-solving.",
-  },
+    year: "2008 - 2019",
+    title: "South Point High School",
+    desc: "Percentage: 77.8%. Foundational logic, mathematics, and primary education.",
+  }
 ];
 
 const skillGroups = [
-  { category: "Frontend", skills: ["React", "Next.js", "TypeScript", "Tailwind", "Framer Motion"] },
-  { category: "Backend", skills: ["Node.js", "Express", "REST APIs", "GraphQL", "Socket.IO"] },
-  { category: "Database", skills: ["PostgreSQL", "MongoDB", "Redis", "Prisma", "Supabase"] },
-  { category: "Tools", skills: ["Git", "GitHub", "Postman", "VS Code", "Figma"] },
-  { category: "DevOps", skills: ["Docker", "AWS", "Vercel", "Linux", "CI/CD"] },
-  { category: "Core", skills: ["Data Structures", "Algorithms", "System Design", "Agile", "OOP"] },
+  { category: "Languages", skills: ["Python", "Java", "C#", "JavaScript"] },
+  { category: "Frontend", skills: ["React.js", "Next.js", "TailwindCSS"] },
+  { category: "Backend", skills: ["Node.js", "Express.js", "Django"] },
+  { category: "Databases", skills: ["MongoDB", "PostgreSQL", "MySQL"] },
+  { category: "Tools", skills: ["Git", "GitHub", "Azure", "Firebase"] },
+  { category: "Concepts", skills: ["REST APIs", "Authentication", "MVC"] },
 ];
 
 const workflowSteps = [

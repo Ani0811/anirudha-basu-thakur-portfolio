@@ -11,7 +11,7 @@ export default function LoadingScreen({ bootText, bootMessages }: Props) {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-20 pointer-events-none" />
       <div className="w-full max-w-md px-8 text-center relative z-10">
         <h1 className="text-4xl font-bold tracking-widest text-white mb-12 animate-pulse glow-text">
-          ANI.DEV
+          ANIRUDHA.DEV
         </h1>
         <div className="h-32 text-left mb-8 text-sm">
           {bootMessages.slice(0, bootText).map((msg, i) => (

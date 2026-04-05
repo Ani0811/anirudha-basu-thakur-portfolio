@@ -1,9 +1,10 @@
 "use client";
 
 const contactLinks = [
-  { icon: "✉", label: "hello@ani.dev", href: "mailto:hello@ani.dev" },
-  { icon: "GH", label: "github.com/ani", href: "https://github.com" },
-  { icon: "IN", label: "linkedin.com/in/ani", href: "https://linkedin.com" },
+  { icon: "✉", label: "anirudha.basuthakur@gmail.com", href: "mailto:anirudha.basuthakur@gmail.com" },
+  { icon: "GH", label: "github.com/Ani0811", href: "https://github.com/Ani0811" },
+  { icon: "IN", label: "linkedin.com/in/anirudha-basu-thakur-686aa8253", href: "https://linkedin.com/in/anirudha-basu-thakur-686aa8253" },
+  { icon: "📞", label: "+91-9875417275", href: "tel:+919875417275" },
 ];
 
 import React from "react";

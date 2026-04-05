@@ -108,7 +108,7 @@ export default function HeroSection({
 
               {/* Name */}
               <h1
-                className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-[0.95] mb-4 sm:mb-5 drop-shadow-md transition-all duration-300"
+                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none mb-3 sm:mb-4 drop-shadow-md transition-all duration-300"
                 style={{ opacity: nameReveal, transform: `translateY(${(1 - nameReveal) * 22}px)` }}
               >
                 <span className="block drop-shadow-lg">Anirudha</span>
@@ -117,20 +117,20 @@ export default function HeroSection({
 
               {/* Role */}
               <h2
-                className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-[40px] sm:min-h-[48px]"
+                className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-4 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-8 sm:min-h-10"
                 style={{ opacity: roleReveal, transform: `translateY(${(1 - roleReveal) * 24}px)` }}
               >
                 <span>{text || "\u00A0"}</span>
-                <span className="w-[2px] sm:w-[3px] h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
+                <span className="w-0.5 sm:w-0.75 h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
               </h2>
 
               {/* Intro */}
               <p
-                className="text-base sm:text-lg md:text-xl text-slate-200 font-light mb-8 sm:mb-10 max-w-xl mx-auto lg:mx-0 drop-shadow-md transition-all duration-300 leading-relaxed"
+                className="text-sm sm:text-base md:text-lg text-slate-200 font-light mb-8 sm:mb-10 max-w-xl mx-auto lg:mx-0 drop-shadow-md transition-all duration-300 leading-relaxed"
                 style={{ opacity: introReveal, transform: `translateY(${(1 - introReveal) * 26}px)` }}
               >
                 Building modern web systems. <br />
-                <span className="text-slate-400 mt-2 block text-sm sm:text-base md:text-lg">
+                <span className="text-slate-400 mt-1 block text-xs sm:text-sm md:text-base">
                   I construct interactive web experiences, scalable backend structures, and
                   high-performance tools driving today&apos;s web ecosystems.
                 </span>

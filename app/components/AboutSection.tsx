@@ -23,17 +23,15 @@ export default function AboutSection() {
             </span>
           </h3>
           <p className="text-slate-400 text-base sm:text-lg mb-8 leading-relaxed">
-            My digital workspace fuses cutting-edge frontend interactions with deep, robust backend
-            architectures. By abstracting complexity, I craft modular systems that look elegant and
-            scale efficiently on the cloud.
+            Entry-level Software Engineer with experience building scalable full-stack applications using React.js, Node.js, Express, and MongoDB. Skilled in REST API development, authentication systems, and database design. Experience integrating payment gateways and deploying applications to cloud platforms. Familiar with machine learning using Python and PyTorch and interested in building intelligent, scalable software systems.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <button className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
+            <a href="/docs/Anirudha_Basu_Thakur_Resume.pdf" download="Anirudha_Basu_Thakur_Resume.pdf" className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm text-center">
               Download Resume
-            </button>
-            <button className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm">
+            </a>
+            <a href="https://github.com/Ani0811" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 transition-all text-white font-medium shadow-sm text-center">
               View GitHub
-            </button>
+            </a>
           </div>
         </div>
 

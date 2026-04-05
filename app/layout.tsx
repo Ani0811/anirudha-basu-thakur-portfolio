@@ -15,8 +15,8 @@ const bodyFont = Rajdhani({
 });
 
 export const metadata: Metadata = {
-  title: "ANI.DEV | Developer Command Center",
-  description: "Cinematic futuristic developer portfolio website for Ani.",
+  title: "Anirudha Basu Thakur | Software Engineer",
+  description: "Portfolio for Anirudha Basu Thakur, an Entry-level Software Engineer and Full-Stack Developer.",
 };
 
 export default function RootLayout({

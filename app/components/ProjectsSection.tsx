@@ -4,25 +4,19 @@ import React from "react";
 
 const projects = [
   {
-    title: "PulseBoard",
-    desc: "Real-time analytics dashboard for multi-service monitoring with stream-based alerts and dynamic visualizations.",
-    tags: ["Next.js", "Node", "WebSockets", "Tailwind"],
+    title: "Foodie Frenzy",
+    desc: "A full-stack restaurant platform supporting user accounts, secure JWT-based login, order management, and Razorpay payment integration.",
+    tags: ["React.js", "Node.js", "Express.js", "MongoDB", "Razorpay", "Firebase"],
+    github: "https://github.com/Ani0811/foodie-frenzy-5656323623",
+    live: "https://foodie-frenzy-frontend-hpkf.onrender.com"
   },
   {
-    title: "CodeFoundry",
-    desc: "Developer collaboration suite featuring live coding rooms, automated tests, and distributed task boards.",
-    tags: ["React", "MongoDB", "Express", "Docker"],
-  },
-  {
-    title: "NeonStack CMS",
-    desc: "Headless content infrastructure for product teams shipping fast, localized experiences worldwide.",
-    tags: ["TypeScript", "PostgreSQL", "Prisma", "AWS"],
-  },
-  {
-    title: "Atlas Stream",
-    desc: "Enterprise-grade data pipeline interface for managing large-scale, low-latency streaming workflows.",
-    tags: ["Next.js", "GraphQL", "Redis", "Kafka"],
-  },
+    title: "Rimberio Real Estate",
+    desc: "A property listing platform for real estate browsing and management. Features relational database design, secure session handling, and deployments on Azure.",
+    tags: ["React.js", "Node.js", "Express.js", "SQL", "Azure", "Razorpay"],
+    github: "https://github.com/Ani0811/realestate-frontend-react",
+    live: "https://realstate-e7bfchdfftbee4c6.centralindia-01.azurewebsites.net"
+  }
 ];
 
 export default function ProjectsSection() {
@@ -79,13 +73,17 @@ export default function ProjectsSection() {
               <p className="text-slate-400 mb-8 leading-relaxed text-sm">{proj.desc}</p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <a
-                  href="https://github.com"
+                  href={proj.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-1 py-3 bg-white/5 border border-white/10 rounded-lg font-medium text-white hover:bg-white/10 hover:border-cyan-500/30 transition-all text-center shadow-sm"
                 >
                   GitHub
                 </a>
                 <a
-                  href="#"
+                  href={proj.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-1 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black transition-all text-center shadow-sm"
                 >
                   Live Demo
