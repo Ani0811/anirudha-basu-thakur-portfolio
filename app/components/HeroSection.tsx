@@ -3,7 +3,7 @@
 import React from "react";
 import { ScrollValues } from "../hooks/useScrollAnimation";
 
-interface Props extends ScrollValues {}
+interface Props extends ScrollValues { }
 
 export default function HeroSection({
   scrollY,
@@ -39,14 +39,14 @@ export default function HeroSection({
       );
     };
 
-    let typingSpeed = isDeleting ? 40 : 100;
+    let typingSpeed = isDeleting ? 50 : 135;
 
     if (!isDeleting && text === fullText) {
       timer = setTimeout(() => setIsDeleting(true), 2000);
     } else if (isDeleting && text === "") {
       setIsDeleting(false);
       setLoopNum((prev) => prev + 1);
-      timer = setTimeout(() => {}, 500);
+      timer = setTimeout(() => { }, 500);
     } else {
       timer = setTimeout(handleType, typingSpeed);
     }

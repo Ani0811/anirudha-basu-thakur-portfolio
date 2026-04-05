@@ -24,7 +24,7 @@ export interface ScrollValues {
 
 const framesFolder = "hero-frames";
 export const frameSources = Array.from(
-  { length: 70 },
+  { length: 64 },
   (_, index) => `/${framesFolder}/${String(index + 1).padStart(2, "0")}.png`
 );
 
