@@ -276,8 +276,8 @@ export default function SkillsSection() {
           A quick look at the academic milestones and experiences that shaped my mindset as a developer.
         </p>
         <div className="relative">
-          {/* Animated vertical line - CENTERED */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 overflow-hidden">
+          {/* Animated vertical line - CENTERED ON DESKTOP, LEFT ON MOBILE */}
+          <div className="absolute left-6 md:left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 overflow-hidden">
             <div className="absolute inset-0 bg-linear-to-b from-cyan-500/30 via-blue-500/20 to-transparent" />
             {/* Animated glow moving down */}
             <div 
@@ -289,46 +289,20 @@ export default function SkillsSection() {
           </div>
 
           {/* Animated Developer Character - CENTERED ON LINE */}
-          <div
-            className="absolute left-1/2 transition-all duration-700 ease-out z-20 pointer-events-none"
+          <div 
+            className="absolute left-6 md:left-1/2 transition-all duration-700 ease-out z-20 pointer-events-none"
             style={{
               top: cardPositions[activeIndex] ? `${cardPositions[activeIndex] + 100}px` : '100px',
               transform: 'translateX(-50%)',
             }}
           >
-            <div className="relative flex items-center justify-center" style={{ width: 'fit-content' }}>
-              <div className="relative z-10" style={{ animation: 'bob 3s ease-in-out infinite' }}>
-                <div className="w-10 h-10 sm:w-14 md:w-20">
-                  <svg viewBox="0 0 64 64" className="w-full h-full" role="img" aria-label="Developer illustration">
-                    <defs>
-                      <linearGradient id="g1" x1="0" x2="1">
-                        <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.18" />
-                        <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.06" />
-                      </linearGradient>
-                    </defs>
-                    {/* soft halo */}
-                    <circle cx="32" cy="22" r="18" fill="url(#g1)" />
-                    {/* head */}
-                    <circle cx="32" cy="22" r="9" fill="#f7d6c9" />
-                    {/* hair */}
-                    <path d="M24 18c1.5-3 4-5 8-5s6.5 2 8 5c0 0-1 4-8 4s-8-4-8-4z" fill="#0f172a" opacity="0.9" />
-                    {/* glasses */}
-                    <g stroke="#0f172a" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="22" y="18" width="8" height="4" rx="1" />
-                      <rect x="34" y="18" width="6" height="4" rx="1" />
-                      <path d="M30 20h4" />
-                    </g>
-                    {/* laptop */}
-                    <rect x="18" y="34" width="28" height="12" rx="2" fill="#0f172a" />
-                    <rect x="22" y="36" width="20" height="8" rx="1.2" fill="#06b6d4" />
-                    <rect x="16" y="46" width="32" height="6" rx="2" fill="#0b1220" />
-                    {/* subtle screen shine */}
-                    <rect x="24" y="38" width="12" height="4" rx="0.8" fill="#ffffff" opacity="0.08" />
-                  </svg>
-                </div>
+            <div className="relative">
+              {/* Character with running animation */}
+              <div className="text-4xl sm:text-5xl animate-bounce" style={{ animationDuration: '1s' }}>
+                👨‍💻
               </div>
-
-              <div className="absolute -z-10 w-36 h-20 sm:w-44 sm:h-24 md:w-56 md:h-28 rounded-full bg-cyan-400/18 blur-3xl" />
+              {/* Glow effect */}
+              <div className="absolute inset-0 blur-2xl bg-cyan-400/60 rounded-full scale-150 -z-10" />
             </div>
           </div>
 
@@ -350,7 +324,7 @@ export default function SkillsSection() {
                 >
                   {/* Card positioned left or right of center */}
                   <div 
-                    className={`w-full sm:w-[45%] ${isLeft ? 'mr-auto' : 'ml-auto'}`}
+                    className={`w-[calc(100%-4rem)] ml-auto md:w-[45%] ${isLeft ? 'md:mr-auto md:ml-0' : 'md:ml-auto'}`}
                     onClick={() => toggleFlip(i)}
                   >
                     {/* 3D Flip Card Container */}
@@ -465,8 +439,12 @@ export default function SkillsSection() {
                     </div>
                   </div>
 
-                  {/* Connection line to center (optional visual) */}
-                  <div className={`absolute top-24 ${isLeft ? 'right-0' : 'left-0'} w-8 sm:w-12 h-px bg-linear-to-${isLeft ? 'r' : 'l'} from-cyan-500/30 to-transparent`} 
+                  {/* Connection line to center (Desktop) */}
+                  <div className={`hidden md:block absolute top-24 ${isLeft ? 'right-0' : 'left-0'} w-8 sm:w-12 h-px bg-linear-to-${isLeft ? 'r' : 'l'} from-cyan-500/30 to-transparent`} 
+                       style={{ top: '50%' }} />
+                       
+                  {/* Connection line (Mobile) */}
+                  <div className="md:hidden absolute left-6 w-10 h-px bg-linear-to-r from-cyan-500/50 to-transparent"
                        style={{ top: '50%' }} />
                 </div>
               );
@@ -855,11 +833,6 @@ export default function SkillsSection() {
             opacity: 0.6;
             transform: scaleX(1);
           }
-        }
-
-        @keyframes bob {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
         }
       `}</style>
     </>
