@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const PROJECTS_PER_PAGE = 4;
 
-const projects = [
+const liveProjects = [
   {
     title: "Foodie Frenzy",
     desc: "A full-stack restaurant platform supporting user accounts, secure JWT-based login, order management, and Razorpay payment integration.",
@@ -24,28 +24,113 @@ const projects = [
   }
 ];
 
+const legacyProjects = [
+  {
+    title: "Console BMS (Bank Management System)",
+    desc: "A console-based banking management system written in Python. Supports account creation, balance queries, deposits/withdrawals and batch processing through CSV files for automated transactions.",
+    tags: ["Python", "CSV", "CLI", "File I/O"],
+    github: "",
+    live: "",
+    image: ""
+  },
+  {
+    title: "User Management System (PHP)",
+    desc: "A classic web-based user management panel built in PHP. Implements user registration, login (sessions), role-based access, and CRUD operations for user profiles. Designed for LAMP/XAMPP deployments.",
+    tags: ["PHP", "MySQL", "Sessions", "CRUD"],
+    github: "",
+    live: "",
+    image: ""
+  }
+];
+
 export default function ProjectsSection() {
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  const totalPages = Math.ceil(projects.length / PROJECTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
-  const endIndex = startIndex + PROJECTS_PER_PAGE;
-  const currentProjects = projects.slice(startIndex, endIndex);
+  const renderProjectCard = (proj: any, i: number) => (
+    <div
+      key={i}
+      className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)] cursor-pointer"
+    >
+      {/* Project Thumbnail */}
+      <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden flex items-center justify-center">
+        {proj.image ? (
+          <Image
+            src={proj.image}
+            alt={proj.title}
+            fill
+            className="object-contain transition-transform duration-700"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={i < 2}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-full opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+            <svg className="w-12 h-12 mb-4 text-cyan-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+            <span className="text-sm font-mono text-cyan-400/80 tracking-widest uppercase">Legacy Application</span>
+          </div>
+        )}
+      </div>
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-      // Scroll to projects section
-      document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+      {/* Project Details */}
+      <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14] h-full">
+        {/* Technology Tags */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {proj.tags.map((tag: string) => (
+            <span
+              key={tag}
+              className="text-[0.7rem] sm:text-xs font-mono px-2.5 py-1 bg-white/3 text-cyan-300/90 border border-cyan-500/20 rounded-md backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-500/40 transition-all duration-300"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
 
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-      document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+        {/* Project Title */}
+        <h4 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
+          {proj.title}
+        </h4>
+
+        {/* Project Description */}
+        <p className="text-slate-400/90 mb-8 leading-relaxed text-sm sm:text-base">
+          {proj.desc}
+        </p>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+          {(!proj.github && !proj.live) ? (
+            <a
+              href="#contact"
+              className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
+            >
+              Request Code
+            </a>
+          ) : (
+            <>
+              {proj.github && (
+                <a
+                  href={proj.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 px-4 bg-white/4 border border-white/10 rounded-lg font-medium text-white hover:bg-white/8 hover:border-cyan-500/30 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
+                >
+                  GitHub
+                </a>
+              )}
+              {proj.live && (
+                <a
+                  href={proj.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
+                >
+                  Live Demo
+                </a>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-16 sm:pt-24 pb-8 sm:pb-12">
@@ -70,117 +155,27 @@ export default function ProjectsSection() {
         </a>
       </div>
 
-      {/* Projects Grid */}
-      <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-        {currentProjects.map((proj, i) => (
-          <div
-            key={i}
-            className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)] cursor-pointer"
-          >
-            {/* Project Thumbnail */}
-            <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden">
-              {/* Image */}
-              {proj.image && (
-                <Image
-                  src={proj.image}
-                  alt={proj.title}
-                  fill
-                  className="object-contain transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority={i < 2}
-                />
-              )}
-            </div>
-
-            {/* Project Details */}
-            <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14]">
-              {/* Technology Tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {proj.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[0.7rem] sm:text-xs font-mono px-2.5 py-1 bg-white/3 text-cyan-300/90 border border-cyan-500/20 rounded-md backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-500/40 transition-all duration-300"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Project Title */}
-              <h4 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
-                {proj.title}
-              </h4>
-
-              {/* Project Description */}
-              <p className="text-slate-400/90 mb-8 leading-relaxed text-sm sm:text-base">
-                {proj.desc}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href={proj.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 px-4 bg-white/4 border border-white/10 rounded-lg font-medium text-white hover:bg-white/8 hover:border-cyan-500/30 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
-                >
-                  GitHub
-                </a>
-                <a
-                  href={proj.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
-                >
-                  Live Demo
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Live Projects */}
+      <div className="mb-12">
+        <h3 className="text-2xl font-bold text-white mb-6 border-b border-white/10 pb-3 flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          Live Projects
+        </h3>
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+          {liveProjects.map(renderProjectCard)}
+        </div>
       </div>
 
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-12">
-          <button
-            onClick={goToPrevPage}
-            disabled={currentPage === 1}
-            className="group flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-medium text-white hover:bg-white/10 hover:border-cyan-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:border-white/10"
-          >
-            <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span>
-            <span>Previous</span>
-          </button>
-
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => {
-                  setCurrentPage(page);
-                  document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className={`w-10 h-10 rounded-lg font-mono text-sm transition-all duration-300 ${
-                  currentPage === page
-                    ? 'bg-cyan-500 text-black border border-cyan-400 shadow-lg shadow-cyan-500/30'
-                    : 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-cyan-500/30'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={goToNextPage}
-            disabled={currentPage === totalPages}
-            className="group flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-medium text-white hover:bg-white/10 hover:border-cyan-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:border-white/10"
-          >
-            <span>Next</span>
-            <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-          </button>
+      {/* Legacy Projects */}
+      <div className="mt-20">
+        <h3 className="text-2xl font-bold text-white mb-6 border-b border-white/10 pb-3 flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+          Older / Legacy Projects
+        </h3>
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+          {legacyProjects.map(renderProjectCard)}
         </div>
-      )}
+      </div>
     </section>
   );
 }
