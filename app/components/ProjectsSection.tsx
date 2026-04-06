@@ -30,7 +30,9 @@ export default function ProjectsSection() {
           </h2>
         </div>
         <a
-          href="https://github.com"
+          href="https://github.com/Ani0811"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-mono text-sm hover:underline underline-offset-4"
         >
           VIEW GITHUB ARCHIVE →

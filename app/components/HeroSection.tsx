@@ -108,36 +108,40 @@ export default function HeroSection({
 
               {/* Name */}
               <h1
-                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none mb-3 sm:mb-4 drop-shadow-md transition-all duration-300"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none mb-2 sm:mb-4 drop-shadow-md transition-all duration-300"
                 style={{ opacity: nameReveal, transform: `translateY(${(1 - nameReveal) * 22}px)` }}
               >
-                <span className="block drop-shadow-lg">Anirudha</span>
-                <span className="block text-slate-200 drop-shadow-lg">Basu Thakur</span>
+                <span className="block text-transparent bg-clip-text bg-linear-to-r from-indigo-400 via-purple-400 to-cyan-400 animate-gradient bg-size-[200%_auto] pb-1">
+                  Anirudha
+                </span>
+                <span className="block text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-emerald-400 to-indigo-400 animate-gradient bg-size-[200%_auto] pb-1">
+                  Basu Thakur
+                </span>
               </h1>
 
               {/* Role */}
               <h2
-                className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-4 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-8 sm:min-h-10"
+                className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold mb-6 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-6 sm:min-h-10"
                 style={{ opacity: roleReveal, transform: `translateY(${(1 - roleReveal) * 24}px)` }}
               >
                 <span>{text || "\u00A0"}</span>
-                <span className="w-0.5 sm:w-0.75 h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
+                <span className="w-[1.5px] sm:w-0.5 h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
               </h2>
 
               {/* CTA Buttons */}
               <div
-                className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 transition-all duration-300"
+                className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 transition-all duration-300 w-full mx-auto md:mx-0"
                 style={{ opacity: actionReveal, transform: `translateY(${(1 - actionReveal) * 28}px)` }}
               >
                 <a
                   href="#projects"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
+                  className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-3.5 bg-linear-to-r from-cyan-500 to-blue-500 text-white text-sm sm:text-base font-bold rounded-xl hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all duration-300 text-center"
                 >
                   View Projects
                 </a>
                 <a
                   href="#contact"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 hover:border-cyan-500/50 hover:scale-105 active:scale-95 backdrop-blur-md transition-all duration-300"
+                  className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-3.5 bg-white/5 border border-white/10 text-white text-sm sm:text-base font-bold rounded-xl hover:bg-white/10 hover:border-cyan-500/50 hover:scale-105 active:scale-95 backdrop-blur-md transition-all duration-300 text-center"
                 >
                   Contact Me
                 </a>
@@ -156,7 +160,7 @@ export default function HeroSection({
       </section>
 
       {/* CINEMATIC TRANSITION STATEMENT */}
-      <section className="py-20 sm:py-32 flex items-center justify-center relative mt-[-16vh] sm:mt-[-20vh]">
+      <section className="py-20 sm:py-32 flex items-center justify-center relative mt-[-5vh] sm:mt-[-10vh]">
         <div className="absolute top-1/2 left-0 w-full h-px bg-[linear-gradient(to_right,transparent,var(--tw-gradient-stops),transparent)] from-cyan-500/50 to-transparent animate-pulse" />
         <h2
           className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-center text-white/90 tracking-tight relative z-10 px-4 sm:px-6 transition-all duration-500 animate-float"
@@ -166,7 +170,7 @@ export default function HeroSection({
           }}
         >
           <span className="inline-block animate-gradient bg-linear-to-r from-white via-cyan-300 to-blue-400 bg-clip-text text-transparent bg-size-[200%_auto]">
-            Crafting modern web experiences
+            Crafting Modern Experiences
           </span>
         </h2>
       </section>
