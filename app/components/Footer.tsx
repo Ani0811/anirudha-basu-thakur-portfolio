@@ -179,11 +179,8 @@ export default function Footer() {
           <div className="border-t border-white/5 animate-fade-in" style={{ animationDelay: '0.9s' }}>
             <div className="max-w-6xl mx-auto px-6 py-5">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-                <p className="text-slate-600 font-mono animate-fade-in-up" style={{ animationDelay: '1s' }}>
-                  © {currentYear} <span className="text-slate-400">Anirudha Basu Thakur</span>
-                </p>
-                <p className="text-slate-600 font-mono flex items-center gap-2 animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
-                  Built with <span className="text-cyan-500 animate-pulse-subtle font-semibold">Next.js</span> & <span className="text-purple-400 animate-pulse-subtle font-semibold">Tailwind</span>
+                <p className="text-slate-400 font-mono animate-fade-in-up" style={{ animationDelay: '1s' }}>
+                  Acknowledgement: Built with ❤️. Thanks to everyone who supported this project.
                 </p>
               </div>
             </div>

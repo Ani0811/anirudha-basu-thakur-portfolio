@@ -301,6 +301,7 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
                       &gt; Message
                     </label>
                     <textarea
+                      name="message"
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}

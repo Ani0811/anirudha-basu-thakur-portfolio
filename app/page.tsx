@@ -9,6 +9,7 @@ import AboutSection from "./components/AboutSection";
 import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
+import RateMyPortfolioSection from "./components/RateMyPortfolioSection";
 import Footer from "./components/Footer";
 import UpdateNotification from "./components/UpdateNotification";
 import RainBackground from "./components/RainBackground";
@@ -79,6 +80,7 @@ export default function Portfolio() {
         <SkillsSection />
         <ProjectsSection />
         <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
+        <RateMyPortfolioSection />
       </main>
 
       <Footer />

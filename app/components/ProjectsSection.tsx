@@ -44,93 +44,197 @@ const legacyProjects = [
 ];
 
 export default function ProjectsSection() {
-  const renderProjectCard = (proj: any, i: number) => (
-    <div
-      key={i}
-      className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)] cursor-pointer"
-    >
-      {/* Project Thumbnail */}
-      <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden flex items-center justify-center">
-        {proj.image ? (
-          <Image
-            src={proj.image}
-            alt={proj.title}
-            fill
-            className="object-contain transition-transform duration-700"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority={i < 2}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full opacity-50 group-hover:opacity-100 transition-opacity duration-500">
-            <svg className="w-12 h-12 mb-4 text-cyan-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-            <span className="text-sm font-mono text-cyan-400/80 tracking-widest uppercase">Legacy Application</span>
-          </div>
-        )}
-      </div>
+  const [roastingProject, setRoastingProject] = useState<string | null>(null);
+  const [roastResults, setRoastResults] = useState<Record<string, string>>({});
+  const [requestingProject, setRequestingProject] = useState<string | null>(null);
 
-      {/* Project Details */}
-      <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14] h-full">
-        {/* Technology Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {proj.tags.map((tag: string) => (
-            <span
-              key={tag}
-              className="text-[0.7rem] sm:text-xs font-mono px-2.5 py-1 bg-white/3 text-cyan-300/90 border border-cyan-500/20 rounded-md backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-500/40 transition-all duration-300"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+  const handleRoastCode = async (project: any) => {
+    if (!project.github) return;
+    
+    setRoastingProject(project.title);
+    setRoastResults(prev => ({ ...prev, [project.title]: '' }));
 
-        {/* Project Title */}
-        <h4 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
-          {proj.title}
-        </h4>
+    try {
+      // Fetch code from GitHub repo
+      const repoUrl = project.github.replace('https://github.com/', '');
+      const response = await fetch(`/api/ai/roast-github`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repoUrl, projectName: project.title }),
+      });
 
-        {/* Project Description */}
-        <p className="text-slate-400/90 mb-8 leading-relaxed text-sm sm:text-base">
-          {proj.desc}
-        </p>
+      const data = await response.json();
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-          {(!proj.github && !proj.live) ? (
-            <a
-              href="#contact"
-              className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
-            >
-              Request Code
-            </a>
+      if (response.ok) {
+        setRoastResults(prev => ({ ...prev, [project.title]: data.roast }));
+      } else {
+        setRoastResults(prev => ({ ...prev, [project.title]: `Error: ${data.error}` }));
+      }
+    } catch (error) {
+      setRoastResults(prev => ({ ...prev, [project.title]: 'Failed to roast code. Please try again.' }));
+    } finally {
+      setRoastingProject(null);
+    }
+  };
+
+  const handleRequestCode = async (project: any) => {
+    setRequestingProject(project.title);
+
+    try {
+      const response = await fetch('/api/ai/generate-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectName: project.title,
+          techStack: project.tags.join(", ")
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Auto-fill contact form
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          const messageTextarea = contactSection.querySelector('textarea[name="message"]') as HTMLTextAreaElement;
+          if (messageTextarea) {
+            messageTextarea.value = data.message;
+            messageTextarea.focus();
+            messageTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to generate message:', error);
+    } finally {
+      setRequestingProject(null);
+    }
+  };
+
+  const renderProjectCard = (proj: any, i: number) => {
+    const hasRoast = roastResults[proj.title];
+    const isRoasting = roastingProject === proj.title;
+    const isRequesting = requestingProject === proj.title;
+
+    return (
+      <div
+        key={i}
+        className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)]"
+      >
+        {/* Project Thumbnail */}
+        <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden flex items-center justify-center">
+          {proj.image ? (
+            <Image
+              src={proj.image}
+              alt={proj.title}
+              fill
+              className="object-contain transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority={i < 2}
+            />
           ) : (
-            <>
-              {proj.github && (
-                <a
-                  href={proj.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 px-4 bg-white/4 border border-white/10 rounded-lg font-medium text-white hover:bg-white/8 hover:border-cyan-500/30 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
-                >
-                  GitHub
-                </a>
-              )}
-              {proj.live && (
-                <a
-                  href={proj.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
-                >
-                  Live Demo
-                </a>
-              )}
-            </>
+            <div className="flex flex-col items-center justify-center w-full h-full opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+              <svg className="w-12 h-12 mb-4 text-cyan-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+              <span className="text-sm font-mono text-cyan-400/80 tracking-widest uppercase">Legacy Application</span>
+            </div>
           )}
         </div>
+
+        {/* Project Details */}
+        <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14]">
+          {/* Technology Tags */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {proj.tags.map((tag: string) => (
+              <span
+                key={tag}
+                className="text-[0.7rem] sm:text-xs font-mono px-2.5 py-1 bg-white/3 text-cyan-300/90 border border-cyan-500/20 rounded-md backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-500/40 transition-all duration-300"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Project Title */}
+          <h4 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
+            {proj.title}
+          </h4>
+
+          {/* Project Description */}
+          <p className="text-slate-400/90 mb-8 leading-relaxed text-sm sm:text-base">
+            {proj.desc}
+          </p>
+
+          {/* Roast Result */}
+          {hasRoast && (
+            <div className="mb-6 p-4 bg-linear-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🔥</span>
+                <h5 className="font-bold text-orange-400">The Verdict</h5>
+              </div>
+              <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{hasRoast}</p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+            {(!proj.github && !proj.live) ? (
+              <button
+                onClick={() => handleRequestCode(proj)}
+                disabled={isRequesting}
+                className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRequesting ? 'Generating...' : 'Request Code'}
+              </button>
+            ) : (
+              <>
+                {proj.github && (
+                  <>
+                    <a
+                      href={proj.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-3 px-4 bg-white/4 border border-white/10 rounded-lg font-medium text-white hover:bg-white/8 hover:border-cyan-500/30 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
+                    >
+                      GitHub
+                    </a>
+                    <button
+                      onClick={() => handleRoastCode(proj)}
+                      disabled={isRoasting}
+                      className="flex-1 py-3 px-4 bg-linear-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg font-medium text-orange-300 hover:from-orange-500 hover:to-red-500 hover:text-white transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(234,88,12,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isRoasting ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Roasting...
+                        </span>
+                      ) : (
+                        <>🔥 Roast My Code</>
+                      )}
+                    </button>
+                  </>
+                )}
+                {proj.live && (
+                  <a
+                    href={proj.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
+                  >
+                    Live Demo
+                  </a>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-16 sm:pt-24 pb-8 sm:pb-12">

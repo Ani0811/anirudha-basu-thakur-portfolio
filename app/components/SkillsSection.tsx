@@ -41,7 +41,7 @@ const skillGroups = [
   },
   { 
     category: "Frontend",
-    icon: "⟨/⟩",
+    icon: "💻",
     description: "User Interface Development",
     skills: [
       { name: "React.js", level: 95, icon: "⚛" },

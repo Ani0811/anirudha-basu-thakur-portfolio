@@ -1,13 +1,7 @@
 "use client";
 
 import React from "react";
-
-const stats = [
-  { label: "Projects Built", value: "38+" },
-  { label: "Technologies Used", value: "24+" },
-  { label: "Years Learning", value: "5+" },
-  { label: "Commits", value: "2K+" },
-];
+import GithubStats from "./GithubStats";
 
 const badges = [
   { label: "Full-Stack Development", icon: "⚡" },
@@ -109,39 +103,11 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Right column – stats */}
-        <div className="grid grid-cols-2 gap-4">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className={`group p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-500/50 transition-all duration-500 hover:bg-white/10 relative overflow-hidden ${
-                isVisible ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-90 rotate-3'
-              }`}
-              style={{ 
-                transitionDelay: `${i * 100 + 400}ms`,
-                transformOrigin: 'center'
-              }}
-            >
-              {/* Animated shine effect on load */}
-              <div 
-                className={`absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full transition-transform duration-1000 ${
-                  isVisible ? 'translate-x-full' : ''
-                }`}
-                style={{ transitionDelay: `${i * 100 + 600}ms` }}
-              />
-              
-              <div className="relative z-10">
-                <div className="text-4xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-all duration-300 group-hover:scale-110 transform">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">{stat.label}</div>
-              </div>
-              
-              {/* Pulsing corner accent */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-br from-cyan-500/0 via-cyan-500/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute bottom-0 left-0 w-20 h-20 bg-linear-to-tr from-blue-500/0 via-blue-500/10 to-transparent rounded-tr-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
-          ))}
+        {/* Right column – GitHub stats */}
+        <div className={`transition-all duration-700 delay-300 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
+          <GithubStats username="Ani0811" />
         </div>
       </div>
     </section>
