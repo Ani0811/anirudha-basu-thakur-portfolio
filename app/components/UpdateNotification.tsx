@@ -9,10 +9,10 @@ export default function UpdateNotification() {
     <>
       <button
         onClick={() => setShowNotification((value) => !value)}
-        className="fixed bottom-6 left-6 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 transition-all duration-300 hover:bg-cyan-500/20 hover:scale-110"
+        className="fixed bottom-6 left-6 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-cyan-500/15 bg-transparent p-0 text-cyan-400/70 backdrop-blur-sm transition-colors duration-300 hover:bg-cyan-500/10 hover:text-cyan-300"
         aria-label="Check updates"
       >
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+        <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
