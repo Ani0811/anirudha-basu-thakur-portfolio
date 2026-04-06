@@ -124,18 +124,6 @@ export default function HeroSection({
                 <span className="w-0.5 sm:w-0.75 h-[1em] bg-cyan-400 ml-1.5 animate-pulse" />
               </h2>
 
-              {/* Intro */}
-              <p
-                className="text-sm sm:text-base md:text-lg text-slate-200 font-light mb-8 sm:mb-10 max-w-xl mx-auto lg:mx-0 drop-shadow-md transition-all duration-300 leading-relaxed"
-                style={{ opacity: introReveal, transform: `translateY(${(1 - introReveal) * 26}px)` }}
-              >
-                Building modern web systems. <br />
-                <span className="text-slate-400 mt-1 block text-xs sm:text-sm md:text-base">
-                  I construct interactive web experiences, scalable backend structures, and
-                  high-performance tools driving today&apos;s web ecosystems.
-                </span>
-              </p>
-
               {/* CTA Buttons */}
               <div
                 className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 transition-all duration-300"
@@ -143,13 +131,13 @@ export default function HeroSection({
               >
                 <a
                   href="#projects"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-white text-black font-bold rounded-lg hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)]"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
                 >
                   View Projects
                 </a>
                 <a
                   href="#contact"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-[#0a0a0c]/80 text-white font-bold rounded-lg hover:bg-[#111116] backdrop-blur-md transition-all shadow-xl"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 hover:border-cyan-500/50 hover:scale-105 active:scale-95 backdrop-blur-md transition-all duration-300"
                 >
                   Contact Me
                 </a>
@@ -169,15 +157,19 @@ export default function HeroSection({
 
       {/* CINEMATIC TRANSITION STATEMENT */}
       <section className="py-20 sm:py-32 flex items-center justify-center relative mt-[-16vh] sm:mt-[-20vh]">
-        <div className="absolute top-1/2 left-0 w-full h-px bg-[linear-gradient(to_right,transparent,var(--tw-gradient-stops),transparent)] from-cyan-500/50 to-transparent" />
+        <div className="absolute top-1/2 left-0 w-full h-px bg-[linear-gradient(to_right,transparent,var(--tw-gradient-stops),transparent)] from-cyan-500/50 to-transparent animate-pulse" />
         <h2
-          className="text-3xl sm:text-4xl md:text-7xl font-black text-center text-white/90 tracking-tight relative z-10 px-4 sm:px-6 glow-text transition-opacity duration-500"
-          style={{ opacity: statementOpacity }}
+          className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-center text-white/90 tracking-tight relative z-10 px-4 sm:px-6 transition-all duration-500 animate-float"
+          style={{ 
+            opacity: statementOpacity,
+            textShadow: '0 0 30px rgba(34,211,238,0.35), 0 0 70px rgba(34,211,238,0.2)',
+          }}
         >
-          Crafting modern web experiences.
+          <span className="inline-block animate-gradient bg-linear-to-r from-white via-cyan-300 to-blue-400 bg-clip-text text-transparent bg-size-[200%_auto]">
+            Crafting modern web experiences
+          </span>
         </h2>
       </section>
     </>
   );
 }
-

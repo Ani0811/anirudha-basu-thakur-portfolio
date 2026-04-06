@@ -67,7 +67,7 @@ export default function Portfolio() {
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
-      <main className="relative z-10 flex flex-col gap-24 sm:gap-32 pb-24 sm:pb-32">
+      <main className="relative z-10 flex flex-col gap-12 sm:gap-16 pb-24 sm:pb-32">
         <HeroSection {...scrollValues} />
         <AboutSection />
         <SkillsSection />
@@ -104,10 +104,28 @@ export default function Portfolio() {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.5; transform: scale(0.9); }
         }
+
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .animate-gradient {
+          animation: gradient 4s ease infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-6px) scale(1.01); }
+        }
+
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
       `,
         }}
       />
     </div>
   );
 }
-
