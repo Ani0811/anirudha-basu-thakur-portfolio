@@ -42,7 +42,15 @@ export default function RainBackground() {
     let lightningTimer = Math.random() * 400 + 200;
     let lightningOpacity = 0;
 
-    const draw = () => {
+    let lastTime = performance.now();
+
+    const draw = (time: number) => {
+      // Calculate delta to keep animation smooth even if frames drop
+      const deltaTime = time - lastTime || 16;
+      lastTime = time;
+      // Normalizing speed multiplier (assuming 60fps ~ 16ms per frame)
+      const speedMult = deltaTime / 16;
+
       ctx.clearRect(0, 0, width, height);
 
       // --- Lightning Effect ---
@@ -50,18 +58,18 @@ export default function RainBackground() {
         ctx.fillStyle = `rgba(200, 240, 255, ${lightningOpacity})`;
         ctx.fillRect(0, 0, width, height);
         
-        lightningOpacity -= 0.015; // Subtle fade out
+        lightningOpacity -= 0.005 * speedMult; // Much slower fade out for longer lightning
         
         // Random strobe effect during a flash
-        if (Math.random() < 0.2 && lightningOpacity > 0.03) {
-          lightningOpacity += 0.05;
+        if (Math.random() < 0.2 && lightningOpacity > 0.05) {
+          lightningOpacity += 0.08;
         }
       } else {
-        lightningTimer--;
+        lightningTimer -= speedMult;
         if (lightningTimer <= 0) {
           // Trigger new subtle lightning strike
-          lightningOpacity = Math.random() * 0.12 + 0.05; // max ~0.17 opacity
-          lightningTimer = Math.random() * 600 + 300; // Wait 300-900 frames for next strike (~5-15s)
+          lightningOpacity = Math.random() * 0.2 + 0.15; // Higher opacity (up to ~0.35)
+          lightningTimer = Math.random() * 400 + 200; // More frequent (wait 200-600 frames)
         }
       }
 
@@ -79,9 +87,9 @@ export default function RainBackground() {
         ctx.lineWidth = drop.width;
         ctx.stroke();
 
-        // Update position
-        drop.y += drop.speed;
-        drop.x -= drop.speed * 0.1; // match the tilt angle
+        // Update position using deltaTime multiplier so speed remains constant over time
+        drop.y += drop.speed * speedMult;
+        drop.x -= drop.speed * 0.1 * speedMult; // match the tilt angle
 
         // Respawn when out of bounds
         if (drop.y > height || drop.x < 0) {
@@ -93,9 +101,9 @@ export default function RainBackground() {
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    animationFrameId = requestAnimationFrame(draw);
 
-    window.addEventListener("resize", setSize);
+    window.addEventListener("resize", setSize, { passive: true });
 
     return () => {
       window.removeEventListener("resize", setSize);
@@ -107,6 +115,7 @@ export default function RainBackground() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none mix-blend-screen"
+      style={{ transform: "translateZ(0)" }}
     />
   );
 }

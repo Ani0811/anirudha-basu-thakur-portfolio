@@ -71,14 +71,32 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
     "",
   ]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setFormData({ name: "", email: "", message: "" });
+        alert("Thanks! Your message has been sent successfully.");
+      } else {
+        alert(data.error || "Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      alert("Error connecting to server. Please try again later.");
+    } finally {
       setIsSubmitting(false);
-      setFormData({ name: "", email: "", message: "" });
-      alert("Message sent! (This is a demo)");
-    }, 1500);
+    }
   };
 
   const handleTerminalCommand = (e: React.FormEvent) => {

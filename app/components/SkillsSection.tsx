@@ -339,10 +339,10 @@ export default function SkillsSection() {
                     >
                       {/* Card Front */}
                       <div 
-                        className={`group/card absolute inset-0 w-full overflow-hidden bg-linear-to-br from-[#111116] to-[#1a1a24] border rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-2xl transition-all duration-500 ${
+                        className={`group/card absolute inset-0 w-full overflow-hidden bg-linear-to-br from-[#111116]/80 to-[#1a1a24]/90 border rounded-2xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${
                           activeIndex === i 
-                            ? 'border-cyan-500/60 shadow-cyan-500/30 scale-105' 
-                            : 'border-white/10 hover:border-cyan-500/40 hover:scale-[1.02] hover:shadow-cyan-500/20'
+                            ? 'border-cyan-500/60 shadow-cyan-500/40 scale-105 ring-1 ring-cyan-400/30' 
+                            : 'border-white/10 hover:border-cyan-500/50 hover:scale-105 hover:-translate-y-2 hover:shadow-cyan-500/20'
                         }`}
                         style={{
                           backfaceVisibility: 'hidden',
@@ -390,10 +390,10 @@ export default function SkillsSection() {
 
                       {/* Card Back */}
                       <div 
-                        className={`group/back absolute inset-0 w-full overflow-hidden bg-linear-to-br from-cyan-950/40 via-blue-950/40 to-purple-950/40 border rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-2xl transition-all duration-500 ${
+                        className={`group/back absolute inset-0 w-full overflow-hidden bg-linear-to-br from-cyan-950/60 via-blue-950/60 to-purple-950/60 border rounded-2xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${
                           activeIndex === i 
-                            ? 'border-cyan-400/60 shadow-cyan-500/30' 
-                            : 'border-cyan-500/30 hover:border-cyan-400/50'
+                            ? 'border-cyan-400/80 shadow-cyan-500/40 ring-1 ring-cyan-400/40 hover:-translate-y-2' 
+                            : 'border-cyan-500/30 hover:border-cyan-400/60 hover:-translate-y-2 hover:shadow-cyan-400/30'
                         }`}
                         style={{
                           backfaceVisibility: 'hidden',
@@ -466,7 +466,7 @@ export default function SkillsSection() {
           {skillGroups.map((group, i) => (
             <div
               key={i}
-              className="group/skillcard relative bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-cyan-500/50 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-cyan-500/20 overflow-hidden"
+              className="group/skillcard relative bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-cyan-500/50 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-cyan-500/20 overflow-hidden"
               style={{
                 animation: `fadeInUp 0.6s ease-out ${i * 0.15}s both`
               }}
