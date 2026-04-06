@@ -10,6 +10,7 @@ import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import UpdateNotification from "./components/UpdateNotification";
 
 const bootMessages = [
   "Booting developer workspace...",
@@ -23,6 +24,7 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [bootText, setBootText] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [terminalMode, setTerminalMode] = useState(false);
 
   // Boot animation sequence
   useEffect(() => {
@@ -72,10 +74,11 @@ export default function Portfolio() {
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
-        <ContactSection />
+        <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
       </main>
 
       <Footer />
+      <UpdateNotification />
 
       {/* Global custom animations */}
       <style
