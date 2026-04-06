@@ -46,6 +46,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Mail transport verification failed: ${message}` }, { status: 500 });
     }
 
+    // Format current time in IST as dd-mm-yyyy HH:MM:SS
+    const istTime = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(new Date()).replace(/\//g, '-').replace(',', '');
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'anirudha.basuthakur@gmail.com', // Your portfolio email
@@ -88,7 +100,7 @@ export async function POST(req: Request) {
           <!-- Footer -->
           <div style="margin-top: 40px; padding-top: 20px; border-top: 1px dashed #1e293b; text-align: center;">
             <p style="color: #475569; font-size: 12px; margin: 0;">Transmitted via Your Portfolio App</p>
-            <p style="color: #334155; font-size: 10px; margin-top: 5px;">Time: ${new Date().toISOString()}</p>
+            <p style="color: #334155; font-size: 10px; margin-top: 5px;">Time: ${istTime} IST</p>
           </div>
         </div>
       `,
