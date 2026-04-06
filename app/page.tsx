@@ -11,6 +11,7 @@ import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import UpdateNotification from "./components/UpdateNotification";
+import RainBackground from "./components/RainBackground";
 
 const bootMessages = [
   "Booting developer workspace...",
@@ -61,6 +62,9 @@ export default function Portfolio() {
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full mix-blend-screen" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_40%,#000_20%,transparent_100%)] opacity-30" />
+        
+        {/* Dynamic Rain Effect */}
+        <RainBackground />
       </div>
 
       <Navbar
