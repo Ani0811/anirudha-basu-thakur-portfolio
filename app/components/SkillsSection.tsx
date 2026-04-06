@@ -500,7 +500,7 @@ export default function SkillsSection() {
                 {group.skills.map((skill, j) => (
                   <div 
                     key={j}
-                    className="group/skill"
+                    className="group/skill relative p-3 -mx-3 rounded-xl hover:bg-white/5 hover:border hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300"
                     style={{
                       animation: `slideInLeft 0.5s ease-out ${i * 0.15 + j * 0.1}s both`
                     }}
@@ -576,91 +576,155 @@ export default function SkillsSection() {
 
         {/* Glass Wheels with text below connecting line */}
         <div className="relative">
-          {/* Wheels Row */}
-          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0 lg:px-4">
+          
+          {/* ========================================= */}
+          {/* DESKTOP LAYOUT (Horizontal Flow)          */}
+          {/* ========================================= */}
+          <div className="hidden lg:block">
+            {/* Wheels Row */}
+            <div className="relative flex flex-row items-center justify-between px-4">
+              {workflowSteps.map((process, i) => (
+                <div 
+                  key={i} 
+                  className="group relative flex flex-col items-center"
+                  style={{ animation: `wheelAppear 0.8s ease-out ${i * 0.15}s both` }}
+                >
+                  {/* Glass Wheel */}
+                  <div className="relative">
+                    {/* Outer glow ring - cyan themed */}
+                    <div 
+                      className="absolute -inset-3 rounded-full bg-linear-to-r from-cyan-500/20 via-cyan-400/30 to-blue-500/20 opacity-40 group-hover:opacity-70 blur-md transition-opacity duration-500"
+                      style={{ animation: 'spinSlow 12s linear infinite' }}
+                    />
+                    
+                    {/* Main glass wheel */}
+                    <div className="relative w-32 h-32 rounded-full bg-slate-900/70 backdrop-blur-xl border-2 border-cyan-500/20 flex items-center justify-center overflow-hidden group-hover:border-cyan-400/40 group-hover:shadow-2xl group-hover:shadow-cyan-500/30 transition-all duration-500 group-hover:scale-110">
+                      
+                      {/* Inner dashed ring - cyan */}
+                      <div 
+                        className="absolute inset-2 rounded-full border-2 border-dashed border-cyan-500/20 group-hover:border-cyan-400/40 transition-colors"
+                        style={{ animation: 'spinReverse 8s linear infinite' }} 
+                      />
+                      
+                      {/* Inner glass circle with number */}
+                      <div className="relative w-20 h-20 rounded-full bg-linear-to-br from-cyan-500/80 to-blue-600/80 p-0.5 group-hover:rotate-6 transition-transform duration-500 shadow-lg shadow-cyan-500/20">
+                        <div className="w-full h-full rounded-full bg-slate-950/95 backdrop-blur flex items-center justify-center">
+                          <span className="text-2xl font-bold font-mono text-cyan-300 group-hover:text-white transition-colors">
+                            {process.step}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Shine effect on hover */}
+                      <div className="absolute inset-0 rounded-full bg-linear-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      
+                      {/* Orbiting dot - cyan */}
+                      <div 
+                        className="absolute w-2 h-2 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50"
+                        style={{ 
+                          animation: 'orbit 4s linear infinite',
+                          animationDelay: `${i * 0.8}s`
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Animated connecting line - below wheels */}
+            <div className="relative h-4 mt-8 mx-12">
+              <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-linear-to-r from-transparent via-cyan-500/20 to-transparent rounded-full" />
+              <div 
+                className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-linear-to-r from-cyan-500/0 via-cyan-400/60 to-cyan-500/0 rounded-full"
+                style={{ animation: 'pulseFlow 2s ease-in-out infinite' }}
+              />
+              {/* Dot markers on line */}
+              {workflowSteps.map((_, i) => (
+                <div 
+                  key={i}
+                  className="absolute top-1/2 w-3 h-3 rounded-full bg-cyan-500/40 border border-cyan-400/60"
+                  style={{ left: `${(i / (workflowSteps.length - 1)) * 100}%`, transform: 'translate(-50%, -50%)' }}
+                />
+              ))}
+            </div>
+
+            {/* Text Row - below connecting line */}
+            <div className="flex flex-row items-start justify-between gap-4 px-4 mt-10">
+              {workflowSteps.map((process, i) => (
+                <div 
+                  key={i} 
+                  className="flex-1 text-center max-w-50"
+                  style={{ animation: `fadeInUp 0.6s ease-out ${i * 0.1 + 0.3}s both` }}
+                >
+                  <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                    {process.title}
+                  </h4>
+                  <p className="text-sm font-mono mb-3 text-cyan-400 bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text font-semibold">
+                    {process.subtitle}
+                  </p>
+                  <p className="text-sm leading-relaxed text-slate-300 hover:text-slate-200 transition-colors">
+                    {process.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ========================================= */}
+          {/* MOBILE LAYOUT (Vertical List)             */}
+          {/* ========================================= */}
+          <div className="flex flex-col gap-12 lg:hidden">
             {workflowSteps.map((process, i) => (
               <div 
                 key={i} 
-                className="group relative flex flex-col items-center"
-                style={{ animation: `wheelAppear 0.8s ease-out ${i * 0.15}s both` }}
+                className="group relative flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6"
+                style={{ animation: `fadeInUp 0.6s ease-out ${i * 0.15}s both` }}
               >
+                {/* Connecting Line (Vertical) - only visible between items */}
+                {i !== workflowSteps.length - 1 && (
+                  <div className="absolute left-1/2 sm:left-14 top-32 sm:top-28 -bottom-12 w-px bg-linear-to-b from-cyan-500/40 to-transparent -translate-x-1/2 sm:translate-x-0 hidden sm:block" />
+                )}
+
                 {/* Glass Wheel */}
-                <div className="relative">
-                  {/* Outer glow ring - cyan themed */}
+                <div className="relative shrink-0">
+                  {/* Outer glow ring */}
                   <div 
                     className="absolute -inset-3 rounded-full bg-linear-to-r from-cyan-500/20 via-cyan-400/30 to-blue-500/20 opacity-40 group-hover:opacity-70 blur-md transition-opacity duration-500"
                     style={{ animation: 'spinSlow 12s linear infinite' }}
                   />
                   
                   {/* Main glass wheel */}
-                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-xl border-2 border-cyan-500/20 flex items-center justify-center overflow-hidden group-hover:border-cyan-400/40 group-hover:shadow-2xl group-hover:shadow-cyan-500/30 transition-all duration-500 group-hover:scale-110">
-                    
-                    {/* Inner dashed ring - cyan */}
+                  <div className="relative w-28 h-28 rounded-full bg-slate-900/70 backdrop-blur-xl border-2 border-cyan-500/20 flex items-center justify-center overflow-hidden group-hover:border-cyan-400/40 group-hover:shadow-2xl group-hover:shadow-cyan-500/30 transition-all duration-500 group-hover:scale-105">
+                    {/* Inner dashed ring */}
                     <div 
                       className="absolute inset-2 rounded-full border-2 border-dashed border-cyan-500/20 group-hover:border-cyan-400/40 transition-colors"
                       style={{ animation: 'spinReverse 8s linear infinite' }} 
                     />
                     
-                    {/* Inner glass circle with number */}
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-linear-to-br from-cyan-500/80 to-blue-600/80 p-0.5 group-hover:rotate-6 transition-transform duration-500 shadow-lg shadow-cyan-500/20">
+                    {/* Inner glass circle */}
+                    <div className="relative w-16 h-16 rounded-full bg-linear-to-br from-cyan-500/80 to-blue-600/80 p-0.5 shadow-lg shadow-cyan-500/20 group-hover:-rotate-6 transition-transform">
                       <div className="w-full h-full rounded-full bg-slate-950/95 backdrop-blur flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl font-bold font-mono text-cyan-300 group-hover:text-white transition-colors">
+                        <span className="text-xl font-bold font-mono text-cyan-300 group-hover:text-white transition-colors">
                           {process.step}
                         </span>
                       </div>
                     </div>
-
-                    {/* Shine effect on hover */}
-                    <div className="absolute inset-0 rounded-full bg-linear-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Orbiting dot - cyan */}
-                    <div 
-                      className="absolute w-2 h-2 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50"
-                      style={{ 
-                        animation: 'orbit 4s linear infinite',
-                        animationDelay: `${i * 0.8}s`
-                      }}
-                    />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Animated connecting line - below wheels */}
-          <div className="hidden lg:block relative h-4 mt-8 mx-12">
-            <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-linear-to-r from-transparent via-cyan-500/20 to-transparent rounded-full" />
-            <div 
-              className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-linear-to-r from-cyan-500/0 via-cyan-400/60 to-cyan-500/0 rounded-full"
-              style={{ animation: 'pulseFlow 2s ease-in-out infinite' }}
-            />
-            {/* Dot markers on line */}
-            {workflowSteps.map((_, i) => (
-              <div 
-                key={i}
-                className="absolute top-1/2 w-3 h-3 rounded-full bg-cyan-500/40 border border-cyan-400/60"
-                style={{ left: `${(i / (workflowSteps.length - 1)) * 100}%`, transform: 'translate(-50%, -50%)' }}
-              />
-            ))}
-          </div>
-
-          {/* Text Row - below connecting line */}
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-4 lg:px-4 mt-8 lg:mt-10">
-            {workflowSteps.map((process, i) => (
-              <div 
-                key={i} 
-                className="flex-1 text-center lg:max-w-50"
-                style={{ animation: `fadeInUp 0.6s ease-out ${i * 0.1 + 0.3}s both` }}
-              >
-                <h4 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
-                  {process.title}
-                </h4>
-                <p className="text-sm font-mono mb-3 text-cyan-400 bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text font-semibold">
-                  {process.subtitle}
-                </p>
-                <p className="text-sm leading-relaxed text-slate-300 hover:text-slate-200 transition-colors">
-                  {process.description}
-                </p>
+                {/* Text Content */}
+                <div className="flex flex-col sm:pt-4">
+                  <h4 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                    {process.title}
+                  </h4>
+                  <p className="text-sm font-mono mb-3 text-cyan-400 font-semibold">
+                    {process.subtitle}
+                  </p>
+                  <p className="text-sm leading-relaxed text-slate-300">
+                    {process.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

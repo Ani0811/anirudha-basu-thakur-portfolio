@@ -41,6 +41,8 @@ export default function RainBackground() {
     // Lightning state
     let lightningTimer = Math.random() * 400 + 200;
     let lightningOpacity = 0;
+    let lightningActive = false;
+    let lightningEndTime = 0; // in ms
 
     let lastTime = performance.now();
 
@@ -54,22 +56,40 @@ export default function RainBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // --- Lightning Effect ---
-      if (lightningOpacity > 0) {
-        ctx.fillStyle = `rgba(200, 240, 255, ${lightningOpacity})`;
+      if (lightningActive) {
+        // Draw current flash (capped so it never fully whites out the UI)
+        const drawOpacity = Math.min(lightningOpacity, 0.45);
+        ctx.fillStyle = `rgba(200, 240, 255, ${drawOpacity})`;
         ctx.fillRect(0, 0, width, height);
-        
-        lightningOpacity -= 0.005 * speedMult; // Much slower fade out for longer lightning
-        
-        // Random strobe effect during a flash
-        if (Math.random() < 0.2 && lightningOpacity > 0.05) {
-          lightningOpacity += 0.08;
+
+        // While active and before the end time, allow small flickers
+        if (time < lightningEndTime) {
+          if (Math.random() < 0.15 && lightningOpacity < 0.45) {
+            lightningOpacity += 0.04; // small strobe bump
+          }
+          // keep baseline (no fast fade) while within the 2s window
+        } else {
+          // after the designated window, fade out quickly
+          lightningOpacity -= 0.06 * speedMult;
+        }
+
+        // If opacity falls below threshold, end the active flash
+        if (lightningOpacity <= 0.01) {
+          lightningOpacity = 0;
+          lightningActive = false;
         }
       } else {
+        // countdown to next potential strike
         lightningTimer -= speedMult;
         if (lightningTimer <= 0) {
-          // Trigger new subtle lightning strike
-          lightningOpacity = Math.random() * 0.2 + 0.15; // Higher opacity (up to ~0.35)
-          lightningTimer = Math.random() * 400 + 200; // More frequent (wait 200-600 frames)
+          // 10% chance to actually trigger a lightning flash when timer elapses
+          if (Math.random() < 0.1) {
+            lightningActive = true;
+            lightningOpacity = Math.random() * 0.15 + 0.15; // 0.15 - 0.3 starting opacity
+            lightningEndTime = time + 2000; // stay up to 2 seconds
+          }
+          // Reset timer regardless so we retry later
+          lightningTimer = Math.random() * 400 + 200;
         }
       }
 

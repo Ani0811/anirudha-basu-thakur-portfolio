@@ -64,6 +64,7 @@ interface ContactSectionProps {
 export default function ContactSection({ terminalMode, setTerminalMode }: ContactSectionProps) {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   const [terminalInput, setTerminalInput] = useState("");
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
     "Welcome to Anirudha's Terminal v1.0.0",
@@ -74,6 +75,7 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
     
     try {
       const response = await fetch('/api/contact', {
@@ -88,14 +90,16 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
 
       if (response.ok) {
         setFormData({ name: "", email: "", message: "" });
-        alert("Thanks! Your message has been sent successfully.");
+        setSubmitStatus({ type: 'success', message: "Thanks! Your message has been sent successfully." });
       } else {
-        alert(data.error || "Failed to send message. Please try again.");
+        setSubmitStatus({ type: 'error', message: data.error || "Failed to send message. Please try again." });
       }
     } catch (error) {
-      alert("Error connecting to server. Please try again later.");
+      setSubmitStatus({ type: 'error', message: "Error connecting to server. Please try again later." });
     } finally {
       setIsSubmitting(false);
+      // Auto dismiss success/error message after 5 seconds if you'd like
+      setTimeout(() => setSubmitStatus({ type: null, message: '' }), 3000);
     }
   };
 
@@ -306,6 +310,18 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
                     />
                   </div>
                   
+                  {submitStatus.type && (
+                    <div 
+                      className={`text-sm font-mono p-3 rounded-lg border ${
+                        submitStatus.type === 'success' 
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                          : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      }`}
+                    >
+                      {submitStatus.type === 'success' ? '✓ ' : '✗ '}{submitStatus.message}
+                    </div>
+                  )}
+
                   <button 
                     type="submit"
                     disabled={isSubmitting}
