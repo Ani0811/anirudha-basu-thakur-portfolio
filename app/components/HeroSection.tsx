@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { ScrollValues } from "../hooks/useScrollAnimation";
+import { ScrollValues, getCachedImage, frameSources } from "../hooks/useScrollAnimation";
 
 interface Props extends ScrollValues { }
 
@@ -21,43 +21,76 @@ export default function HeroSection({
   textTranslateY,
   statementOpacity,
   isLoaded,
+  heroStartFrameIndex,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafId = useRef<number | null>(null);
+  const lastScrollY = useRef(0);
+  const currentScrollY = useRef(0);
+  const canvasSize = useRef({ width: 0, height: 0, dpr: 1 });
 
-  // Drawing logic for the canvas
+  // Drawing logic for the canvas - high performance RAF loop
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !currentFrameImage) return;
+    if (!canvas || !isLoaded) return;
 
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext("2d", { alpha: false });
     if (!context) return;
 
-    // Cover logic (simulating object-fit: cover)
-    const render = () => {
-      const { width, height } = canvas.getBoundingClientRect();
+    const updateCanvasSize = () => {
+      const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      
-      // Update canvas size if needed (with HiDPI support)
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-      }
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvasSize.current = { width: canvas.width, height: canvas.height, dpr };
+    };
 
-      const imgWidth = currentFrameImage.width;
-      const imgHeight = currentFrameImage.height;
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
+    const drawFrame = (scrollY: number) => {
+      const scrollRange = window.innerHeight * 5.5;
+      const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
+      const playableFrameCount = frameSources.length - heroStartFrameIndex;
+      const frameIndex = heroStartFrameIndex + Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+      
+      const img = getCachedImage(frameIndex);
+      if (!img) return;
+
+      const { width: canvasWidth, height: canvasHeight } = canvasSize.current;
+      const imgWidth = img.width;
+      const imgHeight = img.height;
 
       const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
       const x = (canvasWidth / 2) - (imgWidth / 2) * scale;
       const y = (canvasHeight / 2) - (imgHeight / 2) * scale;
 
-      context.clearRect(0, 0, canvasWidth, canvasHeight);
-      context.drawImage(currentFrameImage, x, y, imgWidth * scale, imgHeight * scale);
+      context.drawImage(img, x, y, imgWidth * scale, imgHeight * scale);
     };
 
-    render();
-  }, [currentFrameImage]);
+    const animate = () => {
+      // Linear interpolation (lerping) for ultra-smooth movement
+      // factor: 0.1 for very smooth/weighted, 0.2-0.3 for snappier
+      const lerpFactor = 0.12; 
+      const targetScroll = window.scrollY;
+      
+      currentScrollY.current += (targetScroll - currentScrollY.current) * lerpFactor;
+      
+      // Only redraw if the interpolated scroll has moved significantly or initially
+      if (Math.abs(currentScrollY.current - lastScrollY.current) > 0.1 || lastScrollY.current === 0) {
+        drawFrame(currentScrollY.current);
+        lastScrollY.current = currentScrollY.current;
+      }
+
+      rafId.current = requestAnimationFrame(animate);
+    };
+
+    updateCanvasSize();
+    window.addEventListener("resize", updateCanvasSize);
+    rafId.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener("resize", updateCanvasSize);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, [isLoaded, heroStartFrameIndex]);
 
   // Typewriter effect logic
   const roles = React.useMemo(() => ["Full Stack Developer", "Software Engineer"], []);

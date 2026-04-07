@@ -12,8 +12,8 @@ export interface ScrollValues {
   heroObjectPosition: string;
   topOverlayOpacity: number;
   bottomOverlayOpacity: number;
-  currentFrameSrc: string;
-  currentFrameImage: HTMLImageElement | null;
+  currentFrameSrc: string; // Keep for initial render/pre-loading
+  currentFrameImage: HTMLImageElement | null; // Keep for initial render
   badgeReveal: number;
   nameReveal: number;
   roleReveal: number;
@@ -22,6 +22,7 @@ export interface ScrollValues {
   textTranslateY: number;
   statementOpacity: number;
   isLoaded: boolean;
+  heroStartFrameIndex: number;
 }
 
 const framesFolder = "hero-frames";
@@ -139,7 +140,15 @@ export function useScrollAnimation(): ScrollValues {
       const preloadPromises = frameSources.map((src, index) => {
         return new Promise<void>((resolve) => {
           const img = new Image();
-          img.onload = () => {
+          img.onload = async () => {
+            try {
+              // Ensure image is decoded before adding to cache
+              if ('decode' in img) {
+                await img.decode();
+              }
+            } catch (e) {
+              console.warn("Failed to decode image:", src);
+            }
             imageCache.set(index, img);
             resolve();
           };
@@ -168,20 +177,35 @@ export function useScrollAnimation(): ScrollValues {
   }, []);
 
   // Advance frame index based on scroll position - gated by isLoaded
+  // Note: We only update the state-based frame index for "low-frequency" UI logic.
+  // The high-frequency canvas drawing will happen directly in the HeroSection loop.
   useEffect(() => {
     if (typeof window === "undefined" || !isLoaded) return;
     
-    const scrollRange = window.innerHeight * 5.5;
-    const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
-    const playableFrameCount = frameSources.length - heroStartFrameIndex;
-    const nextIndex =
-      heroStartFrameIndex +
-      Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+    // Throttled update for UI reveals at roughly 15-20fps to keep React happy
+    const throttleDelay = 50; 
+    let lastUpdate = 0;
 
-    if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
-      setFrameIndex(nextIndex);
-    }
-  }, [scrollY, heroStartFrameIndex, frameIndex, isLoaded]);
+    const updateFrameState = () => {
+      const now = Date.now();
+      if (now - lastUpdate < throttleDelay) return;
+
+      const scrollRange = window.innerHeight * 5.5;
+      const progress = Math.max(0, Math.min(window.scrollY / scrollRange, 1));
+      const playableFrameCount = frameSources.length - heroStartFrameIndex;
+      const nextIndex =
+        heroStartFrameIndex +
+        Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+
+      if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
+        setFrameIndex(nextIndex);
+        lastUpdate = now;
+      }
+    };
+
+    window.addEventListener("scroll", updateFrameState, { passive: true });
+    return () => window.removeEventListener("scroll", updateFrameState);
+  }, [heroStartFrameIndex, frameIndex, isLoaded]);
 
   // --- Derived values ---
   const isDesktop = viewportWidth >= 1024;
@@ -253,6 +277,11 @@ export function useScrollAnimation(): ScrollValues {
     textTranslateY,
     statementOpacity,
     isLoaded,
+    heroStartFrameIndex,
   };
+}
+
+export function getCachedImage(index: number): HTMLImageElement | null {
+  return imageCache.get(index) || null;
 }
 
