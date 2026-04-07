@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const contactLinks = [
   { 
@@ -71,6 +72,7 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
     "Type 'help' for available commands",
     "",
   ]);
+  const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,7 +177,7 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
   };
 
   return (
-    <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-8 sm:pt-10">
+    <section id="contact" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-8 sm:pt-10">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 via-purple-500/5 to-blue-500/5 blur-3xl animate-pulse" />
         
@@ -191,15 +193,18 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
             <div className="space-y-8">
               {!terminalMode ? (
                 <>
-                  <div>
-                    <h3 className="text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase mb-4">GET IN TOUCH</h3>
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="inline-flex flex-col">
+                      <h3 className={`text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>GET IN TOUCH</h3>
+                      <div className={`h-px w-full mt-2 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
+                    </div>
+                    <h2 className={`text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       Let's Build Something
                       <span className="block text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-purple-400 animate-gradient bg-size-[200%_auto]">
                         Extraordinary
                       </span>
                     </h2>
-                    <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+                    <p className={`text-slate-400 text-base sm:text-lg leading-relaxed transition-all duration-700 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       Ready to architect robust backends, craft fluid frontends, or design scalable systems?{' '}
                       <button
                         onClick={() => setTerminalMode(true)}

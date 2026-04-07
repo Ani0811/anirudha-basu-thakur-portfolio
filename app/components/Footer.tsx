@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const socialLinks = [
   { 
@@ -54,11 +55,33 @@ const updates = [
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const fullQuote = "Thank you for dropping by! Whether you have a project in mind, a question, or just want to say hi, feel free to reach out. I'm always open to new opportunities and creative ideas.";
+  const [typedText, setTypedText] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+  const [footerRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
+
+  useEffect(() => {
+    if (!isVisible) return;
+    
+    let i = 0;
+    const interval = setInterval(() => {
+      setTypedText(fullQuote.slice(0, i));
+      i++;
+      if (i > fullQuote.length) {
+        clearInterval(interval);
+        setTimeout(() => setShowCursor(false), 2000);
+      }
+    }, 28);
+    return () => clearInterval(interval);
+  }, [isVisible]);
 
   return (
-    <footer className="relative mt-12 sm:mt-16">
-      {/* Top gradient line */}
-      <div className="h-px w-full bg-linear-to-r from-transparent via-cyan-500/50 to-transparent" />
+    <footer ref={footerRef} className="relative mt-12 sm:mt-16">
+      {/* Universal Premium Separator */}
+      <div className="premium-separator mb-12">
+        <div className="premium-line" />
+        <div className="separator-chip" />
+      </div>
       
       <div className="bg-[#030508] relative overflow-hidden">
         {/* Subtle background glow */}
@@ -106,8 +129,9 @@ export default function Footer() {
                   {/* Notepad top ring/clip */}
                   <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-12 h-3 rounded-full bg-[#0a0c14] border border-white/20 shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
                   <div className="relative z-10">
-                    <p className="font-mono text-[13px] sm:text-sm xl:text-base text-slate-300 leading-relaxed text-center italic">
-                      "Thank you for dropping by! Whether you have a project in mind, a question, or just want to say hi, feel free to reach out. I'm always open to new opportunities and creative ideas."
+                    <p className="font-mono text-[13px] sm:text-sm xl:text-base text-slate-300 leading-relaxed text-center italic min-h-[4.5em]">
+                      "{typedText}"
+                      {showCursor && <span className="cursor-blink" />}
                     </p>
                   </div>
                 </div>
@@ -189,14 +213,25 @@ export default function Footer() {
             
           {/* Bottom bar */}
           <div className="border-t border-white/5 animate-fade-in mt-6" style={{ animationDelay: '0.9s' }}>
-            <div className="max-w-7xl mx-auto px-6 py-6 border-t border-white/5">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400 font-mono">
-                <p className="animate-fade-in-up text-center sm:text-left text-xs sm:text-sm" style={{ animationDelay: '1s' }}>
-                  Built by <span className="text-cyan-400 font-semibold">Anirudha Basu Thakur</span> &copy; 2026 All Rights Reserved.
+            <div className="max-w-7xl mx-auto px-6 py-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 font-mono">
+                <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest text-center md:text-left order-2 md:order-1">
+                  &copy; {currentYear} Anirudha Basu Thakur. All Rights Reserved.
                 </p>
-                <div className="hidden sm:block h-4 w-px bg-white/20"></div>
-                <p className="animate-fade-in-up text-center sm:text-right text-xs sm:text-sm" style={{ animationDelay: '1.2s' }}>
-                  Built with <span className="text-fuchsia-400">Next.js</span>, <span className="text-sky-400">TailwindCSS</span> and <span className="text-purple-400">Framer Motion</span>.
+                
+                {/* Integrated Gemini Branding - Compact */}
+                <div className="flex items-center gap-2 group opacity-50 hover:opacity-100 transition-opacity order-1 md:order-2">
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">Powered by</span>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 group-hover:border-cyan-500/30 transition-all">
+                    <svg className="w-3 h-3 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2L14.5,9.5L22,12L14.5,14.5L12,22L9.5,14.5L2,12L9.5,9.5L12,2Z" />
+                    </svg>
+                    <span className="gemini-text text-xs tracking-tight">Gemini</span>
+                  </div>
+                </div>
+
+                <p className="text-[10px] sm:text-xs text-slate-500 tracking-wider text-center md:text-right order-3">
+                  Next.js | Tailwind CSS | Framer Motion
                 </p>
               </div>
             </div>

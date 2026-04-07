@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 export default function RateMyPortfolioSection() {
   const [formData, setFormData] = useState<{ name: string; email: string; rating: number; feedback: string }>({ name: "", email: "", rating: 0, feedback: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
+  const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +50,7 @@ export default function RateMyPortfolioSection() {
   const ratingLabels = ["Poor", "Fair", "Good", "Very Good", "Excellent"];
 
   return (
-    <section id="rate-portfolio" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-8 sm:pt-10 pb-16">
+    <section id="rate-portfolio" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-8 sm:pt-10 pb-16">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 via-purple-500/5 to-blue-500/5 blur-3xl animate-pulse" />
         
@@ -62,13 +64,16 @@ export default function RateMyPortfolioSection() {
           <div className="relative z-10">
             {/* Header */}
             <div className="text-center mb-12">
-              <h3 className="text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold mb-3">
-                FEEDBACK
-              </h3>
-              <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-4">
+              <div className="flex flex-col items-center mb-4">
+                <h3 className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+                  FEEDBACK
+                </h3>
+                <div className={`h-px w-32 mt-3 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
+              </div>
+              <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight mb-4 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 Rate My Portfolio
               </h2>
-              <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+              <p className={`text-slate-400 text-base sm:text-lg leading-relaxed transition-all duration-700 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 Your feedback helps me improve. Let me know what you think!
               </p>
             </div>

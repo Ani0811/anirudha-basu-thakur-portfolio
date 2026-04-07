@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const milestones = [
   {
@@ -175,10 +176,9 @@ const developerQuote = {
 };
 
 export default function SkillsSection() {
-  const [isVisible, setIsVisible] = React.useState(false);
+  const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [flippedCards, setFlippedCards] = React.useState<boolean[]>(new Array(milestones.length).fill(false));
-  const sectionRef = React.useRef<HTMLElement>(null);
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   const toggleFlip = (index: number) => {
@@ -188,23 +188,6 @@ export default function SkillsSection() {
       return newFlipped;
     });
   };
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   // Track which card is currently in view and calculate positions
   const [cardPositions, setCardPositions] = React.useState<number[]>([]);
@@ -233,7 +216,7 @@ export default function SkillsSection() {
   // Track which card is currently in view
   React.useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current || cardRefs.current.length === 0) return;
+      if (!isVisible || cardRefs.current.length === 0) return;
       
       const scrollY = window.scrollY;
       const viewportCenter = scrollY + window.innerHeight / 2;
@@ -269,9 +252,12 @@ export default function SkillsSection() {
     <>
       {/* LEARNING JOURNEY */}
       <section ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 w-full relative pt-12 sm:pt-20">
-        <h3 className="text-sm sm:text-base font-mono text-cyan-400 mb-16 sm:mb-20 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50">
-          LEARNING JOURNEY
-        </h3>
+        <div className="flex flex-col items-center mb-16 sm:mb-20">
+          <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+            LEARNING JOURNEY
+          </h3>
+          <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
+        </div>
         <p className="max-w-2xl mx-auto -mt-12 sm:-mt-14 mb-12 sm:mb-16 text-center text-sm sm:text-base text-slate-400 leading-relaxed">
           A quick look at the academic milestones and experiences that shaped my mindset as a developer.
         </p>
@@ -455,9 +441,12 @@ export default function SkillsSection() {
 
       {/* TECH STACK */}
       <section id="skills" className="max-w-6xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
-        <h3 className="text-sm sm:text-base font-mono text-cyan-400 mb-16 sm:mb-20 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50">
-          TECH STACK
-        </h3>
+        <div className="flex flex-col items-center mb-16 sm:mb-20">
+          <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
+            TECH STACK
+          </h3>
+          <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.4s' }} />
+        </div>
         <p className="max-w-3xl mx-auto -mt-12 sm:-mt-14 mb-12 sm:mb-16 text-center text-sm sm:text-base text-slate-400 leading-relaxed">
           A focused snapshot of the tools and technologies I use to build clean, scalable, and production-ready software.
         </p>
@@ -566,9 +555,12 @@ export default function SkillsSection() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
-          <h3 className="text-sm sm:text-base font-mono text-cyan-400 mb-4 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50">
-            HOW I WORK
-          </h3>
+          <div className="flex flex-col items-center mb-8">
+            <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
+              HOW I WORK
+            </h3>
+            <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.6s' }} />
+          </div>
           <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             A glimpse into my development workflow — from napkin sketch to production deployment.
           </p>

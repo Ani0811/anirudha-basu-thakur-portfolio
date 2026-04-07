@@ -23,23 +23,30 @@ export interface ScrollValues {
   statementOpacity: number;
   isLoaded: boolean;
   heroStartFrameIndex: number;
+  heroEndFrameIndex: number;
+  heroScrollRangeFactor: number;
 }
 
 const framesFolder = "hero-frames";
 export const frameSources = Array.from(
-  { length: 64 },
-  (_, index) => `/${framesFolder}/${String(index + 1).padStart(2, "0")}.webp`
+  { length: 73 },
+  (_, index) => `/${framesFolder}/${String(index + 8).padStart(3, "0")}.webp`
 );
 
-// Global cache for images to persist across re-renders if hook is re-called
+// Global cache for images and initialization status to persist across re-renders
 const imageCache = new Map<number, HTMLImageElement>();
+let globalIsLoaded = false;
+let globalHeroStartFrameIndex = 0;
+let globalHeroEndFrameIndex = 72; // Default to last index
+
+export const HERO_SCROLL_RANGE_FACTOR = 6.5; // Optimized for 73 frames
 
 export function useScrollAnimation(): ScrollValues {
   const [scrollY, setScrollY] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(1280);
-  const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(0);
-  const [frameIndex, setFrameIndex] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(globalHeroStartFrameIndex);
+  const [frameIndex, setFrameIndex] = useState(globalHeroStartFrameIndex);
+  const [isLoaded, setIsLoaded] = useState(globalIsLoaded);
   
   const scrollRef = useRef<number>(0);
   const rafId = useRef<number | null>(null);
@@ -119,14 +126,38 @@ export function useScrollAnimation(): ScrollValues {
       });
 
     const bootstrapFrames = async () => {
+      // If already initialized globally, just update state and return
+      if (globalIsLoaded) {
+        setHeroStartFrameIndex(globalHeroStartFrameIndex);
+        setFrameIndex(globalHeroStartFrameIndex);
+        setIsLoaded(true);
+        return;
+      }
+
       let detectedStart = 0;
 
-      // Find start frame - more aggressive threshold to avoid skipping content
-      for (let i = 0; i < frameSources.length; i++) {
-        const brightness = await getFrameBrightness(frameSources[i]);
-        if (brightness > 5) {
-          detectedStart = i;
-          break;
+      // Find start frame - skip if already checked
+      if (globalHeroStartFrameIndex === 0) {
+        for (let i = 0; i < frameSources.length; i++) {
+          const brightness = await getFrameBrightness(frameSources[i]);
+          if (brightness > 5) {
+            detectedStart = i;
+            globalHeroStartFrameIndex = i;
+            break;
+          }
+        }
+      } else {
+        detectedStart = globalHeroStartFrameIndex;
+      }
+
+      // Find end frame - scan backwards from the end to skip trailing black frames
+      if (globalHeroEndFrameIndex === 72) {
+        for (let i = frameSources.length - 1; i >= detectedStart; i--) {
+          const brightness = await getFrameBrightness(frameSources[i]);
+          if (brightness > 2) { // Slightly lower threshold for trail-off
+            globalHeroEndFrameIndex = i;
+            break;
+          }
         }
       }
 
@@ -139,6 +170,12 @@ export function useScrollAnimation(): ScrollValues {
       // Preload all frames into the imageCache Map
       const preloadPromises = frameSources.map((src, index) => {
         return new Promise<void>((resolve) => {
+          // SKIP if already in cache
+          if (imageCache.has(index)) {
+            resolve();
+            return;
+          }
+
           const img = new Image();
           img.onload = async () => {
             try {
@@ -158,7 +195,10 @@ export function useScrollAnimation(): ScrollValues {
       });
 
       await Promise.all(preloadPromises);
-      if (!isCancelled) setIsLoaded(true);
+      if (!isCancelled) {
+        globalIsLoaded = true;
+        setIsLoaded(true);
+      }
     };
 
     bootstrapFrames();
@@ -190,18 +230,18 @@ export function useScrollAnimation(): ScrollValues {
       const now = Date.now();
       if (now - lastUpdate < throttleDelay) return;
 
-      const scrollRange = window.innerHeight * 5.5;
-      const progress = Math.max(0, Math.min(window.scrollY / scrollRange, 1));
-      const playableFrameCount = frameSources.length - heroStartFrameIndex;
-      const nextIndex =
-        heroStartFrameIndex +
-        Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+    const scrollRange = window.innerHeight * HERO_SCROLL_RANGE_FACTOR;
+    const progress = Math.max(0, Math.min(window.scrollY / scrollRange, 1));
+    const playableFrameCount = (globalHeroEndFrameIndex - globalHeroStartFrameIndex) + 1;
+    const nextIndex =
+      heroStartFrameIndex +
+      Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
 
-      if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
-        setFrameIndex(nextIndex);
-        lastUpdate = now;
-      }
-    };
+    if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
+      setFrameIndex(nextIndex);
+      lastUpdate = now;
+    }
+  };
 
     window.addEventListener("scroll", updateFrameState, { passive: true });
     return () => window.removeEventListener("scroll", updateFrameState);
@@ -214,8 +254,8 @@ export function useScrollAnimation(): ScrollValues {
 
   const maxScroll = useMemo(() => {
     if (typeof window === "undefined") return 3200;
-    return window.innerHeight * (isDesktop ? 4 : 3);
-  }, [isDesktop]);
+    return window.innerHeight * HERO_SCROLL_RANGE_FACTOR;
+  }, []);
 
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
@@ -278,6 +318,8 @@ export function useScrollAnimation(): ScrollValues {
     statementOpacity,
     isLoaded,
     heroStartFrameIndex,
+    heroEndFrameIndex: globalHeroEndFrameIndex,
+    heroScrollRangeFactor: HERO_SCROLL_RANGE_FACTOR,
   };
 }
 

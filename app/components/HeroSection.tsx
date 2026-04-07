@@ -22,6 +22,8 @@ export default function HeroSection({
   statementOpacity,
   isLoaded,
   heroStartFrameIndex,
+  heroEndFrameIndex,
+  heroScrollRangeFactor,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafId = useRef<number | null>(null);
@@ -46,9 +48,9 @@ export default function HeroSection({
     };
 
     const drawFrame = (scrollY: number) => {
-      const scrollRange = window.innerHeight * 5.5;
+      const scrollRange = window.innerHeight * heroScrollRangeFactor;
       const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
-      const playableFrameCount = frameSources.length - heroStartFrameIndex;
+      const playableFrameCount = (heroEndFrameIndex - heroStartFrameIndex) + 1;
       const frameIndex = heroStartFrameIndex + Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
       
       const img = getCachedImage(frameIndex);
@@ -129,17 +131,11 @@ export default function HeroSection({
   return (
     <>
       {/* HERO SECTION – scroll controls frame playback */}
-      <section id="home" className="relative w-full h-[560vh] sm:h-[600vh] lg:h-[700vh]">
+      <section id="home" className="relative w-full" style={{ height: `${(heroScrollRangeFactor + 1.5) * 100}vh` }}>
         {/* Sticky Hero Frame Background */}
         <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[radial-gradient(circle_at_50%_30%,#1a2442_0%,#0a0a0c_75%)]">
-          {/* Blurred background layer - keep as img for ambient feel */}
-          <img
-            src={currentFrameSrc}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-70 transform-gpu"
-            loading="eager"
-          />
+          {/* Ambient background layer - using CSS blur on the same source or a static glow */}
+          <div className="absolute inset-0 bg-cyan-950/20 blur-3xl opacity-50" />
           
           {/* Sharp foreground layer - using Canvas for performance */}
           <canvas

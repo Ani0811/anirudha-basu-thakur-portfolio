@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const PROJECTS_PER_PAGE = 4;
 
@@ -47,6 +48,7 @@ export default function ProjectsSection() {
   const [roastingProject, setRoastingProject] = useState<string | null>(null);
   const [roastResults, setRoastResults] = useState<Record<string, string>>({});
   const [requestingProject, setRequestingProject] = useState<string | null>(null);
+  const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
 
   const handleRoastCode = async (project: any) => {
     if (!project.github) return;
@@ -260,14 +262,17 @@ export default function ProjectsSection() {
   };
 
   return (
-    <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-16 sm:pt-24 pb-8 sm:pb-12">
+    <section id="projects" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-16 sm:pt-24 pb-8 sm:pb-12">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-        <div className="space-y-3">
-          <h3 className="text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold">
-            PORTFOLIO
-          </h3>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight">
+        <div className="flex flex-col gap-3">
+          <div className="inline-flex flex-col">
+            <h3 className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+              PORTFOLIO
+            </h3>
+            <div className={`h-px w-full mt-2 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
+          </div>
+          <h2 className={`text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             Featured Projects
           </h2>
         </div>
@@ -275,10 +280,16 @@ export default function ProjectsSection() {
           href="https://github.com/Ani0811"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-all duration-300 font-mono text-xs sm:text-sm tracking-wider self-start md:self-auto"
+          className="group relative flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-mono text-sm tracking-widest text-cyan-400 backdrop-blur-xl transition-all duration-500 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:shadow-[0_0_40px_rgba(34,211,238,0.25)] hover:-translate-y-1 hover:scale-[1.03] self-start md:self-auto overflow-hidden shadow-2xl"
         >
-          <span className="group-hover:mr-1 transition-all duration-300">VIEW GITHUB ARCHIVE</span>
-          <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+          
+          <span className="relative z-10 font-bold group-hover:text-white transition-colors duration-300 uppercase">VIEW GITHUB ARCHIVE</span>
+          <span className="relative z-10 text-xl group-hover:translate-x-2 transition-transform duration-500 ease-out">→</span>
+          
+          {/* Decorative glow */}
+          <div className="absolute -bottom-2 radial-gradient(circle_at_center,rgba(34,211,238,0.3)_0%,transparent_70%) w-full h-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </a>
       </div>
 

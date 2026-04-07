@@ -169,16 +169,106 @@ a {
   }
 }
 
-@keyframes textShimmer {
+@keyframes headerReveal {
   0% {
-    background-position: -200% center;
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+    letter-spacing: -0.05em;
+    filter: blur(12px);
   }
   100% {
-    background-position: 200% center;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.25em;
+    filter: blur(0);
   }
 }
 
-.animate-fade-in-up {
+@keyframes underlineGrow {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes chipPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(34, 211, 238, 0.4); border-color: rgba(34, 211, 238, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(34, 211, 238, 0.8); border-color: rgba(34, 211, 238, 0.8); }
+}
+
+.animate-h-reveal {
+  animation: headerReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-u-grow {
+  animation: underlineGrow 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.premium-separator {
+  position: relative;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.premium-line {
+  position: absolute;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.4) 50%, transparent 100%);
+}
+
+.premium-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.15) 50%, transparent 100%);
+  filter: blur(3px);
+  transform: translateY(2px);
+}
+
+.separator-chip {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  background: #030711;
+  border: 1px solid rgba(34, 211, 238, 0.6);
+  transform: rotate(45deg);
+  z-index: 2;
+  animation: chipPulse 4s infinite;
+}
+
+.separator-chip::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  background: radial-gradient(circle at center, rgba(34, 211, 238, 0.3), transparent 70%);
+  filter: blur(4px);
+}
+
+.animate-gemini-pulse {
+  animation: geminiPulse 4s ease-in-out infinite;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #22d3ee;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+}
+
+.gemini-text {
+  background: linear-gradient(90deg, #22d3ee 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+}
+
+.animate-text-shimmer {
   animation: fadeInUp 0.8s ease-out forwards;
   opacity: 0;
 }
