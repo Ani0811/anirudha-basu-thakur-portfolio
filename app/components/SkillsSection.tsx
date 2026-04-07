@@ -92,10 +92,10 @@ const skillGroups = [
     description: "Integration & Architecture",
     skills: [
       { name: "REST APIs", level: 90, icon: "🔌" },
+      { name: "Postman", level: 88, icon: "🚀" },
       { name: "GraphQL", level: 75, icon: "◉" },
       { name: "Authentication", level: 88, icon: "🔐" },
-      { name: "Payment Integration", level: 85, icon: "💳" },
-      { name: "WebSockets", level: 80, icon: "🔗" }
+      { name: "Payment Integration", level: 85, icon: "💳" }
     ]
   },
 ];

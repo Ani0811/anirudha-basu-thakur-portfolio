@@ -43,9 +43,12 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative">
-        <div className="text-base sm:text-xl font-bold tracking-tighter text-white glow-text relative z-50">
-          ANIRUDHA.DEV
-        </div>
+        <button 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="text-base sm:text-lg lg:text-xl font-black tracking-tighter bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_auto] hover:scale-105 active:scale-95 transition-all duration-300 relative z-50 cursor-pointer drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+        >
+          Anirudha Basu Thakur
+        </button>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center justify-center gap-1 lg:gap-2 text-base lg:text-lg font-medium absolute left-1/2 -translate-x-1/2">

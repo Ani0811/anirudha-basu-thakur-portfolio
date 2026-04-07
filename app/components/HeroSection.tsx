@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { ScrollValues } from "../hooks/useScrollAnimation";
 
 interface Props extends ScrollValues { }
@@ -8,6 +8,7 @@ interface Props extends ScrollValues { }
 export default function HeroSection({
   scrollY,
   currentFrameSrc,
+  currentFrameImage,
   videoScale,
   videoObjectPosition,
   topOverlayOpacity,
@@ -19,7 +20,45 @@ export default function HeroSection({
   actionReveal,
   textTranslateY,
   statementOpacity,
+  isLoaded,
 }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Drawing logic for the canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !currentFrameImage) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    // Cover logic (simulating object-fit: cover)
+    const render = () => {
+      const { width, height } = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Update canvas size if needed (with HiDPI support)
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+
+      const imgWidth = currentFrameImage.width;
+      const imgHeight = currentFrameImage.height;
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+      const x = (canvasWidth / 2) - (imgWidth / 2) * scale;
+      const y = (canvasHeight / 2) - (imgHeight / 2) * scale;
+
+      context.clearRect(0, 0, canvasWidth, canvasHeight);
+      context.drawImage(currentFrameImage, x, y, imgWidth * scale, imgHeight * scale);
+    };
+
+    render();
+  }, [currentFrameImage]);
+
   // Typewriter effect logic
   const roles = React.useMemo(() => ["Full Stack Developer", "Software Engineer"], []);
   const [text, setText] = React.useState("");
@@ -60,7 +99,7 @@ export default function HeroSection({
       <section id="home" className="relative w-full h-[560vh] sm:h-[600vh] lg:h-[700vh]">
         {/* Sticky Video Background */}
         <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[radial-gradient(circle_at_50%_30%,#1a2442_0%,#0a0a0c_75%)]">
-          {/* Blurred background layer */}
+          {/* Blurred background layer - keep as img for ambient feel */}
           <img
             src={currentFrameSrc}
             alt=""
@@ -68,19 +107,26 @@ export default function HeroSection({
             className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-70 transform-gpu"
             loading="eager"
           />
-          {/* Sharp foreground layer */}
-          <img
-            src={currentFrameSrc}
-            alt="Scrolling frame sequence"
-            className="absolute inset-0 w-full h-full object-cover object-center transform-gpu will-change-[transform,opacity,filter]"
-            loading="eager"
-            fetchPriority="high"
+          
+          {/* Sharp foreground layer - using Canvas for performance */}
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform"
             style={{
-              opacity: 1,
-              objectPosition: videoObjectPosition,
+              opacity: isLoaded ? 1 : 0,
+              transition: "opacity 0.5s ease-in-out",
               transform: `scale(${videoScale})`,
             }}
           />
+
+          {!isLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0c]/60 backdrop-blur-sm z-50">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+                <span className="text-cyan-400 font-mono text-xs tracking-widest animate-pulse">SYNCHRONIZING FRAMES...</span>
+              </div>
+            </div>
+          )}
 
           {/* Vignette overlays */}
           <div

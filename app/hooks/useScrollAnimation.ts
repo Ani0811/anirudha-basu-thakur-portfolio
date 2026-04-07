@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 export interface ScrollValues {
   scrollY: number;
@@ -13,6 +13,7 @@ export interface ScrollValues {
   topOverlayOpacity: number;
   bottomOverlayOpacity: number;
   currentFrameSrc: string;
+  currentFrameImage: HTMLImageElement | null;
   badgeReveal: number;
   nameReveal: number;
   roleReveal: number;
@@ -20,28 +21,46 @@ export interface ScrollValues {
   actionReveal: number;
   textTranslateY: number;
   statementOpacity: number;
+  isLoaded: boolean;
 }
 
 const framesFolder = "hero-frames";
 export const frameSources = Array.from(
   { length: 64 },
-  (_, index) => `/${framesFolder}/${String(index + 1).padStart(2, "0")}.png`
+  (_, index) => `/${framesFolder}/${String(index + 1).padStart(2, "0")}.webp`
 );
+
+// Global cache for images to persist across re-renders if hook is re-called
+const imageCache = new Map<number, HTMLImageElement>();
 
 export function useScrollAnimation(): ScrollValues {
   const [scrollY, setScrollY] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(1280);
-  const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(9);
-  const [frameIndex, setFrameIndex] = useState(9);
+  const [heroStartFrameIndex, setHeroStartFrameIndex] = useState(0);
+  const [frameIndex, setFrameIndex] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  const scrollRef = useRef<number>(0);
+  const rafId = useRef<number | null>(null);
 
-  // Listen to scroll and resize
+  // Listen to scroll and resize with RAF throttling
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+    const updateScroll = () => {
+      setScrollY(window.scrollY);
+      rafId.current = null;
+    };
+
+    const handleScroll = () => {
+      if (rafId.current === null) {
+        rafId.current = requestAnimationFrame(updateScroll);
+      }
+    };
+
     const handleResize = () => setViewportWidth(window.innerWidth);
 
     if (typeof window !== "undefined") {
       handleResize();
-      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("scroll", handleScroll, { passive: true });
       window.addEventListener("resize", handleResize);
     }
 
@@ -49,14 +68,14 @@ export function useScrollAnimation(): ScrollValues {
       if (typeof window !== "undefined") {
         window.removeEventListener("scroll", handleScroll);
         window.removeEventListener("resize", handleResize);
+        if (rafId.current !== null) cancelAnimationFrame(rafId.current);
       }
     };
   }, []);
 
-  // Detect the first non-black frame and preload all frames
+  // Detect the first non-black frame and preload all frames into cache
   useEffect(() => {
     let isCancelled = false;
-    let preloadTimer: ReturnType<typeof setTimeout> | undefined;
 
     const getFrameBrightness = (src: string): Promise<number> =>
       new Promise((resolve) => {
@@ -101,6 +120,7 @@ export function useScrollAnimation(): ScrollValues {
     const bootstrapFrames = async () => {
       let detectedStart = 0;
 
+      // Find start frame
       for (let i = 0; i < frameSources.length; i++) {
         const brightness = await getFrameBrightness(frameSources[i]);
         if (brightness > 14) {
@@ -111,36 +131,38 @@ export function useScrollAnimation(): ScrollValues {
 
       if (isCancelled) return;
 
+      // Update both simultaneously to prevent any jumps from defaults
       setHeroStartFrameIndex(detectedStart);
       setFrameIndex(detectedStart);
 
-      if (typeof window !== "undefined") {
-        const firstFrame = new window.Image();
-        firstFrame.src = frameSources[detectedStart];
+      // Preload all frames into the imageCache Map
+      const preloadPromises = frameSources.map((src, index) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            imageCache.set(index, img);
+            resolve();
+          };
+          img.onerror = () => resolve(); // Keep going even if one fails
+          img.src = src;
+        });
+      });
 
-        preloadTimer = setTimeout(() => {
-          for (let i = 0; i < frameSources.length; i++) {
-            if (i === detectedStart) continue;
-            const image = new window.Image();
-            image.src = frameSources[i];
-          }
-        }, 50);
-      }
+      await Promise.all(preloadPromises);
+      if (!isCancelled) setIsLoaded(true);
     };
 
     bootstrapFrames();
 
     return () => {
       isCancelled = true;
-      if (preloadTimer !== undefined) {
-        clearTimeout(preloadTimer);
-      }
     };
   }, []);
 
-  // Advance frame index based on scroll position
+  // Advance frame index based on scroll position - gated by isLoaded
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !isLoaded) return;
+    
     const scrollRange = window.innerHeight * 5.5;
     const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
     const playableFrameCount = frameSources.length - heroStartFrameIndex;
@@ -148,8 +170,10 @@ export function useScrollAnimation(): ScrollValues {
       heroStartFrameIndex +
       Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
 
-    setFrameIndex(nextIndex);
-  }, [scrollY, heroStartFrameIndex]);
+    if (nextIndex !== frameIndex) {
+      setFrameIndex(nextIndex);
+    }
+  }, [scrollY, heroStartFrameIndex, frameIndex, isLoaded]);
 
   // --- Derived values ---
   const isDesktop = viewportWidth >= 1024;
@@ -178,6 +202,7 @@ export function useScrollAnimation(): ScrollValues {
   const topOverlayOpacity = 0.18 + scrollProgress * 0.22;
   const bottomOverlayOpacity = 0.22 + scrollProgress * 0.2;
   const currentFrameSrc = frameSources[frameIndex];
+  const currentFrameImage = imageCache.get(frameIndex) || null;
 
   const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
   const revealByProgress = (start: number, end: number) => {
@@ -210,6 +235,7 @@ export function useScrollAnimation(): ScrollValues {
     topOverlayOpacity,
     bottomOverlayOpacity,
     currentFrameSrc,
+    currentFrameImage,
     badgeReveal,
     nameReveal,
     roleReveal,
@@ -217,6 +243,7 @@ export function useScrollAnimation(): ScrollValues {
     actionReveal,
     textTranslateY,
     statementOpacity,
+    isLoaded,
   };
 }
 

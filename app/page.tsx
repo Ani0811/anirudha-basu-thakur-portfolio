@@ -13,6 +13,7 @@ import RateMyPortfolioSection from "./components/RateMyPortfolioSection";
 import Footer from "./components/Footer";
 import UpdateNotification from "./components/UpdateNotification";
 import RainBackground from "./components/RainBackground";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 
 const bootMessages = [
   "Booting developer workspace...",
@@ -85,6 +86,7 @@ export default function Portfolio() {
 
       <Footer />
       <UpdateNotification />
+      <ScrollToTopButton />
 
       {/* Global custom animations */}
       <style

@@ -237,7 +237,7 @@ export default function ContactSection({ terminalMode, setTerminalMode }: Contac
                     <div className="w-3 h-3 rounded-full bg-red-500" />
                     <div className="w-3 h-3 rounded-full bg-yellow-500" />
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="ml-2 text-cyan-400 text-xs">ANIRUDHA.DEV ~</span>
+                    <span className="ml-2 text-cyan-400 text-xs font-bold bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">ANIRUDHA BASU THAKUR ~</span>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto overflow-x-hidden mb-4 space-y-1 scrollbar-hide">
