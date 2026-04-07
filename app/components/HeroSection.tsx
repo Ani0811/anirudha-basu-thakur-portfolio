@@ -9,8 +9,8 @@ export default function HeroSection({
   scrollY,
   currentFrameSrc,
   currentFrameImage,
-  videoScale,
-  videoObjectPosition,
+  heroScale,
+  heroObjectPosition,
   topOverlayOpacity,
   bottomOverlayOpacity,
   badgeReveal,
@@ -97,7 +97,7 @@ export default function HeroSection({
     <>
       {/* HERO SECTION – scroll controls frame playback */}
       <section id="home" className="relative w-full h-[560vh] sm:h-[600vh] lg:h-[700vh]">
-        {/* Sticky Video Background */}
+        {/* Sticky Hero Frame Background */}
         <div className="sticky top-0 w-full h-screen overflow-hidden z-0 bg-[radial-gradient(circle_at_50%_30%,#1a2442_0%,#0a0a0c_75%)]">
           {/* Blurred background layer - keep as img for ambient feel */}
           <img
@@ -115,7 +115,7 @@ export default function HeroSection({
             style={{
               opacity: isLoaded ? 1 : 0,
               transition: "opacity 0.5s ease-in-out",
-              transform: `scale(${videoScale})`,
+              transform: `scale(${heroScale})`,
             }}
           />
 

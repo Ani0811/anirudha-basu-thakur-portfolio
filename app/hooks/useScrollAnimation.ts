@@ -8,8 +8,8 @@ export interface ScrollValues {
   isTablet: boolean;
   isDesktop: boolean;
   scrollProgress: number;
-  videoScale: number;
-  videoObjectPosition: string;
+  heroScale: number;
+  heroObjectPosition: string;
   topOverlayOpacity: number;
   bottomOverlayOpacity: number;
   currentFrameSrc: string;
@@ -120,10 +120,10 @@ export function useScrollAnimation(): ScrollValues {
     const bootstrapFrames = async () => {
       let detectedStart = 0;
 
-      // Find start frame
+      // Find start frame - more aggressive threshold to avoid skipping content
       for (let i = 0; i < frameSources.length; i++) {
         const brightness = await getFrameBrightness(frameSources[i]);
-        if (brightness > 14) {
+        if (brightness > 5) {
           detectedStart = i;
           break;
         }
@@ -153,9 +153,17 @@ export function useScrollAnimation(): ScrollValues {
     };
 
     bootstrapFrames();
+    
+    // Safety timeout to ensure site doesn't stay stuck if detection takes too long
+    const safetyTimeout = setTimeout(() => {
+      if (!isCancelled && !isLoaded) {
+        setIsLoaded(true);
+      }
+    }, 2000);
 
     return () => {
       isCancelled = true;
+      clearTimeout(safetyTimeout);
     };
   }, []);
 
@@ -170,7 +178,7 @@ export function useScrollAnimation(): ScrollValues {
       heroStartFrameIndex +
       Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
 
-    if (nextIndex !== frameIndex) {
+    if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
       setFrameIndex(nextIndex);
     }
   }, [scrollY, heroStartFrameIndex, frameIndex, isLoaded]);
@@ -187,11 +195,12 @@ export function useScrollAnimation(): ScrollValues {
 
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
+  // Cinematic Zoom Reveal - starts slightly zoomed in and "settles" on scroll
   const videoScale = isMobile
-    ? 0.96 + scrollProgress * 0.025
+    ? 1.05 - scrollProgress * 0.03
     : isTablet
-    ? 1 + scrollProgress * 0.05
-    : 1 + scrollProgress * 0.07;
+    ? 1.06 - scrollProgress * 0.04
+    : 1.08 - scrollProgress * 0.08;
 
   const videoObjectPosition = isMobile
     ? "center 30%"
@@ -230,8 +239,8 @@ export function useScrollAnimation(): ScrollValues {
     isTablet,
     isDesktop,
     scrollProgress,
-    videoScale,
-    videoObjectPosition,
+    heroScale: videoScale,
+    heroObjectPosition: videoObjectPosition,
     topOverlayOpacity,
     bottomOverlayOpacity,
     currentFrameSrc,
