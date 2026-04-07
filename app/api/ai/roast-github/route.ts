@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'text-bison-001' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
     const prompt = `You are a brutally honest senior software engineer reviewing the "${projectName}" project.
 Based on the code and README provided below, give a SHORT (2-3 sentences) roast that is funny but constructive.

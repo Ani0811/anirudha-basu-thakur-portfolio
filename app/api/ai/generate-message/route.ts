@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'text-bison-001' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
     const prompt = `Generate a concise professional message requesting access to the source code for the project: "${projectName}".
 The project uses the following technologies: ${techStack}.

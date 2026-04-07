@@ -68,7 +68,7 @@ export default function RoastMyCode() {
         <button
           onClick={handleRoast}
           disabled={loading || !code.trim()}
-          className="w-full py-3 px-6 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="w-full py-3 px-6 bg-linear-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {loading ? 'Roasting...' : '🔥 Roast My Code'}
         </button>
@@ -80,7 +80,7 @@ export default function RoastMyCode() {
         )}
 
         {roast && (
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
+          <div className="p-6 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <span>🎯</span> The Verdict
             </h3>

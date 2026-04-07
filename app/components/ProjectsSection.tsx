@@ -57,6 +57,8 @@ export default function ProjectsSection() {
     try {
       // Fetch code from GitHub repo
       const repoUrl = project.github.replace('https://github.com/', '');
+      console.log('Roasting project:', project.title, 'Repo URL:', repoUrl);
+      
       const response = await fetch(`/api/ai/roast-github`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,13 +66,15 @@ export default function ProjectsSection() {
       });
 
       const data = await response.json();
+      console.log('Roast response:', data);
 
       if (response.ok) {
         setRoastResults(prev => ({ ...prev, [project.title]: data.roast }));
       } else {
-        setRoastResults(prev => ({ ...prev, [project.title]: `Error: ${data.error}` }));
+        setRoastResults(prev => ({ ...prev, [project.title]: `Error: ${data.error || 'Unknown error'}` }));
       }
     } catch (error) {
+      console.error('Roast error:', error);
       setRoastResults(prev => ({ ...prev, [project.title]: 'Failed to roast code. Please try again.' }));
     } finally {
       setRoastingProject(null);
@@ -98,7 +102,13 @@ export default function ProjectsSection() {
         if (contactSection) {
           const messageTextarea = contactSection.querySelector('textarea[name="message"]') as HTMLTextAreaElement;
           if (messageTextarea) {
-            messageTextarea.value = data.message;
+            // Trigger React's onChange event to update state
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+            if (nativeInputValueSetter) {
+              nativeInputValueSetter.call(messageTextarea, data.message);
+            }
+            const event = new Event('input', { bubbles: true });
+            messageTextarea.dispatchEvent(event);
             messageTextarea.focus();
             messageTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
@@ -168,12 +178,19 @@ export default function ProjectsSection() {
 
           {/* Roast Result */}
           {hasRoast && (
-            <div className="mb-6 p-4 bg-linear-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg">
+            <div className="relative mb-6 p-4 bg-linear-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg">
+              <button
+                onClick={() => setRoastResults(prev => ({ ...prev, [proj.title]: '' }))}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-orange-500/20 hover:bg-orange-500/40 border border-orange-500/40 flex items-center justify-center text-orange-300 hover:text-white transition-all duration-200 text-xs"
+                aria-label="Close roast"
+              >
+                ✕
+              </button>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🔥</span>
                 <h5 className="font-bold text-orange-400">The Verdict</h5>
               </div>
-              <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{hasRoast}</p>
+              <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap pr-6">{hasRoast}</p>
             </div>
           )}
 
