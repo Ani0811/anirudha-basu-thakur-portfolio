@@ -85,33 +85,39 @@ export default function ProjectsSection() {
     setRequestingProject(project.title);
 
     try {
-      const response = await fetch('/api/ai/generate-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectName: project.title,
-          techStack: project.tags.join(", ")
-        }),
-      });
+      // Simulate network request delay
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
-      const data = await response.json();
+      const PRE_DEFINED_MESSAGES = [
+        "Hi Anirudha! I loved exploring your PORTFOLIO_NAME project and would really appreciate learning from your approach. Could you please share the source code with me?",
+        "Hey there! I was really impressed by what you built with PORTFOLIO_NAME. Would it be possible to get access to the repository to see how you structured the code?",
+        "Hello Anirudha, your work on PORTFOLIO_NAME is fantastic! I am trying to build something similar and would love to study your source code if you're open to sharing it.",
+        "Hi! I came across your PORTFOLIO_NAME project and was blown away. Could you kindly share the code so I can understand your TECH_STACK implementation better?",
+        "Hey Anirudha, amazing work on PORTFOLIO_NAME! I'm very interested in learning from your coding style. Would you mind sharing the source codebase with me?"
+      ];
 
-      if (response.ok) {
-        // Auto-fill contact form
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-          const messageTextarea = contactSection.querySelector('textarea[name="message"]') as HTMLTextAreaElement;
-          if (messageTextarea) {
-            // Trigger React's onChange event to update state
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
-            if (nativeInputValueSetter) {
-              nativeInputValueSetter.call(messageTextarea, data.message);
-            }
-            const event = new Event('input', { bubbles: true });
-            messageTextarea.dispatchEvent(event);
-            messageTextarea.focus();
-            messageTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const randomIndex = Math.floor(Math.random() * PRE_DEFINED_MESSAGES.length);
+      const rawMessage = PRE_DEFINED_MESSAGES[randomIndex];
+      
+      const techStackStr = project.tags?.join(", ") || "tech";
+      const message = rawMessage
+        .replace(/PORTFOLIO_NAME/g, project.title || "project")
+        .replace(/TECH_STACK/g, techStackStr);
+
+      // Auto-fill contact form
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        const messageTextarea = contactSection.querySelector('textarea[name="message"]') as HTMLTextAreaElement;
+        if (messageTextarea) {
+          // Trigger React's onChange event to update state
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+          if (nativeInputValueSetter) {
+            nativeInputValueSetter.call(messageTextarea, message);
           }
+          const event = new Event('input', { bubbles: true });
+          messageTextarea.dispatchEvent(event);
+          messageTextarea.focus();
+          messageTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     } catch (error) {

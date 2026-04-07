@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useScrollAnimation } from "./hooks/useScrollAnimation";
 import LoadingScreen from "./components/LoadingScreen";
 import Navbar from "./components/Navbar";

@@ -56,7 +56,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-20 sm:mt-24">
+    <footer className="relative mt-12 sm:mt-16">
       {/* Top gradient line */}
       <div className="h-px w-full bg-linear-to-r from-transparent via-cyan-500/50 to-transparent" />
       
@@ -65,24 +65,20 @@ export default function Footer() {
         <div className="absolute bottom-0 left-1/4 w-125 h-75 bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none" />
         <div className="absolute top-0 right-1/4 w-100 h-62.5 bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
           
-          <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
-            {/* Main content - two column split */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 py-6 sm:py-8">
+            {/* Main content - highly horizontal layout */}
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 xl:gap-16 items-start justify-between">
               
-              {/* Left side - Brand */}
-              <div className="space-y-5">
+              {/* Left side - Brand & Socials */}
+              <div className="flex-1 w-full lg:w-[25%] space-y-4">
                 <div className="animate-fade-in-up">
-                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+                  <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-black tracking-tight leading-tight">
                     <span className="text-white inline-block animate-fade-in-up animate-text-glow" style={{ animationDelay: '0.1s' }}>ANIRUDHA</span>
                     <br />
                     <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-purple-400 inline-block animate-fade-in-up animate-gradient-shift" style={{ animationDelay: '0.2s' }}>BASU THAKUR</span>
                   </h2>
-                  <div className="mt-4 w-16 h-1 bg-linear-to-r from-cyan-500 to-purple-500 rounded-full animate-expand-width animate-glow-pulse" style={{ animationDelay: '0.3s' }} />
+                  <div className="mt-3 w-16 h-1 bg-linear-to-r from-cyan-500 to-purple-500 rounded-full animate-expand-width animate-glow-pulse" style={{ animationDelay: '0.3s' }} />
                 </div>
-                
-                <p className="text-slate-300 text-lg sm:text-xl leading-relaxed max-w-md animate-fade-in-up animate-text-shimmer" style={{ animationDelay: '0.4s' }}>
-                  Software Engineer & AI Engineer crafting intelligent solutions with clean code and innovative technology.
-                </p>
                 
                 {/* Social icons */}
                 <div className="flex items-center gap-3 pt-2">
@@ -92,7 +88,7 @@ export default function Footer() {
                       href={social.url}
                       target={social.url.startsWith("mailto") ? undefined : "_blank"}
                       rel={social.url.startsWith("mailto") ? undefined : "noopener noreferrer"}
-                      className="group w-12 h-12 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:shadow-[0_0_25px_rgba(34,211,238,0.3)] transition-all duration-300 animate-scale-in hover:rotate-12 hover:scale-110"
+                      className="group w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all duration-300 animate-scale-in hover:rotate-12 hover:scale-110"
                       style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                       aria-label={social.name}
                     >
@@ -104,22 +100,38 @@ export default function Footer() {
                 </div>
               </div>
               
-              {/* Right side - Navigation & Contact */}
-              <div className="grid grid-cols-2 gap-8">
+              {/* Middle - Transparent Notepad Note */}
+              <div className="flex-1 w-full lg:w-[35%] animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                <div className="relative p-5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md w-full h-full shadow-[inset_0_1px_rgba(255,255,255,0.05),0_10px_30px_rgba(0,0,0,0.5)] before:absolute before:inset-0 before:bg-[url('/noise.png')] before:opacity-5 before:rounded-xl flex flex-col justify-center">
+                  {/* Notepad top ring/clip */}
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-12 h-3 rounded-full bg-[#0a0c14] border border-white/20 shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                  <div className="relative z-10">
+                    <p className="font-mono text-[13px] sm:text-sm xl:text-base text-slate-300 leading-relaxed text-center italic">
+                      "Thank you for dropping by! Whether you have a project in mind, a question, or just want to say hi, feel free to reach out. I'm always open to new opportunities and creative ideas."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Right side - Navigation & Connect */}
+              <div className="flex-1 w-full lg:w-[40%] flex flex-col sm:flex-row gap-8 sm:gap-12 justify-between">
                 {/* Navigate */}
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                  <h3 className="text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase mb-5 animate-pulse-subtle">
+                <div className="animate-fade-in-up sm:w-1/3" style={{ animationDelay: '0.3s' }}>
+                  <h3 className="text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase mb-4 animate-pulse-subtle">
                     Navigate
                   </h3>
-                  <ul className="space-y-4">
+                  <ul className="space-y-3">
                     {navLinks.map((link, index) => (
                       <li key={link.name} className="animate-slide-in-right" style={{ animationDelay: `${0.4 + index * 0.1}s` }}>
                         <a
                           href={link.href}
-                          className="group flex items-center gap-2 text-slate-300 hover:text-white transition-all duration-300 hover:translate-x-2"
+                          className="group flex items-center gap-2 text-slate-400 hover:text-cyan-300 transition-all duration-300 transform hover:translate-x-3"
                         >
-                          <span className="text-cyan-500/60 group-hover:text-cyan-400 group-hover:translate-x-2 transition-all duration-300 text-base">→</span>
-                          <span className="text-base font-medium">{link.name}</span>
+                          <span className="text-cyan-500/40 group-hover:text-cyan-400 transform transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-125 font-mono">~{'>'}</span>
+                          <span className="text-base font-medium relative overflow-hidden inline-block pb-0.5">
+                            {link.name}
+                            <span className="absolute bottom-0 left-0 w-full h-px bg-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                          </span>
                         </a>
                       </li>
                     ))}
@@ -127,21 +139,21 @@ export default function Footer() {
                 </div>
                 
                 {/* Connect */}
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                  <h3 className="text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase mb-5 animate-pulse-subtle">
+                <div className="animate-fade-in-up sm:w-2/3" style={{ animationDelay: '0.5s' }}>
+                  <h3 className="text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase mb-4 animate-pulse-subtle">
                     Connect
                   </h3>
                   <div className="space-y-4">
                     <a 
                       href="mailto:anirudha.basuthakur@gmail.com"
-                      className="block text-slate-300 hover:text-white text-sm transition-all duration-300 break-all leading-relaxed hover:translate-x-2 animate-fade-in-up"
+                      className="inline-block text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-fuchsia-400 hover:from-cyan-300 hover:to-fuchsia-300 font-bold text-sm sm:text-[15px] xl:text-base transition-all duration-300 leading-relaxed hover:translate-x-2 hover:scale-105 animate-fade-in-up drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]"
                       style={{ animationDelay: '0.6s' }}
                     >
-                      anirudha.basuthakur<br className="sm:hidden" />@gmail.com
+                      anirudha.basuthakur@gmail.com
                     </a>
                     <a 
                       href="tel:+919875417275"
-                      className="block text-slate-300 hover:text-white text-sm transition-all duration-300 hover:translate-x-2 animate-fade-in-up"
+                      className="block text-transparent bg-clip-text bg-linear-to-r from-fuchsia-400 to-cyan-400 hover:from-fuchsia-300 hover:to-cyan-300 font-bold text-sm sm:text-base transition-all duration-300 hover:translate-x-2 hover:scale-105 animate-fade-in-up drop-shadow-[0_0_8px_rgba(232,121,249,0.5)]"
                       style={{ animationDelay: '0.7s' }}
                     >
                       +91-9875417275
@@ -174,13 +186,17 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          
+            
           {/* Bottom bar */}
-          <div className="border-t border-white/5 animate-fade-in" style={{ animationDelay: '0.9s' }}>
-            <div className="max-w-6xl mx-auto px-6 py-5">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-                <p className="text-slate-400 font-mono animate-fade-in-up" style={{ animationDelay: '1s' }}>
-                  Acknowledgement: Built with ❤️. Thanks to everyone who supported this project.
+          <div className="border-t border-white/5 animate-fade-in mt-6" style={{ animationDelay: '0.9s' }}>
+            <div className="max-w-7xl mx-auto px-6 py-6 border-t border-white/5">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400 font-mono">
+                <p className="animate-fade-in-up text-center sm:text-left text-xs sm:text-sm" style={{ animationDelay: '1s' }}>
+                  Built by <span className="text-cyan-400 font-semibold">Anirudha Basu Thakur</span> &copy; 2026 All Rights Reserved.
+                </p>
+                <div className="hidden sm:block h-4 w-px bg-white/20"></div>
+                <p className="animate-fade-in-up text-center sm:text-right text-xs sm:text-sm" style={{ animationDelay: '1.2s' }}>
+                  Built with <span className="text-fuchsia-400">Next.js</span>, <span className="text-sky-400">TailwindCSS</span> and <span className="text-purple-400">Framer Motion</span>.
                 </p>
               </div>
             </div>
