@@ -45,8 +45,7 @@ export default function AboutSection() {
           <h2 className={`text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            Full-Stack Developer
-            <span className="block text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500 mt-2 animate-gradient bg-size-[200%_auto]">
+            <span className="block text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500 animate-gradient bg-size-[200%_auto]">
               Building Scalable Solutions
             </span>
           </h2>
