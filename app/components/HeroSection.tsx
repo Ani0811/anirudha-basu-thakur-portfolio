@@ -51,7 +51,14 @@ export default function HeroSection({
       const scrollRange = window.innerHeight * heroScrollRangeFactor;
       const progress = Math.max(0, Math.min(scrollY / scrollRange, 1));
       const playableFrameCount = (heroEndFrameIndex - heroStartFrameIndex) + 1;
-      const frameIndex = heroStartFrameIndex + Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+      const rawFrameIndex = heroStartFrameIndex + Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
+      
+      // Step calculation to match the preloading logic in useScrollAnimation
+      const isMobileDevice = window.innerWidth < 640;
+      const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
+      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+      
+      const frameIndex = step === 1 ? rawFrameIndex : Math.floor(rawFrameIndex / step) * step;
       
       const img = getCachedImage(frameIndex);
       if (!img) return;
@@ -69,14 +76,18 @@ export default function HeroSection({
 
     const animate = () => {
       // Linear interpolation (lerping) for ultra-smooth movement
-      // factor: 0.1 for very smooth/weighted, 0.2-0.3 for snappier
-      const lerpFactor = 0.12; 
+      // factor: Higher for mobile to reduce CPU usage frequency
+      const isMobileDevice = window.innerWidth < 640;
+      const lerpFactor = isMobileDevice ? 0.18 : 0.12; 
       const targetScroll = window.scrollY;
       
       currentScrollY.current += (targetScroll - currentScrollY.current) * lerpFactor;
       
-      // Only redraw if the interpolated scroll has moved significantly or initially
-      if (Math.abs(currentScrollY.current - lastScrollY.current) > 0.1 || lastScrollY.current === 0) {
+      // Only redraw if the interpolated scroll has moved significantly
+      // Mobile has higher threshold to reduce draw calls
+      const threshold = isMobileDevice ? 0.5 : 0.1;
+      
+      if (Math.abs(currentScrollY.current - lastScrollY.current) > threshold || lastScrollY.current === 0) {
         drawFrame(currentScrollY.current);
         lastScrollY.current = currentScrollY.current;
       }

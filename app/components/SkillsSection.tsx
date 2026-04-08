@@ -194,6 +194,9 @@ export default function SkillsSection() {
   const [cardPositions, setCardPositions] = React.useState<number[]>([]);
 
   React.useEffect(() => {
+    // Only run expensive coordinate tracking on desktop
+    if (window.innerWidth < 768) return;
+
     const updatePositions = () => {
       const positions = cardRefs.current.map(card => {
         if (card) {
@@ -216,6 +219,9 @@ export default function SkillsSection() {
 
   // Track which card is currently in view
   React.useEffect(() => {
+    // Only run expensive scroll tracking on desktop
+    if (window.innerWidth < 768) return;
+
     const handleScroll = () => {
       if (!isVisible || cardRefs.current.length === 0) return;
 
@@ -275,9 +281,9 @@ export default function SkillsSection() {
             />
           </div>
 
-          {/* Animated Developer Character - CENTERED ON LINE */}
+          {/* Animated Developer Character - ONLY ON DESKTOP */}
           <div
-            className="absolute left-6 md:left-1/2 transition-all duration-700 ease-out z-20 pointer-events-none"
+            className="hidden md:absolute md:block left-6 md:left-1/2 transition-all duration-700 ease-out z-20 pointer-events-none"
             style={{
               top: cardPositions[activeIndex] ? `${cardPositions[activeIndex] + 100}px` : '100px',
               transform: 'translateX(-50%)',

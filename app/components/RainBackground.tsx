@@ -24,7 +24,8 @@ export default function RainBackground() {
     setSize();
 
     // Adjust drop count based on screen size for performance
-    const maxDrops = width < 768 ? 70 : 150;
+    const isMobile = width < 768;
+    const maxDrops = isMobile ? 30 : 150;
     
     // Initialize drops
     const drops = Array.from({ length: maxDrops }, () => ({
@@ -55,41 +56,42 @@ export default function RainBackground() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // --- Lightning Effect ---
-      if (lightningActive) {
-        // Draw current flash (capped so it never fully whites out the UI)
-        const drawOpacity = Math.min(lightningOpacity, 0.45);
-        ctx.fillStyle = `rgba(200, 240, 255, ${drawOpacity})`;
-        ctx.fillRect(0, 0, width, height);
+      // --- Lightning Effect (Disabled on Mobile for performance) ---
+      if (!isMobile) {
+        if (lightningActive) {
+          // Draw current flash (capped so it never fully whites out the UI)
+          const drawOpacity = Math.min(lightningOpacity, 0.45);
+          ctx.fillStyle = `rgba(200, 240, 255, ${drawOpacity})`;
+          ctx.fillRect(0, 0, width, height);
 
-        // While active and before the end time, allow small flickers
-        if (time < lightningEndTime) {
-          if (Math.random() < 0.15 && lightningOpacity < 0.45) {
-            lightningOpacity += 0.04; // small strobe bump
+          // While active and before the end time, allow small flickers
+          if (time < lightningEndTime) {
+            if (Math.random() < 0.15 && lightningOpacity < 0.45) {
+              lightningOpacity += 0.04; // small strobe bump
+            }
+          } else {
+            // after the designated window, fade out quickly
+            lightningOpacity -= 0.06 * speedMult;
           }
-          // keep baseline (no fast fade) while within the 2s window
+
+          // If opacity falls below threshold, end the active flash
+          if (lightningOpacity <= 0.01) {
+            lightningOpacity = 0;
+            lightningActive = false;
+          }
         } else {
-          // after the designated window, fade out quickly
-          lightningOpacity -= 0.06 * speedMult;
-        }
-
-        // If opacity falls below threshold, end the active flash
-        if (lightningOpacity <= 0.01) {
-          lightningOpacity = 0;
-          lightningActive = false;
-        }
-      } else {
-        // countdown to next potential strike
-        lightningTimer -= speedMult;
-        if (lightningTimer <= 0) {
-          // 10% chance to actually trigger a lightning flash when timer elapses
-          if (Math.random() < 0.1) {
-            lightningActive = true;
-            lightningOpacity = Math.random() * 0.15 + 0.15; // 0.15 - 0.3 starting opacity
-            lightningEndTime = time + 2000; // stay up to 2 seconds
+          // countdown to next potential strike
+          lightningTimer -= speedMult;
+          if (lightningTimer <= 0) {
+            // 10% chance to actually trigger a lightning flash when timer elapses
+            if (Math.random() < 0.1) {
+              lightningActive = true;
+              lightningOpacity = Math.random() * 0.15 + 0.15; // 0.15 - 0.3 starting opacity
+              lightningEndTime = time + 2000; // stay up to 2 seconds
+            }
+            // Reset timer regardless so we retry later
+            lightningTimer = Math.random() * 400 + 200;
           }
-          // Reset timer regardless so we retry later
-          lightningTimer = Math.random() * 400 + 200;
         }
       }
 

@@ -81,52 +81,11 @@ export function useScrollAnimation(): ScrollValues {
     };
   }, []);
 
-  // Detect the first non-black frame and preload all frames into cache
+  // Preload all frames into cache with skipping on mobile
   useEffect(() => {
     let isCancelled = false;
 
-    const getFrameBrightness = (src: string): Promise<number> =>
-      new Promise((resolve) => {
-        if (typeof window === "undefined") {
-          resolve(0);
-          return;
-        }
-        const image = new window.Image();
-        image.decoding = "async";
-        image.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            const sampleWidth = 24;
-            const sampleHeight = 24;
-            canvas.width = sampleWidth;
-            canvas.height = sampleHeight;
-            const context = canvas.getContext("2d", { willReadFrequently: true });
-
-            if (!context) {
-              resolve(0);
-              return;
-            }
-
-            context.drawImage(image, 0, 0, sampleWidth, sampleHeight);
-            const imageData = context.getImageData(0, 0, sampleWidth, sampleHeight);
-            const data = imageData.data;
-            let sum = 0;
-
-            for (let i = 0; i < data.length; i += 4) {
-              sum += data[i] * 0.2126 + data[i + 1] * 0.7152 + data[i + 2] * 0.0722;
-            }
-
-            resolve(sum / (data.length / 4));
-          } catch {
-            resolve(0);
-          }
-        };
-        image.onerror = () => resolve(0);
-        image.src = src;
-      });
-
     const bootstrapFrames = async () => {
-      // If already initialized globally, just update state and return
       if (globalIsLoaded) {
         setHeroStartFrameIndex(globalHeroStartFrameIndex);
         setFrameIndex(globalHeroStartFrameIndex);
@@ -134,43 +93,31 @@ export function useScrollAnimation(): ScrollValues {
         return;
       }
 
-      let detectedStart = 0;
-
-      // Find start frame - skip if already checked
-      if (globalHeroStartFrameIndex === 0) {
-        for (let i = 0; i < frameSources.length; i++) {
-          const brightness = await getFrameBrightness(frameSources[i]);
-          if (brightness > 5) {
-            detectedStart = i;
-            globalHeroStartFrameIndex = i;
-            break;
-          }
-        }
-      } else {
-        detectedStart = globalHeroStartFrameIndex;
-      }
-
-      // Find end frame - scan backwards from the end to skip trailing black frames
-      if (globalHeroEndFrameIndex === 72) {
-        for (let i = frameSources.length - 1; i >= detectedStart; i--) {
-          const brightness = await getFrameBrightness(frameSources[i]);
-          if (brightness > 2) { // Slightly lower threshold for trail-off
-            globalHeroEndFrameIndex = i;
-            break;
-          }
-        }
-      }
+      // Pre-calculated values to avoid expensive brightness detection on every mount
+      // These should match the frames known to be non-black
+      const detectedStart = 0; 
+      globalHeroStartFrameIndex = 0;
+      globalHeroEndFrameIndex = 72;
 
       if (isCancelled) return;
 
-      // Update both simultaneously to prevent any jumps from defaults
       setHeroStartFrameIndex(detectedStart);
       setFrameIndex(detectedStart);
 
-      // Preload all frames into the imageCache Map
-      const preloadPromises = frameSources.map((src, index) => {
-        return new Promise<void>((resolve) => {
-          // SKIP if already in cache
+      // Determine step based on device capability (simple heuristic)
+      // Mobile: Load every 3rd frame (roughly 24 frames total)
+      // Tablet: Load every 2nd frame
+      const isMobileDevice = window.innerWidth < 640;
+      const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
+      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+
+      // Preload frames into the imageCache Map with stepping
+      const preloadPromises = [];
+      for (let i = 0; i < frameSources.length; i += step) {
+        const index = i;
+        const src = frameSources[index];
+        
+        preloadPromises.push(new Promise<void>((resolve) => {
           if (imageCache.has(index)) {
             resolve();
             return;
@@ -179,20 +126,17 @@ export function useScrollAnimation(): ScrollValues {
           const img = new Image();
           img.onload = async () => {
             try {
-              // Ensure image is decoded before adding to cache
-              if ('decode' in img) {
-                await img.decode();
-              }
+              if ('decode' in img) await img.decode();
             } catch (e) {
               console.warn("Failed to decode image:", src);
             }
             imageCache.set(index, img);
             resolve();
           };
-          img.onerror = () => resolve(); // Keep going even if one fails
+          img.onerror = () => resolve();
           img.src = src;
-        });
-      });
+        }));
+      }
 
       await Promise.all(preloadPromises);
       if (!isCancelled) {
@@ -203,12 +147,9 @@ export function useScrollAnimation(): ScrollValues {
 
     bootstrapFrames();
     
-    // Safety timeout to ensure site doesn't stay stuck if detection takes too long
     const safetyTimeout = setTimeout(() => {
-      if (!isCancelled && !isLoaded) {
-        setIsLoaded(true);
-      }
-    }, 2000);
+      if (!isCancelled && !isLoaded) setIsLoaded(true);
+    }, 1500);
 
     return () => {
       isCancelled = true;
@@ -238,8 +179,17 @@ export function useScrollAnimation(): ScrollValues {
       Math.min(playableFrameCount - 1, Math.floor(progress * playableFrameCount));
 
     if (nextIndex !== frameIndex && nextIndex < frameSources.length) {
-      setFrameIndex(nextIndex);
-      lastUpdate = now;
+      // Find the nearest available index (stepping backward to find the last loaded one)
+      const isMobileDevice = window.innerWidth < 640;
+      const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
+      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+      
+      const adjustedIndex = step === 1 ? nextIndex : Math.floor(nextIndex / step) * step;
+      
+      if (adjustedIndex !== frameIndex) {
+        setFrameIndex(adjustedIndex);
+        lastUpdate = now;
+      }
     }
   };
 
