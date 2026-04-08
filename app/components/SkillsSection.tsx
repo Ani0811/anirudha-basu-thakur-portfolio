@@ -177,6 +177,7 @@ const developerQuote = {
 
 export default function SkillsSection() {
   const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [workingProcessRef, workingProcessVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [flippedCards, setFlippedCards] = React.useState<boolean[]>(new Array(milestones.length).fill(false));
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -552,19 +553,19 @@ export default function SkillsSection() {
       </section>
 
       {/* WORKING PROCESS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
+      <section ref={workingProcessRef} className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <div className="flex flex-col items-center mb-8">
-            <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
+            <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${workingProcessVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
               HOW I WORK
             </h3>
-            <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.6s' }} />
+            <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${workingProcessVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.6s' }} />
           </div>
-          <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight mb-4 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight mb-4 transition-all duration-700 delay-200 ${workingProcessVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             Working Process
           </h2>
-          <p className={`text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className={`text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ${workingProcessVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             A glimpse into my development workflow — from napkin sketch to production deployment.
           </p>
         </div>
