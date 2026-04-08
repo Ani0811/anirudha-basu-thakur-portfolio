@@ -47,7 +47,11 @@ export async function POST(req: NextRequest) {
         switch (event.type) {
           case 'PushEvent':
             title = 'Pushed to repository';
-            detail = event.payload.commits?.[0]?.message || 'No commit message';
+            const pushCommits = event.payload.commits || [];
+            // Take the last commit message (usually the most recent one in the push)
+            detail = pushCommits.length > 0 
+              ? pushCommits[pushCommits.length - 1].message 
+              : `Pushed ${event.payload.size || ''} commit(s)`;
             break;
           case 'PullRequestEvent':
             title = `${event.payload.action} pull request`;
