@@ -137,10 +137,10 @@ export default function ProjectsSection() {
     return (
       <div
         key={i}
-        className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)]"
+        className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)] flex flex-col h-full"
       >
         {/* Project Thumbnail */}
-        <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-64 sm:h-80 bg-linear-to-br from-[#0d1117] via-[#0a0d14] to-[#060810] overflow-hidden flex items-center justify-center shrink-0">
           {proj.image ? (
             <Image
               src={proj.image}
@@ -161,7 +161,7 @@ export default function ProjectsSection() {
         </div>
 
         {/* Project Details */}
-        <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14]">
+        <div className="p-6 sm:p-8 relative z-20 bg-linear-to-b from-[#0f1420] to-[#0a0c14] flex flex-col flex-1">
           {/* Technology Tags */}
           <div className="flex flex-wrap gap-2 mb-6">
             {proj.tags.map((tag: string) => (
