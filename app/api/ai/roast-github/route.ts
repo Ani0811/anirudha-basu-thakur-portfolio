@@ -291,7 +291,7 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     const prompt = `You are a brutally honest senior software engineer reviewing the "${projectName}" project.
 Based on the code and README provided below, give a SHORT (2-3 sentences) roast that is funny but constructive.
@@ -302,15 +302,37 @@ ${codeSnippet}
 
 Provide ONLY the roast text, no additional formatting or labels.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const roast = response.text();
-
-    return NextResponse.json({ roast });
+    try {
+      const result = await model.generateContent(prompt);
+      const response = result.response;
+      const roast = response.text();
+      return NextResponse.json({ roast });
+    } catch (apiErr: any) {
+      console.error('Gemini API Error:', apiErr);
+      if (apiErr.status === 503 || apiErr.message?.includes('503')) {
+        return NextResponse.json(
+          { 
+            error: 'The roasting AI is currently overwhelmed by the sheer brilliance of your code (or just high traffic). Please try again in a moment!',
+            isRetryable: true 
+          },
+          { status: 503 }
+        );
+      }
+      if (apiErr.status === 429 || apiErr.message?.includes('429') || apiErr.message?.toLowerCase().includes('quota')) {
+        return NextResponse.json(
+          { 
+            error: "We've reached the free-tier roast limit! The AI advisor is on a mandatory coffee break. Please check back later.",
+            isRetryable: false 
+          },
+          { status: 429 }
+        );
+      }
+      throw apiErr; // Re-throw to be caught by outer catch
+    }
   } catch (error) {
     console.error('Error generating roast:', error);
     return NextResponse.json(
-      { error: 'Failed to generate roast' },
+      { error: 'The AI advisor is temporarily offline. It might be debugging itself or just taking a breather. Please try again in a few minutes.' },
       { status: 500 }
     );
   }

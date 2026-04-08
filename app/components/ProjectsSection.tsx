@@ -73,11 +73,11 @@ export default function ProjectsSection() {
       if (response.ok) {
         setRoastResults(prev => ({ ...prev, [project.title]: data.roast }));
       } else {
-        setRoastResults(prev => ({ ...prev, [project.title]: `Error: ${data.error || 'Unknown error'}` }));
+        setRoastResults(prev => ({ ...prev, [project.title]: data.error || 'The AI is currently speechless. Please try again later.' }));
       }
     } catch (error) {
       console.error('Roast error:', error);
-      setRoastResults(prev => ({ ...prev, [project.title]: 'Failed to roast code. Please try again.' }));
+      setRoastResults(prev => ({ ...prev, [project.title]: 'Network hiccup! The AI couldn\'t reach the code. Check your connection and try again.' }));
     } finally {
       setRoastingProject(null);
     }

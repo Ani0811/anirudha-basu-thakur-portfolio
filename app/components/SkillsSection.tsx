@@ -561,7 +561,10 @@ export default function SkillsSection() {
             </h3>
             <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.6s' }} />
           </div>
-          <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight mb-4 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            Working Process
+          </h2>
+          <p className={`text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             A glimpse into my development workflow — from napkin sketch to production deployment.
           </p>
         </div>
