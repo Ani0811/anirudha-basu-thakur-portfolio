@@ -5,10 +5,11 @@ Welcome to the source code of my high-performance, cinematic portfolio. Built wi
 ## 🚀 Key Features
 
 - **Cinematic Hero Animation**: A frame-by-frame background animation synchronized with the user's scroll.
+- **Live GitHub Activity Stream**: A real-time "Currently Working On" timeline that fetches and resolves commit messages via a two-stage API system.
+- **Metric-Driven Projects**: Featured work descriptions enhanced with quantifiable metrics (load time reductions, transaction processing speeds, etc.) to demonstrate real-world impact.
 - **Glassmorphism UI**: A consistent design language using frosted-glass effects, blurred backdrops, and vibrant glows.
-- **Interactive Typewriter**: A progressive role reveal with smooth, character-by-character animation.
 - **AI-Powered "Roast My Code"**: Integration with Gemini AI to provide playful, real-time feedback on project codebases.
-- **Responsive & Optimized**: Fully responsive layout designed to maintain high performance across mobile, tablet, and desktop.
+- **Storytelling UX**: A refined "About" section focusing on the narrative journey and problem-solving mindset.
 
 ## 🛠️ Tech Stack
 
@@ -16,8 +17,18 @@ Welcome to the source code of my high-performance, cinematic portfolio. Built wi
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Logic**: TypeScript
 - **Animations**: Custom `requestAnimationFrame` hooks & CSS Transitions
+- **Backend**: Next.js Server Actions & API Routes (GitHub & Gemini AI Integration)
 
-## ⚡ The Scroll Animation Engine (Technical Deep Dive)
+## ⚡ Technical Achievements
+
+### 1. The Scroll Animation Engine
+Achieving 60FPS fluid motion while loading high-quality image frames required a custom-built rendering engine using Decoupled Rendering (RAF Loop), Linear Interpolation (Lerping), and Intelligent Asset Caching with `img.decode()`.
+
+### 2. Two-Stage GitHub Activity Resolution
+To handle the "Currently Working On" section, we implemented a sophisticated fetching logic:
+- **Stage 1 (Discovery)**: Fetches the public GitHub events feed.
+- **Stage 2 (Resolution)**: Identifies `PushEvent` items where GitHub omits commit data and performs parallel secondary lookups to the Commits API to resolve full messages.
+- **Result**: A live, descriptive activity stream that shows specific commit messages even when the default feed is truncated.
 
 The standout feature of this portfolio is the Hero background animation. Achieving 60FPS fluid motion while loading high-quality image frames required a custom-built rendering engine.
 
