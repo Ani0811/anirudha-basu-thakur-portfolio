@@ -35,51 +35,72 @@ export async function POST(req: NextRequest) {
     const events = await response.json();
 
     // Filter and format the events for the UI
-    const formattedEvents = events
-      .filter((event: any) => 
-        ['PushEvent', 'CreateEvent', 'PullRequestEvent', 'IssuesEvent'].includes(event.type)
-      )
-      .slice(0, 5)
-      .map((event: any) => {
-        let title = '';
-        let detail = '';
+    const filteredEvents = events.filter((event: any) => 
+      ['PushEvent', 'CreateEvent', 'PullRequestEvent', 'IssuesEvent'].includes(event.type)
+    ).slice(0, 5);
 
-        switch (event.type) {
-          case 'PushEvent':
-            title = 'Pushed to repository';
-            const pushCommits = event.payload.commits || [];
-            // Take the last commit message (usually the most recent one in the push)
-            detail = pushCommits.length > 0 
-              ? pushCommits[pushCommits.length - 1].message 
-              : `Pushed ${event.payload.size || ''} commit(s)`;
-            break;
-          case 'PullRequestEvent':
-            title = `${event.payload.action} pull request`;
-            detail = event.payload.pull_request?.title || '';
-            break;
-          case 'CreateEvent':
-            title = `Created ${event.payload.ref_type}`;
-            detail = event.payload.ref || event.repo.name;
-            break;
-          case 'IssuesEvent':
-            title = `${event.payload.action} issue`;
-            detail = event.payload.issue?.title || '';
-            break;
-          default:
-            title = 'GitHub activity';
-            detail = event.repo.name;
-        }
+    // Resolve detailed information for PushEvents concurrently
+    const formattedEvents = await Promise.all(filteredEvents.map(async (event: any) => {
+      let title = '';
+      let detail = '';
 
-        return {
-          id: event.id,
-          type: event.type,
-          repo: event.repo.name,
-          title,
-          detail,
-          timestamp: event.created_at,
-          url: `https://github.com/${event.repo.name}`,
-        };
-      });
+      switch (event.type) {
+        case 'PushEvent':
+          title = 'Pushed to repository';
+          const pushCommits = event.payload.commits || [];
+          
+          if (pushCommits.length > 0) {
+            // Take the last commit message from the payload if present
+            detail = pushCommits[pushCommits.length - 1].message;
+          } else if (event.payload.head) {
+            // Secondary lookup: Fetch the specific commit details using the head SHA
+            try {
+              const commitResponse = await fetch(
+                `https://api.github.com/repos/${event.repo.name}/commits/${event.payload.head}`,
+                { headers }
+              );
+              if (commitResponse.ok) {
+                const commitData = await commitResponse.json();
+                detail = commitData.commit?.message || 'Pushed code updates';
+              } else {
+                detail = 'Pushed code updates';
+              }
+            } catch (err) {
+              console.error('Secondary commit fetch failed:', err);
+              detail = 'Pushed code updates';
+            }
+          } else {
+            detail = `Pushed ${event.payload.size || ''} commit(s)`;
+          }
+          break;
+
+        case 'PullRequestEvent':
+          title = `${event.payload.action} pull request`;
+          detail = event.payload.pull_request?.title || '';
+          break;
+        case 'CreateEvent':
+          title = `Created ${event.payload.ref_type}`;
+          detail = event.payload.ref || event.repo.name;
+          break;
+        case 'IssuesEvent':
+          title = `${event.payload.action} issue`;
+          detail = event.payload.issue?.title || '';
+          break;
+        default:
+          title = 'GitHub activity';
+          detail = event.repo.name;
+      }
+
+      return {
+        id: event.id,
+        type: event.type,
+        repo: event.repo.name,
+        title,
+        detail,
+        timestamp: event.created_at,
+        url: `https://github.com/${event.repo.name}`,
+      };
+    }));
 
     return NextResponse.json(formattedEvents);
   } catch (error) {
