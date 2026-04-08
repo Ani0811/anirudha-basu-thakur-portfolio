@@ -99,6 +99,12 @@ export default function HeroSection({
   const [text, setText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [loopNum, setLoopNum] = React.useState(0);
+  const [showScrollPrompt, setShowScrollPrompt] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowScrollPrompt(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -224,12 +230,18 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* Scroll prompt */}
+          {/* Redesigned Scroll prompt */}
           <div
-            className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 text-cyan-400 font-mono text-xs sm:text-sm tracking-[0.25em] sm:tracking-widest flex flex-col items-center gap-2 animate-bounce transition-opacity duration-300"
-            style={{ opacity: scrollY > 50 ? 0 : 1 }}
+            className={`absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 transition-all duration-1000 ${
+              showScrollPrompt && scrollY < 50 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+            }`}
           >
-            SCROLL <span className="w-px h-8 bg-cyan-500/50 block" />
+            <div className="w-6 h-10 border-2 border-cyan-500/30 rounded-full flex justify-center p-1.5 backdrop-blur-sm">
+              <div className="w-1 h-2 bg-cyan-400 rounded-full animate-scroll-wheel" />
+            </div>
+            <span className="text-cyan-400 font-mono text-[10px] sm:text-xs tracking-[0.3em] uppercase opacity-70">
+              Scroll
+            </span>
           </div>
         </div>
       </section>

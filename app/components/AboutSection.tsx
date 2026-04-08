@@ -54,13 +54,13 @@ export default function AboutSection() {
           <p className={`text-slate-300 text-lg mb-6 leading-relaxed transition-all duration-700 delay-100 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            Software Engineer specializing in full-stack development with expertise in <strong className="text-white">React</strong>, <strong className="text-white">Node.js</strong>, <strong className="text-white">Python</strong>, and <strong className="text-white">MongoDB</strong>.
+            I'm a software engineer who loves the marriage of robust backend logic with smooth frontend experiences. My journey into development started with a fascination for building tools that actually help people, leading me to master the <strong className="text-white">MERN stack</strong> and <strong className="text-white">cloud solutions</strong>.
           </p>
           
           <p className={`text-slate-400 text-base mb-8 leading-relaxed transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            Proficient in building scalable web applications, RESTful APIs, and integrating cloud solutions using Azure and Firebase. Experienced in payment integration with Razorpay and developing AI/ML systems.
+            When I'm not architecting RESTful APIs or refining UI animations, I'm usually exploring new AI/ML applications or optimizing payment flows for better user conversion. I believe every line of code should contribute to a better user journey.
           </p>
           
           {/* Specializations */}

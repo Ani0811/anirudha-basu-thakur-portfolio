@@ -8,6 +8,7 @@ import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
 import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
+import CurrentWorkSection from "./components/CurrentWorkSection";
 import ContactSection from "./components/ContactSection";
 import RateMyPortfolioSection from "./components/RateMyPortfolioSection";
 import Footer from "./components/Footer";
@@ -80,6 +81,7 @@ export default function Portfolio() {
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
+        <CurrentWorkSection />
         <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
         <RateMyPortfolioSection />
       </main>
