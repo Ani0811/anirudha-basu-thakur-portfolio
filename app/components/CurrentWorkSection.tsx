@@ -86,14 +86,31 @@ export default function CurrentWorkSection() {
                 No recent activity found. Code is cooking... 🍳
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div 
+                className={`flex flex-col gap-4 max-h-[520px] overflow-y-auto pr-2 custom-scrollbar transition-all duration-700 delay-400 ${
+                  isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+                }`}
+              >
+                <style jsx>{`
+                  .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-track {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 10px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(34, 211, 238, 0.3);
+                    border-radius: 10px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: rgba(34, 211, 238, 0.5);
+                  }
+                `}</style>
                 {events.map((event, i) => (
                   <div 
                     key={event.id}
-                    className={`group relative p-5 sm:p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-cyan-500/40 transition-all duration-500 hover:-translate-x-1 ${
-                      isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
-                    }`}
-                    style={{ transitionDelay: `${400 + (i * 100)}ms` }}
+                    className="group relative p-5 sm:p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-cyan-500/40 transition-all duration-500 hover:-translate-x-1"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-start gap-4">

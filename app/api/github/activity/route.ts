@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(
-      `https://api.github.com/users/${username}/events/public?per_page=10`,
+      `https://api.github.com/users/${username}/events/public?per_page=15`,
       { headers }
     );
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     // Filter and format the events for the UI
     const filteredEvents = events.filter((event: any) => 
       ['PushEvent', 'CreateEvent', 'PullRequestEvent', 'IssuesEvent'].includes(event.type)
-    ).slice(0, 5);
+    ).slice(0, 10);
 
     // Resolve detailed information for PushEvents concurrently
     const formattedEvents = await Promise.all(filteredEvents.map(async (event: any) => {
