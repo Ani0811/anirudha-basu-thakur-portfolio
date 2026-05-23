@@ -17,10 +17,10 @@ const liveProjects = [
   },
   {
     title: "Rimberio Real Estate",
-    desc: "Developed a scalable property management portal deployed on Azure, managing over 1,000 active listings. Implemented a custom filtering algorithm that reduced property search time for users by 40%.",
-    tags: ["React.js", "Node.js", "Express.js", "SQL", "Azure", "Razorpay"],
+    desc: "Developed a scalable property management portal running on Supabase with Cloudinary for optimized multimedia storage. Implemented a custom filtering algorithm and a dynamic property purchase viewing architecture, managing over 1,000 active listings.",
+    tags: ["React.js", "Node.js", "Express.js", "Supabase", "Cloudinary", "Razorpay"],
     github: "https://github.com/Ani0811/realestate-frontend-react",
-    live: "https://realstate-e7bfchdfftbee4c6.centralindia-01.azurewebsites.net",
+    live: "https://realestate-frontend-react.vercel.app/",
     image: "/projects/Rimberio.jpeg"
   }
 ];

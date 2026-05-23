@@ -5,6 +5,13 @@ import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const milestones = [
   {
+    year: "2026 - 2027",
+    title: "Vellore Institute of Technology",
+    desc: "Pursuing Master of Computer Applications (MCA). Deepening knowledge in advanced software systems, database engineering, and modern application architectures.",
+    icon: "🎓",
+    color: "from-emerald-500 to-teal-500"
+  },
+  {
     year: "2022 - 2025",
     title: "Netaji Subhash Engineering College",
     desc: "CGPA: 7.86. Studied core engineering principles, full-stack web development, and software engineering.",
@@ -72,7 +79,8 @@ const skillGroups = [
       { name: "MongoDB", level: 90, icon: "🍃" },
       { name: "PostgreSQL", level: 85, icon: "🐘" },
       { name: "MySQL", level: 82, icon: "🛢" },
-      { name: "Redis", level: 80, icon: "🔴" }
+      { name: "Redis", level: 80, icon: "🔴" },
+      { name: "Supabase", level: 88, icon: "⚡" }
     ]
   },
   {
