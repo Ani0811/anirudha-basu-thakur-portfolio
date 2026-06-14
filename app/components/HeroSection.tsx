@@ -36,7 +36,7 @@ export default function HeroSection({
     const canvas = canvasRef.current;
     if (!canvas || !isLoaded) return;
 
-    const context = canvas.getContext("2d", { alpha: false });
+    const context = canvas.getContext("2d", { alpha: true });
     if (!context) return;
 
     const updateCanvasSize = () => {
@@ -67,12 +67,10 @@ export default function HeroSection({
       const imgWidth = img.width;
       const imgHeight = img.height;
 
-      // Calculate scale to fit width on mobile/tablet (with padding factor) to prevent extreme crop/zoom
+      // Fit width on mobile/tablet to match desktop zoom level relative to screen width
       let scale;
-      if (isMobileDevice) {
-        scale = (canvasWidth / imgWidth) * 1.45;
-      } else if (isTabletDevice) {
-        scale = (canvasWidth / imgWidth) * 1.65;
+      if (isMobileDevice || isTabletDevice) {
+        scale = canvasWidth / imgWidth;
       } else {
         scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
       }
@@ -80,25 +78,23 @@ export default function HeroSection({
       const x = (canvasWidth / 2) - (imgWidth / 2) * scale;
       const y = (canvasHeight / 2) - (imgHeight / 2) * scale;
 
-      // Clear canvas with background color first to avoid frame trails
-      context.fillStyle = "#0a0a0c";
-      context.fillRect(0, 0, canvasWidth, canvasHeight);
+      // Clear the canvas to support transparency
+      context.clearRect(0, 0, canvasWidth, canvasHeight);
 
       context.drawImage(img, x, y, imgWidth * scale, imgHeight * scale);
 
-      // Fade top and bottom of the frame to blend with background on mobile/tablet
+      // Fade the top and bottom of the frame to transparent so the page background gradient shows through
       if (isMobileDevice || isTabletDevice) {
-        const topGrad = context.createLinearGradient(0, y, 0, y + (imgHeight * scale) * 0.22);
-        topGrad.addColorStop(0, '#0a0a0c');
-        topGrad.addColorStop(1, 'rgba(10, 10, 12, 0)');
-        context.fillStyle = topGrad;
-        context.fillRect(0, y - 2, canvasWidth, (imgHeight * scale) * 0.22 + 2);
+        const grad = context.createLinearGradient(0, y, 0, y + imgHeight * scale);
+        grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        grad.addColorStop(0.18, 'rgba(0, 0, 0, 1)');
+        grad.addColorStop(0.82, 'rgba(0, 0, 0, 1)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        const bottomGrad = context.createLinearGradient(0, y + (imgHeight * scale) * 0.78, 0, y + imgHeight * scale);
-        bottomGrad.addColorStop(0, 'rgba(10, 10, 12, 0)');
-        bottomGrad.addColorStop(1, '#0a0a0c');
-        context.fillStyle = bottomGrad;
-        context.fillRect(0, y + (imgHeight * scale) * 0.78, canvasWidth, (imgHeight * scale) * 0.22 + 2);
+        context.globalCompositeOperation = 'destination-in';
+        context.fillStyle = grad;
+        context.fillRect(0, y - 2, canvasWidth, imgHeight * scale + 4);
+        context.globalCompositeOperation = 'source-over';
       }
     };
 
