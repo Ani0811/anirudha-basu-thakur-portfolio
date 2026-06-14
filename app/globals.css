@@ -934,3 +934,68 @@ a {
   color: white;
 }
 
+@media (pointer: fine) {
+  body, a, button, [role="button"], input, textarea, select {
+    cursor: none !important;
+  }
+  
+  .custom-cursor-dot {
+    position: fixed;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #22d3ee;
+    z-index: 10000;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0);
+    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, opacity 0.3s ease;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+  }
+  
+  .custom-cursor-ring {
+    position: fixed;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(34, 211, 238, 0.4);
+    z-index: 9999;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0);
+    transition: border-color 0.2s ease, width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, background-color 0.2s ease, opacity 0.3s ease;
+  }
+  
+  /* Hover states */
+  .custom-cursor-dot.hovered {
+    width: 4px;
+    height: 4px;
+    top: -2px;
+    left: -2px;
+    background-color: #a855f7;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
+  }
+  
+  .custom-cursor-ring.hovered {
+    width: 52px;
+    height: 52px;
+    top: -26px;
+    left: -26px;
+    border-color: rgba(168, 85, 247, 0.6);
+    background-color: rgba(168, 85, 247, 0.08);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
+  }
+  
+  /* Click states */
+  .custom-cursor-ring.clicked {
+    width: 32px;
+    height: 32px;
+    top: -16px;
+    left: -16px;
+    border-color: #22d3ee;
+    background-color: rgba(34, 211, 238, 0.2);
+  }
+}
+

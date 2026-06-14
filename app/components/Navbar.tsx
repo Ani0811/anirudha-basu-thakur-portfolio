@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 interface Props {
   scrollY: number;
@@ -11,9 +11,60 @@ interface Props {
 const navLinks = ["Home", "About", "Skills", "Projects", "Contact"];
 
 export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen }: Props) {
-  const [activeSection, setActiveSection] = React.useState("home");
+  const [activeSection, setActiveSection] = useState("home");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  React.useEffect(() => {
+  const searchItems = [
+    // Sections
+    { name: "Home Section", type: "Section", targetId: "home" },
+    { name: "About Section", type: "Section", targetId: "about" },
+    { name: "Skills Section", type: "Section", targetId: "skills" },
+    { name: "Projects Section", type: "Section", targetId: "projects" },
+    { name: "Contact Section", type: "Section", targetId: "contact" },
+    { name: "Feedback (Rate Portfolio)", type: "Section", targetId: "rate-portfolio" },
+    // Projects
+    { name: "Foodie Frenzy Project", type: "Project", targetId: "project-foodie-frenzy" },
+    { name: "Rimberio Real Estate Project", type: "Project", targetId: "project-rimberio-real-estate" },
+    { name: "Console BMS Project", type: "Project", targetId: "project-console-bms-bank-management-system" },
+    { name: "User Management System Project", type: "Project", targetId: "project-user-management-system-php" },
+    // Specializations
+    { name: "Full-Stack Development Specialist", type: "Skill", targetId: "skills" },
+    { name: "Backend Architecture Specialist", type: "Skill", targetId: "skills" },
+    { name: "UI/UX Design Specialist", type: "Skill", targetId: "skills" },
+    { name: "Payment Integration Specialist", type: "Skill", targetId: "skills" },
+    { name: "Middleware Development Specialist", type: "Skill", targetId: "skills" },
+    { name: "AI Development Specialist", type: "Skill", targetId: "skills" },
+    // Links / Actions
+    { name: "Download Resume PDF", type: "Action", action: () => {
+      const link = document.createElement('a');
+      link.href = "/docs/Anirudha_Basu_Thakur_Resume.pdf";
+      link.download = "Anirudha_Basu_Thakur_Resume.pdf";
+      link.click();
+    }},
+    { name: "GitHub Profile Link", type: "Link", url: "https://github.com/Ani0811" },
+    { name: "LinkedIn Profile Link", type: "Link", url: "https://linkedin.com/in/anirudha-basu-thakur-686aa8253" },
+    { name: "Roast My Code Tool", type: "Action", action: () => {
+      const el = document.getElementById("projects");
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }},
+    { name: "Terminal Console Mode", type: "Action", action: () => {
+      const el = document.getElementById("contact");
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => {
+        const btn = document.querySelector("#contact button");
+        if (btn) (btn as HTMLButtonElement).click();
+      }, 500);
+    }}
+  ];
+
+  const filteredItems = searchItems.filter(item => 
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
     const handleScroll = () => {
       const sections = navLinks.map(link => link.toLowerCase());
       const scrollPosition = window.scrollY + 200;
@@ -31,6 +82,65 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
     handleScroll(); // Check on mount
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Listen for Ctrl+K and arrow keys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+        setSearchQuery("");
+        setSelectedIndex(0);
+      }
+      
+      if (!isSearchOpen) return;
+      
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev + 1) % Math.max(1, filteredItems.length));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev - 1 + filteredItems.length) % Math.max(1, filteredItems.length));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filteredItems[selectedIndex]) {
+          handleItemSelect(filteredItems[selectedIndex]);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen, filteredItems, selectedIndex]);
+
+  const handleItemSelect = (item: any) => {
+    setIsSearchOpen(false);
+    
+    if (item.action) {
+      item.action();
+      return;
+    }
+    
+    if (item.url) {
+      window.open(item.url, "_blank");
+      return;
+    }
+    
+    if (item.targetId) {
+      const el = document.getElementById(item.targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add dynamic ring pulse highlight
+        el.classList.add("ring-4", "ring-cyan-400/80", "shadow-[0_0_40px_rgba(34,211,238,0.6)]");
+        setTimeout(() => {
+          el.classList.remove("ring-4", "ring-cyan-400/80", "shadow-[0_0_40px_rgba(34,211,238,0.6)]");
+        }, 2200);
+      }
+    }
+  };
 
   return (
     <nav
@@ -73,7 +183,18 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
           })}
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-8 relative z-50">
+        <div className="flex items-center gap-3 sm:gap-6 relative z-50">
+          {/* Quick Search Button */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-300 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer sm:w-auto sm:px-4 sm:py-2 sm:gap-2 sm:rounded-full"
+            aria-label="Open search engine"
+          >
+            <span>🔍</span>
+            <span className="hidden sm:inline text-xs font-semibold">Search</span>
+            <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[9px] bg-white/10 rounded-md text-slate-400 font-sans border border-white/5 uppercase font-medium">Ctrl K</kbd>
+          </button>
+
           <a
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
             target="_blank"
@@ -215,6 +336,81 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
           </a>
         </div>
       </div>
+
+      {/* Command Palette / Search Modal */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4 animate-fade-in">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-[#030508]/80 backdrop-blur-md" 
+            onClick={() => setIsSearchOpen(false)}
+          />
+          
+          {/* Search Box Card */}
+          <div className="relative w-full max-w-lg rounded-2xl border border-cyan-500/30 bg-[#0f1420]/95 shadow-[0_0_50px_rgba(34,211,238,0.25)] overflow-hidden flex flex-col max-h-[60vh] animate-scale-in">
+            {/* Input Header */}
+            <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
+              <span className="text-xl text-cyan-400">🔍</span>
+              <input
+                type="text"
+                placeholder="Search sections, projects, skills..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedIndex(0);
+                }}
+                className="flex-1 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none border-none font-mono"
+                autoFocus
+              />
+              <button 
+                onClick={() => setIsSearchOpen(false)}
+                className="text-slate-500 hover:text-white text-xs font-mono border border-white/10 rounded px-1.5 py-0.5"
+              >
+                ESC
+              </button>
+            </div>
+            
+            {/* List Items */}
+            <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item, index) => {
+                  const isSelected = index === selectedIndex;
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => handleItemSelect(item)}
+                      onMouseEnter={() => setSelectedIndex(index)}
+                      className={`w-full text-left px-4 py-3 rounded-xl flex items-center justify-between transition-all font-mono text-sm cursor-pointer ${
+                        isSelected 
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 pl-6' 
+                          : 'text-slate-300 border border-transparent hover:bg-white/2'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-500 uppercase tracking-widest text-[9px]">
+                          {item.type}
+                        </span>
+                        <span>{item.name}</span>
+                      </div>
+                      {isSelected && <span className="text-cyan-400 text-xs">ENTER ↵</span>}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-slate-500 font-mono text-xs">
+                  No results found matching "{searchQuery}"
+                </div>
+              )}
+            </div>
+            
+            {/* Footer tips */}
+            <div className="px-4 py-3 border-t border-white/5 bg-black/20 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <span>↑↓ to navigate</span>
+              <span>↵ to select</span>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

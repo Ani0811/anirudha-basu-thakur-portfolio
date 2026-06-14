@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useScrollAnimation } from "./hooks/useScrollAnimation";
 import LoadingScreen from "./components/LoadingScreen";
 import Navbar from "./components/Navbar";
+import CustomCursor from "./components/CustomCursor";
 
 // Dynamic imports for sections below the fold to improve LCP and TBT
 const HeroSection = dynamic(() => import("./components/HeroSection"), { ssr: true });
@@ -33,15 +34,22 @@ export default function PortfolioClient() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [terminalMode, setTerminalMode] = useState(false);
 
+  const scrollValues = useScrollAnimation();
+
   // Boot animation sequence
   useEffect(() => {
     if (bootText < bootMessages.length) {
-      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), 600);
+      // Speed up if critical assets are ready/cached
+      const interval = scrollValues.isLoaded ? 200 : 450;
+      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), interval);
       return () => clearTimeout(timer);
     } else {
-      setTimeout(() => setLoading(false), 800);
+      // Shorter transition out
+      const finishDelay = scrollValues.isLoaded ? 200 : 400;
+      const timer = setTimeout(() => setLoading(false), finishDelay);
+      return () => clearTimeout(timer);
     }
-  }, [bootText]);
+  }, [bootText, scrollValues.isLoaded]);
 
   // Lock body scroll while mobile menu is open
   useEffect(() => {
@@ -55,14 +63,15 @@ export default function PortfolioClient() {
     };
   }, [isMobileMenuOpen]);
 
-  const scrollValues = useScrollAnimation();
-
   if (loading) {
     return <LoadingScreen bootText={bootText} bootMessages={bootMessages} />;
   }
 
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans selection:bg-cyan-900 selection:text-cyan-100 overflow-x-clip">
+      {/* Custom trailing cursor */}
+      <CustomCursor />
+
       {/* Background Ambience / Grid */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen" />

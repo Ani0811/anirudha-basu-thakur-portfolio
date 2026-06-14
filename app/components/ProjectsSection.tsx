@@ -137,6 +137,7 @@ export default function ProjectsSection() {
     return (
       <div
         key={i}
+        id={`project-${proj.title.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '-').toLowerCase()}`}
         className="group relative rounded-xl sm:rounded-2xl border border-white/8 bg-linear-to-br from-[#0f1420] to-[#0a0c14] overflow-hidden hover:border-cyan-500/40 transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(34,211,238,0.25)] flex flex-col h-full"
       >
         {/* Project Thumbnail */}
