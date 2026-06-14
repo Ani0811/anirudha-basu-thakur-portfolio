@@ -127,6 +127,7 @@ export default function RequestCodeMessage({
               onClick={copyToClipboard}
               className="absolute top-8 right-2 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
               title="Copy to clipboard"
+              aria-label="Copy message to clipboard"
             >
               📋
             </button>

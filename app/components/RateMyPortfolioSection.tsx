@@ -137,6 +137,7 @@ export default function RateMyPortfolioSection() {
                               onMouseLeave={() => setHoveredStar(null)}
                               disabled={isSubmitting}
                               className="transition-all duration-200 hover:scale-110 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] rounded-full disabled:opacity-50"
+                              aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                             >
                               <svg
                                 className={`w-12 h-12 sm:w-10 sm:h-10 ${

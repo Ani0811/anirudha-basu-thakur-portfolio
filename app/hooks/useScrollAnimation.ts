@@ -111,18 +111,12 @@ export function useScrollAnimation(): ScrollValues {
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
       const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
 
-      // Preload frames into the imageCache Map with stepping
-      const preloadPromises = [];
-      for (let i = 0; i < frameSources.length; i += step) {
-        const index = i;
-        const src = frameSources[index];
-        
-        preloadPromises.push(new Promise<void>((resolve) => {
+      const loadSingleFrame = (index: number, src: string) => {
+        return new Promise<void>((resolve) => {
           if (imageCache.has(index)) {
             resolve();
             return;
           }
-
           const img = new Image();
           img.onload = async () => {
             try {
@@ -135,14 +129,53 @@ export function useScrollAnimation(): ScrollValues {
           };
           img.onerror = () => resolve();
           img.src = src;
-        }));
+        });
+      };
+
+      // 1. Identify first 5 critical frames for initial render
+      const criticalIndices: number[] = [];
+      for (let i = 0; i < frameSources.length && criticalIndices.length < 5; i += step) {
+        criticalIndices.push(i);
       }
 
-      await Promise.all(preloadPromises);
-      if (!isCancelled) {
-        globalIsLoaded = true;
-        setIsLoaded(true);
+      // Preload critical frames first
+      const criticalPromises = criticalIndices.map(idx => loadSingleFrame(idx, frameSources[idx]));
+      await Promise.all(criticalPromises);
+
+      if (isCancelled) return;
+
+      // Mark page as loaded once critical frames are ready to render
+      setIsLoaded(true);
+      globalIsLoaded = true;
+
+      // 2. Identify remaining frames to load progressively
+      const remainingIndices: number[] = [];
+      for (let i = 0; i < frameSources.length; i += step) {
+        if (!criticalIndices.includes(i)) {
+          remainingIndices.push(i);
+        }
       }
+
+      // Load remaining frames in batches of 10, yielding to the browser
+      const batchSize = 10;
+      const loadBatches = async () => {
+        for (let j = 0; j < remainingIndices.length; j += batchSize) {
+          if (isCancelled) break;
+          const batch = remainingIndices.slice(j, j + batchSize);
+          await Promise.all(batch.map(idx => loadSingleFrame(idx, frameSources[idx])));
+          
+          // Yield to main thread
+          await new Promise<void>((resolve) => {
+            if (typeof window !== "undefined" && 'requestIdleCallback' in window) {
+              window.requestIdleCallback(() => resolve(), { timeout: 100 });
+            } else {
+              setTimeout(resolve, 50);
+            }
+          });
+        }
+      };
+      
+      loadBatches();
     };
 
     bootstrapFrames();
