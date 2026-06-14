@@ -125,7 +125,7 @@ export default function Footer() {
               
               {/* Middle - Transparent Notepad Note */}
               <div className="flex-1 w-full lg:w-[35%] animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <div className="relative p-5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md w-full h-full shadow-[inset_0_1px_rgba(255,255,255,0.05),0_10px_30px_rgba(0,0,0,0.5)] before:absolute before:inset-0 before:bg-[url('/noise.png')] before:opacity-5 before:rounded-xl flex flex-col justify-center">
+                <div className="relative p-5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md w-full h-full shadow-[inset_0_1px_rgba(255,255,255,0.05),0_10px_30px_rgba(0,0,0,0.5)] flex flex-col justify-center">
                   {/* Notepad top ring/clip */}
                   <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-12 h-3 rounded-full bg-[#0a0c14] border border-white/20 shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
                   <div className="relative z-10">
