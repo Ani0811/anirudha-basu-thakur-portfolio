@@ -152,38 +152,40 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
           : "bg-transparent border-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4 relative">
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="text-base sm:text-lg lg:text-xl font-black tracking-tighter bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_auto] hover:scale-105 active:scale-95 transition-all duration-300 relative z-50 cursor-pointer drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+          className="text-base sm:text-lg lg:text-xl font-black tracking-tighter bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_auto] hover:scale-105 active:scale-95 transition-all duration-300 relative z-50 cursor-pointer drop-shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0"
         >
           Anirudha Basu Thakur
         </button>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center justify-center gap-1 lg:gap-2 text-base lg:text-lg font-medium absolute left-1/2 -translate-x-1/2">
-          {navLinks.map((item) => {
-            const isActive = activeSection === item.toLowerCase();
-            return (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className={`relative inline-block py-2 px-4 rounded-full transition-all duration-300 group ${
-                  isActive 
-                    ? 'text-cyan-300 bg-white/10 backdrop-blur-md border border-cyan-500/30' 
-                    : 'text-slate-300 border border-transparent'
-                }`}
-              >
-                {item}
-                <span className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 h-0.5 bg-linear-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300 ${
-                  isActive ? 'w-[55%]' : 'w-0 group-hover:w-[55%]'
-                }`} />
-              </a>
-            );
-          })}
+        <div className="hidden lg:flex flex-1 justify-center items-center">
+          <div className="flex items-center gap-1 xl:gap-2 text-sm xl:text-base font-medium">
+            {navLinks.map((item) => {
+              const isActive = activeSection === item.toLowerCase();
+              return (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className={`relative inline-block py-2 px-3 xl:px-4 rounded-full transition-all duration-300 group ${
+                    isActive 
+                      ? 'text-cyan-300 bg-white/10 backdrop-blur-md border border-cyan-500/30' 
+                      : 'text-slate-300 border border-transparent hover:text-white'
+                  }`}
+                >
+                  {item}
+                  <span className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 h-0.5 bg-linear-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300 ${
+                    isActive ? 'w-[55%]' : 'w-0 group-hover:w-[55%]'
+                  }`} />
+                </a>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 sm:gap-6 relative z-50">
+        <div className="flex items-center gap-2 xl:gap-4 shrink-0 relative z-50">
           {/* Quick Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
@@ -199,7 +201,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
             target="_blank"
             download="Anirudha_Basu_Thakur_Resume.pdf"
-            className="hidden sm:flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-semibold rounded-full
+            className="hidden xl:flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-semibold rounded-full
               bg-white/5 backdrop-blur-md border border-white/10 text-slate-200
               shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]
               hover:bg-white/10 hover:border-cyan-500/40 hover:text-cyan-300
@@ -210,14 +212,14 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
           </a>
           <a
             href="#contact"
-            className="hidden sm:flex px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full hover:bg-cyan-500 hover:text-black hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-300"
+            className="hidden lg:flex px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full hover:bg-cyan-500 hover:text-black hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-300"
           >
             Connect Now
           </a>
 
           {/* Hamburger Toggle */}
           <button
-            className="md:hidden text-white p-2"
+            className="lg:hidden text-white p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle mobile menu"
           >
@@ -244,7 +246,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
 
       {/* Mobile Overlay Menu */}
       <div
-        className={`fixed inset-0 bg-[#0a0a0c] z-40 flex flex-col overflow-hidden transition-all duration-700 md:hidden ${
+        className={`fixed inset-0 bg-[#0a0a0c] z-40 flex flex-col overflow-hidden transition-all duration-700 lg:hidden ${
           isMobileMenuOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"

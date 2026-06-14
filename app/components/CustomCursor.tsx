@@ -3,8 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
@@ -22,35 +21,32 @@ export default function CustomCursor() {
 
     let mouseX = 0;
     let mouseY = 0;
-    let ringX = 0;
-    let ringY = 0;
+    let glowX = 0;
+    let glowY = 0;
 
     const onMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-      }
     };
 
-    // Smooth interpolation for the trailing ring
+    // Smooth interpolation for the trailing ambient glow (lerp)
     let rafId: number;
-    const updateRing = () => {
-      const delay = 6; // Trailing delay factor (higher is slower/smoother)
-      ringX += (mouseX - ringX) / delay;
-      ringY += (mouseY - ringY) / delay;
+    const updateGlow = () => {
+      const delay = 10; // Smooth delay trailing factor
+      glowX += (mouseX - glowX) / delay;
+      glowY += (mouseY - glowY) / delay;
 
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+      if (glowRef.current) {
+        // Offset by half of orb width (350px / 2 = 175px) to center it
+        glowRef.current.style.transform = `translate3d(${glowX - 175}px, ${glowY - 175}px, 0)`;
       }
-      rafId = requestAnimationFrame(updateRing);
+      rafId = requestAnimationFrame(updateGlow);
     };
 
     window.addEventListener("mousemove", onMouseMove);
-    rafId = requestAnimationFrame(updateRing);
+    rafId = requestAnimationFrame(updateGlow);
 
-    // Hover states for interactive elements
+    // Hover states for interactive elements to shift the ambient glow color/brightness
     const onMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target) return;
@@ -65,38 +61,23 @@ export default function CustomCursor() {
         window.getComputedStyle(target).cursor === 'pointer';
 
       if (isClickable) {
-        ringRef.current?.classList.add("hovered");
-        dotRef.current?.classList.add("hovered");
+        glowRef.current?.classList.add("hovered");
       } else {
-        ringRef.current?.classList.remove("hovered");
-        dotRef.current?.classList.remove("hovered");
+        glowRef.current?.classList.remove("hovered");
       }
     };
 
     window.addEventListener("mouseover", onMouseOver);
 
-    // Mouse click states
-    const onMouseDown = () => {
-      ringRef.current?.classList.add("clicked");
-    };
-    const onMouseUp = () => {
-      ringRef.current?.classList.remove("clicked");
-    };
-
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mouseup", onMouseUp);
-
     // Fade out when leaving the document
     const onMouseLeave = () => {
-      if (dotRef.current && ringRef.current) {
-        dotRef.current.style.opacity = "0";
-        ringRef.current.style.opacity = "0";
+      if (glowRef.current) {
+        glowRef.current.style.opacity = "0";
       }
     };
     const onMouseEnter = () => {
-      if (dotRef.current && ringRef.current) {
-        dotRef.current.style.opacity = "1";
-        ringRef.current.style.opacity = "1";
+      if (glowRef.current) {
+        glowRef.current.style.opacity = "1";
       }
     };
 
@@ -107,8 +88,6 @@ export default function CustomCursor() {
       mediaQuery.removeEventListener("change", handleMediaChange);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseover", onMouseOver);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mouseleave", onMouseLeave);
       document.removeEventListener("mouseenter", onMouseEnter);
       cancelAnimationFrame(rafId);
@@ -118,17 +97,9 @@ export default function CustomCursor() {
   if (isMobile) return null;
 
   return (
-    <>
-      {/* Inner Dot */}
-      <div
-        ref={dotRef}
-        className="custom-cursor-dot"
-      />
-      {/* Outer trailing ring */}
-      <div
-        ref={ringRef}
-        className="custom-cursor-ring"
-      />
-    </>
+    <div
+      ref={glowRef}
+      className="custom-cursor-glow-orb"
+    />
   );
 }

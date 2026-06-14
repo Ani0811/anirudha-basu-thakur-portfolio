@@ -935,67 +935,31 @@ a {
 }
 
 @media (pointer: fine) {
-  body, a, button, [role="button"], input, textarea, select {
-    cursor: none !important;
+  body {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'><path d='M4.5 3v15.25l3.83-3.83 4.38 7.58 2.17-1.25-4.38-7.58 5.42-.07L4.5 3z' fill='rgba(10,15,30,0.95)' stroke='%2322d3ee' stroke-width='1.5' stroke-linejoin='round'/></svg>") 4 3, auto;
   }
-  
-  .custom-cursor-dot {
-    position: fixed;
-    top: -4px;
-    left: -4px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #22d3ee;
-    z-index: 10000;
-    pointer-events: none;
-    transform: translate3d(0, 0, 0);
-    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, opacity 0.3s ease;
-    box-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+
+  a, button, [role="button"], input, textarea, select, .cursor-pointer {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'><path d='M4.5 3v15.25l3.83-3.83 4.38 7.58 2.17-1.25-4.38-7.58 5.42-.07L4.5 3z' fill='rgba(10,15,30,0.95)' stroke='%23a855f7' stroke-width='1.5' stroke-linejoin='round'/><circle cx='4.5' cy='3' r='1.5' fill='%23a855f7'/></svg>") 4 3, pointer !important;
   }
-  
-  .custom-cursor-ring {
+
+  .custom-cursor-glow-orb {
     position: fixed;
-    top: -20px;
-    left: -20px;
-    width: 40px;
-    height: 40px;
+    top: 0;
+    left: 0;
+    width: 350px;
+    height: 350px;
     border-radius: 50%;
-    border: 1.5px solid rgba(34, 211, 238, 0.4);
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.12) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%);
     z-index: 9999;
     pointer-events: none;
     transform: translate3d(0, 0, 0);
-    transition: border-color 0.2s ease, width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, background-color 0.2s ease, opacity 0.3s ease;
+    transition: opacity 0.5s ease, background 0.3s ease;
+    mix-blend-mode: screen;
   }
-  
-  /* Hover states */
-  .custom-cursor-dot.hovered {
-    width: 4px;
-    height: 4px;
-    top: -2px;
-    left: -2px;
-    background-color: #a855f7;
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
-  }
-  
-  .custom-cursor-ring.hovered {
-    width: 52px;
-    height: 52px;
-    top: -26px;
-    left: -26px;
-    border-color: rgba(168, 85, 247, 0.6);
-    background-color: rgba(168, 85, 247, 0.08);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
-  }
-  
-  /* Click states */
-  .custom-cursor-ring.clicked {
-    width: 32px;
-    height: 32px;
-    top: -16px;
-    left: -16px;
-    border-color: #22d3ee;
-    background-color: rgba(34, 211, 238, 0.2);
+
+  .custom-cursor-glow-orb.hovered {
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(34, 211, 238, 0.06) 45%, transparent 70%);
   }
 }
 
