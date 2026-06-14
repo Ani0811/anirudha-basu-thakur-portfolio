@@ -67,11 +67,39 @@ export default function HeroSection({
       const imgWidth = img.width;
       const imgHeight = img.height;
 
-      const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+      // Calculate scale to fit width on mobile/tablet (with padding factor) to prevent extreme crop/zoom
+      let scale;
+      if (isMobileDevice) {
+        scale = (canvasWidth / imgWidth) * 1.45;
+      } else if (isTabletDevice) {
+        scale = (canvasWidth / imgWidth) * 1.65;
+      } else {
+        scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+      }
+
       const x = (canvasWidth / 2) - (imgWidth / 2) * scale;
       const y = (canvasHeight / 2) - (imgHeight / 2) * scale;
 
+      // Clear canvas with background color first to avoid frame trails
+      context.fillStyle = "#0a0a0c";
+      context.fillRect(0, 0, canvasWidth, canvasHeight);
+
       context.drawImage(img, x, y, imgWidth * scale, imgHeight * scale);
+
+      // Fade top and bottom of the frame to blend with background on mobile/tablet
+      if (isMobileDevice || isTabletDevice) {
+        const topGrad = context.createLinearGradient(0, y, 0, y + (imgHeight * scale) * 0.22);
+        topGrad.addColorStop(0, '#0a0a0c');
+        topGrad.addColorStop(1, 'rgba(10, 10, 12, 0)');
+        context.fillStyle = topGrad;
+        context.fillRect(0, y - 2, canvasWidth, (imgHeight * scale) * 0.22 + 2);
+
+        const bottomGrad = context.createLinearGradient(0, y + (imgHeight * scale) * 0.78, 0, y + imgHeight * scale);
+        bottomGrad.addColorStop(0, 'rgba(10, 10, 12, 0)');
+        bottomGrad.addColorStop(1, '#0a0a0c');
+        context.fillStyle = bottomGrad;
+        context.fillRect(0, y + (imgHeight * scale) * 0.78, canvasWidth, (imgHeight * scale) * 0.22 + 2);
+      }
     };
 
     const animate = () => {
@@ -200,7 +228,7 @@ export default function HeroSection({
 
               {/* Name */}
               <h1
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none mb-2 sm:mb-4 drop-shadow-md transition-all duration-300"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none mb-2 sm:mb-4 drop-shadow-[0_4px_16px_rgba(3,7,18,0.95)] transition-all duration-300"
                 style={{ opacity: nameReveal, transform: `translateY(${(1 - nameReveal) * 22}px)` }}
               >
                 <span className="block text-transparent bg-clip-text bg-linear-to-r from-indigo-400 via-purple-400 to-cyan-400 animate-gradient bg-size-[200%_auto] pb-1">
@@ -213,7 +241,7 @@ export default function HeroSection({
 
               {/* Role */}
               <h2
-                className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold mb-6 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-md transition-all duration-300 flex items-center justify-center lg:justify-start min-h-6 sm:min-h-10"
+                className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold mb-6 sm:mb-5 tracking-tight text-cyan-300 drop-shadow-[0_4px_16px_rgba(3,7,18,0.95)] transition-all duration-300 flex items-center justify-center lg:justify-start min-h-6 sm:min-h-10"
                 style={{ opacity: roleReveal, transform: `translateY(${(1 - roleReveal) * 24}px)` }}
               >
                 <span>{text || "\u00A0"}</span>
