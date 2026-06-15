@@ -10,7 +10,7 @@ const liveProjects = [
   {
     title: "G-One Media",
     desc: "Co-founded and developed the official agency portal for G-One Media, designed to craft high-performance, modern websites for local businesses and corporate clients. Features responsive UI layouts and streamlined branding services.",
-    tags: ["HTML5", "CSS3", "JavaScript", "Responsive Design", "Agency Web"],
+    tags: ["React.js", "Node.js", "Supabase", "Razorpay"],
     github: "https://github.com/Ani0811/G-OneMedia",
     live: "https://ani0811.github.io/G-OneMedia/",
     image: "/projects/G-OneMedia.jpg"
