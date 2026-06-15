@@ -109,7 +109,7 @@ export function useScrollAnimation(): ScrollValues {
       // Tablet: Load every 2nd frame
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
 
       const loadSingleFrame = (index: number, src: string) => {
         return new Promise<void>((resolve) => {
@@ -215,7 +215,7 @@ export function useScrollAnimation(): ScrollValues {
       // Find the nearest available index (stepping backward to find the last loaded one)
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
       
       const adjustedIndex = step === 1 ? nextIndex : Math.floor(nextIndex / step) * step;
       

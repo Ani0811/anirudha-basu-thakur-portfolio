@@ -15,9 +15,64 @@ const bodyFont = Rajdhani({
   weight: ["400", "500", "600"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://anirudha-basu-thakur-portfolio.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Anirudha Basu Thakur | Software Engineer",
-  description: "Portfolio for Anirudha Basu Thakur, an Entry-level Software Engineer and Full-Stack Developer.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Anirudha Basu Thakur | Software Engineer & Full-Stack Developer",
+    template: "%s | Anirudha Basu Thakur"
+  },
+  description: "Portfolio of Anirudha Basu Thakur, a software engineer and full-stack developer based in Kolkata, India. Specialized in React, Next.js, Node.js, and AI systems.",
+  keywords: [
+    "Anirudha Basu Thakur",
+    "Software Engineer",
+    "Full-Stack Developer",
+    "React Developer",
+    "Next.js Developer",
+    "Node.js Developer",
+    "Web Developer Portfolio",
+    "Kolkata India",
+    "G-One Media",
+    "Gemini AI"
+  ],
+  authors: [{ name: "Anirudha Basu Thakur" }],
+  creator: "Anirudha Basu Thakur",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    title: "Anirudha Basu Thakur | Software Engineer & Full-Stack Developer",
+    description: "Portfolio of Anirudha Basu Thakur, featuring custom full-stack solutions, G-One Media digital agency, Foodie Frenzy Ordering, and interactive AI capabilities.",
+    siteName: "Anirudha Basu Thakur Portfolio",
+    images: [
+      {
+        url: "/icon.png",
+        width: 512,
+        height: 512,
+        alt: "Anirudha Basu Thakur Portfolio",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Anirudha Basu Thakur | Software Engineer & Full-Stack Developer",
+    description: "Portfolio of Anirudha Basu Thakur, showcasing modern web systems, responsive design, and AI integrations.",
+    images: ["/icon.png"],
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "YOUR_GSC_VERIFICATION_CODE",
+  },
 };
 
 export default function RootLayout({

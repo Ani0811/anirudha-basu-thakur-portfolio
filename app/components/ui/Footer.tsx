@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 
 const socialLinks = [
   { 
@@ -223,8 +223,19 @@ export default function Footer() {
                 <div className="flex items-center gap-2 group opacity-50 hover:opacity-100 transition-opacity order-1 md:order-2">
                   <span className="text-[9px] uppercase tracking-tighter text-slate-500">Powered by</span>
                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 group-hover:border-cyan-500/30 transition-all">
-                    <svg className="w-3 h-3 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12,2L14.5,9.5L22,12L14.5,14.5L12,22L9.5,14.5L2,12L9.5,9.5L12,2Z" />
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="gemini-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#9bc5ff" />
+                          <stop offset="30%" stopColor="#246bfd" />
+                          <stop offset="65%" stopColor="#a855f7" />
+                          <stop offset="100%" stopColor="#f43f5e" />
+                        </linearGradient>
+                      </defs>
+                      <path 
+                        d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81" 
+                        fill="url(#gemini-logo-grad)" 
+                      />
                     </svg>
                     <span className="gemini-text text-xs tracking-tight">Gemini</span>
                   </div>

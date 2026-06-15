@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,8 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(
-      `https://api.github.com/users/${username}/events/public?per_page=15`,
-      { headers }
+      githubToken
+        ? `https://api.github.com/users/${username}/events?per_page=20`
+        : `https://api.github.com/users/${username}/events/public?per_page=20`,
+      { headers, cache: 'no-store' }
     );
 
     if (!response.ok) {

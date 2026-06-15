@@ -6,6 +6,11 @@ export default function RainBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Disable rain canvas animation on mobile screens to optimize performance
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -24,8 +29,8 @@ export default function RainBackground() {
     setSize();
 
     // Adjust drop count based on screen size for performance
-    const isMobile = width < 768;
-    const maxDrops = isMobile ? 30 : 150;
+    const isSmallScreen = width < 768;
+    const maxDrops = isSmallScreen ? 30 : 150;
     
     // Initialize drops
     const drops = Array.from({ length: maxDrops }, () => ({
@@ -57,7 +62,7 @@ export default function RainBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // --- Lightning Effect (Disabled on Mobile for performance) ---
-      if (!isMobile) {
+      if (!isSmallScreen) {
         if (lightningActive) {
           // Draw current flash (capped so it never fully whites out the UI)
           const drawOpacity = Math.min(lightningOpacity, 0.45);

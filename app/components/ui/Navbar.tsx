@@ -3,15 +3,15 @@
 import React, { useState, useEffect } from "react";
 
 interface Props {
-  scrollY: number;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
 }
 
 const navLinks = ["Home", "About", "Skills", "Projects", "Contact"];
 
-export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen }: Props) {
+export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props) {
   const [activeSection, setActiveSection] = useState("home");
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -66,6 +66,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
 
   useEffect(() => {
     const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
       const sections = navLinks.map(link => link.toLowerCase());
       const scrollPosition = window.scrollY + 200;
 
@@ -147,7 +148,7 @@ export default function Navbar({ scrollY, isMobileMenuOpen, setIsMobileMenuOpen 
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
         isMobileMenuOpen
           ? "bg-[#0a0a0c] border-transparent"
-          : scrollY > 50
+          : isScrolled
           ? "bg-[#0a0a0c]/90 backdrop-blur-xl border-white/5 shadow-lg"
           : "bg-transparent border-transparent"
       }`}

@@ -1,30 +1,28 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { ScrollValues, getCachedImage, frameSources } from "../hooks/useScrollAnimation";
+import { useScrollAnimation, getCachedImage, frameSources } from "../../hooks/useScrollAnimation";
 
-interface Props extends ScrollValues { }
-
-export default function HeroSection({
-  scrollY,
-  currentFrameSrc,
-  currentFrameImage,
-  heroScale,
-  heroObjectPosition,
-  topOverlayOpacity,
-  bottomOverlayOpacity,
-  badgeReveal,
-  nameReveal,
-  roleReveal,
-  introReveal,
-  actionReveal,
-  textTranslateY,
-  statementOpacity,
-  isLoaded,
-  heroStartFrameIndex,
-  heroEndFrameIndex,
-  heroScrollRangeFactor,
-}: Props) {
+export default function HeroSection() {
+  const scrollValues = useScrollAnimation();
+  const {
+    scrollY,
+    heroScale,
+    heroObjectPosition,
+    topOverlayOpacity,
+    bottomOverlayOpacity,
+    badgeReveal,
+    nameReveal,
+    roleReveal,
+    introReveal,
+    actionReveal,
+    textTranslateY,
+    statementOpacity,
+    isLoaded,
+    heroStartFrameIndex,
+    heroEndFrameIndex,
+    heroScrollRangeFactor,
+  } = scrollValues;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafId = useRef<number | null>(null);
   const lastScrollY = useRef(0);
@@ -56,7 +54,7 @@ export default function HeroSection({
       // Step calculation to match the preloading logic in useScrollAnimation
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 3 : isTabletDevice ? 2 : 1;
+      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
       
       const frameIndex = step === 1 ? rawFrameIndex : Math.floor(rawFrameIndex / step) * step;
       

@@ -1,15 +1,16 @@
 "use client";
 
 import React from "react";
-import GithubStats from "./GithubStats";
+import GithubStats from "../features/GithubStats";
+import { FaCode, FaServer, FaPaintBrush, FaCreditCard, FaCogs, FaRobot } from "react-icons/fa";
 
 const badges = [
-  { label: "Full-Stack Development", icon: "⚡" },
-  { label: "Backend Architecture", icon: "🔧" },
-  { label: "UI/UX Design", icon: "🎨" },
-  { label: "Payment Integration", icon: "💳" },
-  { label: "Middleware Development", icon: "⚙️" },
-  { label: "AI Development", icon: "🤖" },
+  { label: "Full-Stack Development", icon: <FaCode /> },
+  { label: "Backend Architecture", icon: <FaServer /> },
+  { label: "UI/UX Design", icon: <FaPaintBrush /> },
+  { label: "Payment Integration", icon: <FaCreditCard /> },
+  { label: "Middleware Development", icon: <FaCogs /> },
+  { label: "AI Development", icon: <FaRobot /> },
 ];
 
 export default function AboutSection() {
@@ -72,7 +73,7 @@ export default function AboutSection() {
                 className="group px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-cyan-500/50 hover:scale-110 transition-all duration-300 cursor-default"
               >
                 <span className="text-sm text-slate-300 flex items-center gap-2">
-                  <span className="text-base group-hover:scale-125 transition-transform duration-300">{badge.icon}</span>
+                  <span className="text-xl group-hover:scale-125 transition-transform duration-300">{badge.icon}</span>
                   {badge.label}
                 </span>
               </div>

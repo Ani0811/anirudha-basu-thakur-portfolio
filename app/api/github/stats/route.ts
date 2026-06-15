@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 interface GitHubRepo {
   name: string;
   owner: { login: string };
@@ -34,6 +36,7 @@ export async function POST(req: NextRequest) {
     // Fetch user data
     const userResponse = await fetch(`https://api.github.com/users/${username}`, {
       headers,
+      cache: 'no-store'
     });
 
     if (!userResponse.ok) {
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     // Fetch repositories
     const reposResponse = await fetch(
       `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`,
-      { headers }
+      { headers, cache: 'no-store' }
     );
 
     if (!reposResponse.ok) {
@@ -66,7 +69,7 @@ export async function POST(req: NextRequest) {
       try {
         const commitsResponse = await fetch(
           `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=1`,
-          { headers }
+          { headers, cache: 'no-store' }
         );
         
         if (commitsResponse.ok) {
@@ -115,6 +118,7 @@ export async function POST(req: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(graphqlQuery),
+          cache: 'no-store'
         });
 
         if (graphqlResponse.ok) {

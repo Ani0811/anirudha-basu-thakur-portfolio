@@ -2,17 +2,25 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 
 const PROJECTS_PER_PAGE = 4;
 
 const liveProjects = [
   {
+    title: "G-One Media",
+    desc: "Co-founded and developed the official agency portal for G-One Media, designed to craft high-performance, modern websites for local businesses and corporate clients. Features responsive UI layouts and streamlined branding services.",
+    tags: ["HTML5", "CSS3", "JavaScript", "Responsive Design", "Agency Web"],
+    github: "https://github.com/Ani0811/G-OneMedia",
+    live: "https://ani0811.github.io/G-OneMedia/",
+    image: "/projects/G-OneMedia.jpg"
+  },
+  {
     title: "Foodie Frenzy",
     desc: "Engineered a high-performance food ordering ecosystem that handled 500+ mock transactions with sub-2s processing times. Integrated JWT authentication and Razorpay, improving checkout security and user retention by an estimated 25%.",
     tags: ["React.js", "Node.js", "Express.js", "MongoDB", "Razorpay", "Firebase"],
     github: "https://github.com/Ani0811/foodie-frenzy-5656323623",
-    live: "https://foodie-frenzy-frontend-hpkf.onrender.com",
+    live: "https://foodie-frenzy-5656323623.vercel.app/",
     image: "/projects/FoodieFrenzy.jpeg"
   },
   {
@@ -149,7 +157,6 @@ export default function ProjectsSection() {
               fill
               className="object-contain transition-transform duration-700"
               sizes="(max-width: 768px) 100vw, 50vw"
-              priority={i < 2}
             />
           ) : (
             <div className="flex flex-col items-center justify-center w-full h-full opacity-50 group-hover:opacity-100 transition-opacity duration-500">

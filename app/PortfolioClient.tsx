@@ -2,54 +2,84 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { useScrollAnimation } from "./hooks/useScrollAnimation";
-import LoadingScreen from "./components/LoadingScreen";
-import Navbar from "./components/Navbar";
-import CustomCursor from "./components/CustomCursor";
+import LoadingScreen from "./components/ui/LoadingScreen";
+import Navbar from "./components/ui/Navbar";
+import CustomCursor from "./components/ui/CustomCursor";
 
 // Dynamic imports for sections below the fold to improve LCP and TBT
-const HeroSection = dynamic(() => import("./components/HeroSection"), { ssr: true });
-const AboutSection = dynamic(() => import("./components/AboutSection"), { ssr: true });
-const SkillsSection = dynamic(() => import("./components/SkillsSection"), { ssr: false });
-const ProjectsSection = dynamic(() => import("./components/ProjectsSection"), { ssr: false });
-const CurrentWorkSection = dynamic(() => import("./components/CurrentWorkSection"), { ssr: false });
-const ContactSection = dynamic(() => import("./components/ContactSection"), { ssr: false });
-const RateMyPortfolioSection = dynamic(() => import("./components/RateMyPortfolioSection"), { ssr: false });
-const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
-const UpdateNotification = dynamic(() => import("./components/UpdateNotification"), { ssr: false });
-const RainBackground = dynamic(() => import("./components/RainBackground"), { ssr: false });
-const ScrollToTopButton = dynamic(() => import("./components/ScrollToTopButton"), { ssr: false });
+const HeroSection = dynamic(() => import("./components/sections/HeroSection"), { ssr: true });
+const AboutSection = dynamic(() => import("./components/sections/AboutSection"), { ssr: true });
+const SkillsSection = dynamic(() => import("./components/sections/SkillsSection"), { ssr: false });
+const ProjectsSection = dynamic(() => import("./components/sections/ProjectsSection"), { ssr: false });
+const CurrentWorkSection = dynamic(() => import("./components/sections/CurrentWorkSection"), { ssr: false });
+const ContactSection = dynamic(() => import("./components/sections/ContactSection"), { ssr: false });
+const Footer = dynamic(() => import("./components/ui/Footer"), { ssr: true });
+const UpdateNotification = dynamic(() => import("./components/ui/UpdateNotification"), { ssr: false });
+const RainBackground = dynamic(() => import("./components/effects/RainBackground"), { ssr: false });
+const ScrollToTopButton = dynamic(() => import("./components/ui/ScrollToTopButton"), { ssr: false });
 
-const bootMessages = [
-  "Booting developer workspace...",
-  "Loading libraries...",
-  "Connecting APIs...",
-  "Compiling components...",
-  "Launching portfolio...",
+const bootCategories = [
+  [
+    "Booting developer workspace...",
+    "Spinning up core workspace...",
+    "Initializing kernel runtime...",
+    "Establishing system handshake...",
+  ],
+  [
+    "Loading modules and packages...",
+    "Resolving node_modules gravity well...",
+    "Injecting custom styling variables...",
+    "Hydrating local configurations...",
+  ],
+  [
+    "Connecting database adapters...",
+    "Establishing secure GitHub endpoints...",
+    "Synchronizing Gemini AI engines...",
+    "Warming up server action handlers...",
+  ],
+  [
+    "Compiling Next.js layouts...",
+    "Optimizing scroll animation buffers...",
+    "Minifying CSS compilation bundles...",
+    "Preloading webp graphics assets...",
+  ],
+  [
+    "Launching portfolio interface...",
+    "Starting primary interface threads...",
+    "Mounting component DOM branches...",
+    "Opening developer system...",
+  ]
 ];
 
 export default function PortfolioClient() {
   const [loading, setLoading] = useState(true);
   const [bootText, setBootText] = useState(0);
+  const [bootMessages, setBootMessages] = useState<string[]>([
+    "Booting developer workspace...",
+    "Loading libraries...",
+    "Connecting APIs...",
+    "Compiling components...",
+    "Launching portfolio...",
+  ]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [terminalMode, setTerminalMode] = useState(false);
 
-  const scrollValues = useScrollAnimation();
+  // Generate randomized messages on mount to prevent SSR hydration mismatch
+  useEffect(() => {
+    const randomized = bootCategories.map(cat => cat[Math.floor(Math.random() * cat.length)]);
+    setBootMessages(randomized);
+  }, []);
 
   // Boot animation sequence
   useEffect(() => {
     if (bootText < bootMessages.length) {
-      // Speed up if critical assets are ready/cached
-      const interval = scrollValues.isLoaded ? 200 : 450;
-      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), interval);
+      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), 300);
       return () => clearTimeout(timer);
     } else {
-      // Shorter transition out
-      const finishDelay = scrollValues.isLoaded ? 200 : 400;
-      const timer = setTimeout(() => setLoading(false), finishDelay);
+      const timer = setTimeout(() => setLoading(false), 300);
       return () => clearTimeout(timer);
     }
-  }, [bootText, scrollValues.isLoaded]);
+  }, [bootText, bootMessages]);
 
   // Lock body scroll while mobile menu is open
   useEffect(() => {
@@ -83,19 +113,17 @@ export default function PortfolioClient() {
       </div>
 
       <Navbar
-        scrollY={scrollValues.scrollY}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
       <main className="relative z-10 flex flex-col gap-12 sm:gap-16 pb-24 sm:pb-32">
-        <HeroSection {...scrollValues} />
+        <HeroSection />
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
         <CurrentWorkSection />
         <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
-        <RateMyPortfolioSection />
       </main>
 
       <Footer />

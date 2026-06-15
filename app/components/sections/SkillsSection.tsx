@@ -1,35 +1,43 @@
 "use client";
 
 import React from "react";
-import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
+import { FaGraduationCap, FaSchool, FaBook, FaCode, FaReact, FaServer, FaDatabase, FaCloud, FaTools, FaJava, FaGitAlt, FaPlug, FaLock, FaCreditCard, FaCss3Alt } from "react-icons/fa";
+import { 
+  SiJavascript, SiTypescript, SiPython, SiNextdotjs, SiTailwindcss, SiHtml5, 
+  SiNodedotjs, SiExpress, SiDjango, SiFlask, SiFastapi, SiMongodb, SiPostgresql, SiMysql, SiRedis, SiSupabase,
+  SiFirebase, SiDocker, SiGithubactions, SiGraphql, SiPostman
+} from "react-icons/si";
+import { TbBrandCSharp } from "react-icons/tb";
+import { VscAzure } from "react-icons/vsc";
 
 const milestones = [
   {
     year: "2026 - 2027",
     title: "Vellore Institute of Technology",
     desc: "Pursuing Master of Computer Applications (MCA). Deepening knowledge in advanced software systems, database engineering, and modern application architectures.",
-    icon: "🎓",
+    icon: <FaGraduationCap />,
     color: "from-emerald-500 to-teal-500"
   },
   {
     year: "2022 - 2025",
     title: "Netaji Subhash Engineering College",
     desc: "CGPA: 7.86. Studied core engineering principles, full-stack web development, and software engineering.",
-    icon: "🎓",
+    icon: <FaGraduationCap />,
     color: "from-cyan-500 to-blue-500"
   },
   {
     year: "2020 - 2022",
     title: "Narayana Group of Schools",
     desc: "Percentage: 77.7%. Higher Secondary Education focusing on science and mathematics.",
-    icon: "📚",
+    icon: <FaBook />,
     color: "from-purple-500 to-pink-500"
   },
   {
     year: "2008 - 2019",
     title: "South Point High School",
     desc: "Percentage: 77.8%. Foundational logic, mathematics, and primary education.",
-    icon: "🏫",
+    icon: <FaSchool />,
     color: "from-orange-500 to-red-500"
   }
 ];
@@ -37,74 +45,74 @@ const milestones = [
 const skillGroups = [
   {
     category: "Languages",
-    icon: "{ }",
+    icon: <FaCode />,
     description: "Core Programming Languages",
     skills: [
-      { name: "JavaScript", level: 95, icon: "⚡" },
-      { name: "TypeScript", level: 90, icon: "📘" },
-      { name: "Python", level: 90, icon: "🐍" },
-      { name: "Java", level: 85, icon: "☕" },
-      { name: "C#", level: 80, icon: "💠" }
+      { name: "JavaScript", level: 95, icon: <SiJavascript /> },
+      { name: "TypeScript", level: 90, icon: <SiTypescript /> },
+      { name: "Python", level: 90, icon: <SiPython /> },
+      { name: "Java", level: 85, icon: <FaJava /> },
+      { name: "C#", level: 80, icon: <TbBrandCSharp /> }
     ]
   },
   {
     category: "Frontend",
-    icon: "💻",
+    icon: <FaReact />,
     description: "User Interface Development",
     skills: [
-      { name: "React.js", level: 95, icon: "⚛" },
-      { name: "Next.js", level: 90, icon: "▲" },
-      { name: "TailwindCSS", level: 92, icon: "◈" },
-      { name: "HTML5", level: 98, icon: "🌐" },
-      { name: "CSS3", level: 95, icon: "🎨" }
+      { name: "React.js", level: 95, icon: <FaReact /> },
+      { name: "Next.js", level: 90, icon: <SiNextdotjs /> },
+      { name: "TailwindCSS", level: 92, icon: <SiTailwindcss /> },
+      { name: "HTML5", level: 98, icon: <SiHtml5 /> },
+      { name: "CSS3", level: 95, icon: <FaCss3Alt /> }
     ]
   },
   {
     category: "Backend",
-    icon: "⚙️",
+    icon: <FaServer />,
     description: "Server-Side Development",
     skills: [
-      { name: "Node.js", level: 90, icon: "🟢" },
-      { name: "Express.js", level: 88, icon: "⚙" },
-      { name: "Django", level: 82, icon: "🧩" },
-      { name: "Flask", level: 78, icon: "🧪" },
-      { name: "FastAPI", level: 75, icon: "🚀" }
+      { name: "Node.js", level: 90, icon: <SiNodedotjs /> },
+      { name: "Express.js", level: 88, icon: <SiExpress /> },
+      { name: "Django", level: 82, icon: <SiDjango /> },
+      { name: "Flask", level: 78, icon: <SiFlask /> },
+      { name: "FastAPI", level: 75, icon: <SiFastapi /> }
     ]
   },
   {
     category: "Databases",
-    icon: "⬢",
+    icon: <FaDatabase />,
     description: "Data Storage & Management",
     skills: [
-      { name: "MongoDB", level: 90, icon: "🍃" },
-      { name: "PostgreSQL", level: 85, icon: "🐘" },
-      { name: "MySQL", level: 82, icon: "🛢" },
-      { name: "Redis", level: 80, icon: "🔴" },
-      { name: "Supabase", level: 88, icon: "⚡" }
+      { name: "MongoDB", level: 90, icon: <SiMongodb /> },
+      { name: "PostgreSQL", level: 85, icon: <SiPostgresql /> },
+      { name: "MySQL", level: 82, icon: <SiMysql /> },
+      { name: "Redis", level: 80, icon: <SiRedis /> },
+      { name: "Supabase", level: 88, icon: <SiSupabase /> }
     ]
   },
   {
     category: "Cloud & DevOps",
-    icon: "☁",
+    icon: <FaCloud />,
     description: "Infrastructure & Deployment",
     skills: [
-      { name: "Azure", level: 85, icon: "☁" },
-      { name: "Firebase", level: 88, icon: "🔥" },
-      { name: "Git/GitHub", level: 92, icon: "⑂" },
-      { name: "Docker", level: 78, icon: "🐳" },
-      { name: "CI/CD", level: 75, icon: "🔄" }
+      { name: "Azure", level: 85, icon: <VscAzure /> },
+      { name: "Firebase", level: 88, icon: <SiFirebase /> },
+      { name: "Git/GitHub", level: 92, icon: <FaGitAlt /> },
+      { name: "Docker", level: 78, icon: <SiDocker /> },
+      { name: "CI/CD", level: 75, icon: <SiGithubactions /> }
     ]
   },
   {
     category: "Tools & APIs",
-    icon: "⚡",
+    icon: <FaTools />,
     description: "Integration & Architecture",
     skills: [
-      { name: "REST APIs", level: 90, icon: "🔌" },
-      { name: "Postman", level: 88, icon: "🚀" },
-      { name: "GraphQL", level: 75, icon: "◉" },
-      { name: "Authentication", level: 88, icon: "🔐" },
-      { name: "Payment Integration", level: 85, icon: "💳" }
+      { name: "REST APIs", level: 90, icon: <FaPlug /> },
+      { name: "Postman", level: 88, icon: <SiPostman /> },
+      { name: "GraphQL", level: 75, icon: <SiGraphql /> },
+      { name: "Authentication", level: 88, icon: <FaLock /> },
+      { name: "Payment Integration", level: 85, icon: <FaCreditCard /> }
     ]
   },
 ];
@@ -339,7 +347,7 @@ export default function SkillsSection() {
                     >
                       {/* Card Front */}
                       <div
-                        className={`group/card absolute inset-0 w-full overflow-hidden bg-linear-to-br from-[#111116]/80 to-[#1a1a24]/90 border rounded-2xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${activeIndex === i
+                        className={`group/card absolute inset-0 w-full overflow-hidden bg-linear-to-br from-[#111116]/80 to-[#1a1a24]/90 border rounded-2xl p-5 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${activeIndex === i
                             ? 'border-cyan-500/60 shadow-cyan-500/40 scale-105 ring-1 ring-cyan-400/30'
                             : 'border-white/10 hover:border-cyan-500/50 hover:scale-105 hover:-translate-y-2 hover:shadow-cyan-500/20'
                           }`}
@@ -389,7 +397,7 @@ export default function SkillsSection() {
 
                       {/* Card Back */}
                       <div
-                        className={`group/back absolute inset-0 w-full overflow-hidden bg-linear-to-br from-cyan-950/60 via-blue-950/60 to-purple-950/60 border rounded-2xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${activeIndex === i
+                        className={`group/back relative w-full overflow-hidden bg-linear-to-br from-cyan-950/60 via-blue-950/60 to-purple-950/60 border rounded-2xl p-5 sm:p-8 backdrop-blur-2xl shadow-2xl transition-all duration-700 ${activeIndex === i
                             ? 'border-cyan-400/80 shadow-cyan-500/40 ring-1 ring-cyan-400/40 hover:-translate-y-2'
                             : 'border-cyan-500/30 hover:border-cyan-400/60 hover:-translate-y-2 hover:shadow-cyan-400/30'
                           }`}
@@ -417,7 +425,7 @@ export default function SkillsSection() {
 
                           <h4 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover/back:text-cyan-100 transition-colors">{milestone.title}</h4>
 
-                          <p className="text-base sm:text-lg text-slate-300 leading-relaxed group-hover/back:text-white transition-colors">{milestone.desc}</p>
+                          <p className="text-sm sm:text-base text-slate-300 leading-relaxed group-hover/back:text-white transition-colors">{milestone.desc}</p>
 
                           <div className="flex items-center gap-2 text-sm text-cyan-400/60 font-mono mt-4 group-hover/back:text-cyan-400 transition-colors">
                             <span className="group-hover/back:-translate-x-1 transition-transform">←</span>
@@ -483,7 +491,7 @@ export default function SkillsSection() {
               {/* Category heading */}
               <div className="relative z-10 mb-8">
                 <div className="flex items-center gap-4 mb-2">
-                  <div className="text-3xl text-cyan-400 font-mono bg-cyan-500/10 w-12 h-12 rounded-xl flex items-center justify-center border border-cyan-500/20 shadow-lg shadow-cyan-500/20">
+                  <div className="text-3xl text-cyan-400 bg-cyan-500/10 w-14 h-14 rounded-xl flex items-center justify-center border border-cyan-500/20 shadow-lg shadow-cyan-500/20 group-hover/skillcard:scale-110 group-hover/skillcard:text-cyan-300 transition-all duration-300">
                     {group.icon}
                   </div>
                   <div>
@@ -500,8 +508,8 @@ export default function SkillsSection() {
               <div className="relative z-10 space-y-6">
                 {group.skills.map((skill, j) => (
                   <div
-                    key={j}
-                    className="group/skill relative p-3 -mx-3 rounded-xl hover:bg-white/5 hover:border hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300"
+                     key={j}
+                     className="group/skill relative p-3 -mx-3 rounded-xl hover:bg-white/5 hover:border hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300"
                     style={{
                       animation: `slideInLeft 0.5s ease-out ${i * 0.15 + j * 0.1}s both`
                     }}
@@ -509,7 +517,7 @@ export default function SkillsSection() {
                     {/* Skill name and percentage */}
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-slate-800/50 border border-slate-600/30 rounded-lg flex items-center justify-center font-mono text-xs font-bold text-cyan-300 shadow-md">
+                        <div className="w-10 h-10 bg-slate-800/50 border border-slate-600/30 rounded-lg flex items-center justify-center text-xl font-bold text-cyan-300 shadow-md group-hover/skill:scale-110 transition-transform duration-300">
                           {skill.icon}
                         </div>
                         <span className="text-lg sm:text-xl text-slate-200 font-semibold group-hover/skill:text-white transition-colors">
