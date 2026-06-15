@@ -75,6 +75,15 @@ export default function Footer() {
     return () => clearInterval(interval);
   }, [isVisible]);
 
+  const handleFooterLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <footer ref={footerRef} className="relative mt-12 sm:mt-16">
       {/* Universal Premium Separator */}
@@ -149,6 +158,7 @@ export default function Footer() {
                       <li key={link.name} className="animate-slide-in-right" style={{ animationDelay: `${0.4 + index * 0.1}s` }}>
                         <a
                           href={link.href}
+                          onClick={(e) => handleFooterLinkClick(e, link.href)}
                           className="group flex items-center gap-2 text-slate-400 hover:text-cyan-300 transition-all duration-300 transform hover:translate-x-3"
                         >
                           <span className="text-cyan-500/40 group-hover:text-cyan-400 transform transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-125 font-mono">~{'>'}</span>

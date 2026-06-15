@@ -116,6 +116,19 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isSearchOpen, filteredItems, selectedIndex]);
 
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+    if (targetId === "home") {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   const handleItemSelect = (item: any) => {
     setIsSearchOpen(false);
     
@@ -170,6 +183,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
+                  onClick={(e) => handleNavLinkClick(e, item.toLowerCase())}
                   className={`relative inline-block py-2 px-3 xl:px-4 rounded-full transition-all duration-300 group ${
                     isActive 
                       ? 'text-cyan-300 bg-white/10 backdrop-blur-md border border-cyan-500/30' 
@@ -213,6 +227,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
           </a>
           <a
             href="#contact"
+            onClick={(e) => handleNavLinkClick(e, "contact")}
             className="hidden lg:flex px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full hover:bg-cyan-500 hover:text-black hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-300"
           >
             Connect Now
@@ -268,7 +283,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => handleNavLinkClick(e, item.toLowerCase())}
                   className={`relative block w-full max-w-xs text-center text-2xl font-bold tracking-wide px-8 py-4 rounded-xl transition-all duration-500 hover:scale-105 active:scale-95 ${
                     isMobileMenuOpen 
                       ? 'opacity-100 translate-x-0' 
@@ -324,7 +339,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
 
           <a
             href="#contact"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={(e) => handleNavLinkClick(e, "contact")}
             className="w-full py-4 text-center text-base font-bold rounded-2xl
               bg-linear-to-r from-cyan-500/15 to-blue-500/15 backdrop-blur-md
               border border-cyan-500/40
