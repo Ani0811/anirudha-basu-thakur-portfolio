@@ -17,6 +17,12 @@ const Footer = dynamic(() => import("./components/ui/Footer"), { ssr: true });
 const UpdateNotification = dynamic(() => import("./components/ui/UpdateNotification"), { ssr: false });
 const RainBackground = dynamic(() => import("./components/effects/RainBackground"), { ssr: false });
 const ScrollToTopButton = dynamic(() => import("./components/ui/ScrollToTopButton"), { ssr: false });
+const TerminalOverlay = dynamic(() => import("@/app/components/ui/TerminalOverlay"), { ssr: false }); // Developer CLI
+const SandboxSection = dynamic(() => import("@/app/components/sections/SandboxSection"), { ssr: false }); // Interactive Sandbox
+const DebugWidget = dynamic(() => import("@/app/components/ui/DebugWidget"), { ssr: false }); // Performance Monitor
+const TerminalWidget = dynamic(() => import("@/app/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
+
+import { PortfolioProvider } from "./context/PortfolioContext";
 
 const bootCategories = [
   [
@@ -98,9 +104,10 @@ export default function PortfolioClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans selection:bg-cyan-900 selection:text-cyan-100 overflow-x-clip">
-      {/* Custom trailing cursor */}
-      <CustomCursor />
+    <PortfolioProvider>
+      <div className="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans selection:bg-cyan-900 selection:text-cyan-100 overflow-x-clip">
+        {/* Custom trailing cursor */}
+        <CustomCursor />
 
       {/* Background Ambience / Grid */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -122,6 +129,7 @@ export default function PortfolioClient() {
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
+        <SandboxSection />
         <CurrentWorkSection />
         <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
       </main>
@@ -129,6 +137,9 @@ export default function PortfolioClient() {
       <Footer />
       <UpdateNotification />
       <ScrollToTopButton />
+      <TerminalOverlay />
+      <TerminalWidget />
+      <DebugWidget />
 
       {/* Global custom animations */}
       <style
@@ -180,5 +191,6 @@ export default function PortfolioClient() {
         }}
       />
     </div>
+    </PortfolioProvider>
   );
 }

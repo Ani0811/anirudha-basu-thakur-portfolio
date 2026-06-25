@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 interface Props {
   isMobileMenuOpen: boolean;
@@ -15,6 +16,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { isDeveloperMode, toggleDeveloperMode, setTerminalOpen } = usePortfolio();
 
   const searchItems = [
     // Sections
@@ -49,13 +51,11 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
       const el = document.getElementById("projects");
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }},
-    { name: "Terminal Console Mode", type: "Action", action: () => {
-      const el = document.getElementById("contact");
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(() => {
-        const btn = document.querySelector("#contact button");
-        if (btn) (btn as HTMLButtonElement).click();
-      }, 500);
+    { name: "Developer CLI Terminal (Hacker Console)", type: "Action", action: () => {
+      setTerminalOpen(true);
+    }},
+    { name: "Toggle Developer Debug Mode (Dev vs Design Layout)", type: "Action", action: () => {
+      toggleDeveloperMode();
     }}
   ];
 
@@ -211,6 +211,8 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
             <span className="hidden sm:inline text-xs font-semibold">Search</span>
             <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[9px] bg-white/10 rounded-md text-slate-400 font-sans border border-white/5 uppercase font-medium">Ctrl K</kbd>
           </button>
+
+
 
           <a
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
