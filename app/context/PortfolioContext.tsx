@@ -3,8 +3,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface PortfolioContextType {
-  isDeveloperMode: boolean;
-  toggleDeveloperMode: () => void;
   isTerminalOpen: boolean;
   toggleTerminal: () => void;
   setTerminalOpen: (open: boolean) => void;
@@ -13,22 +11,7 @@ interface PortfolioContextType {
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export function PortfolioProvider({ children }: { children: ReactNode }) {
-  const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [isTerminalOpen, setTerminalOpen] = useState(false);
-
-  const toggleDeveloperMode = () => {
-    setIsDeveloperMode(prev => {
-      const next = !prev;
-      if (typeof document !== 'undefined') {
-        if (next) {
-          document.body.classList.add('developer-mode');
-        } else {
-          document.body.classList.remove('developer-mode');
-        }
-      }
-      return next;
-    });
-  };
 
   const toggleTerminal = () => setTerminalOpen(prev => !prev);
 
@@ -38,7 +21,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       // Don't intercept if user is typing in an input or textarea
       if (
         ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
-        e.key !== '\`' && e.key !== 'Escape' // allow Escape to close, backtick to toggle even in inputs maybe? No, let's just ignore if in input.
+        e.key !== '\`' && e.key !== 'Escape'
       ) {
         return;
       }
@@ -61,8 +44,6 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
 
   return (
     <PortfolioContext.Provider value={{
-      isDeveloperMode,
-      toggleDeveloperMode,
       isTerminalOpen,
       toggleTerminal,
       setTerminalOpen

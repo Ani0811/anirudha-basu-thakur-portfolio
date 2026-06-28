@@ -16,7 +16,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const { isDeveloperMode, toggleDeveloperMode, setTerminalOpen } = usePortfolio();
+  const { setTerminalOpen } = usePortfolio();
 
   const searchItems = [
     // Sections
@@ -53,9 +53,6 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
     }},
     { name: "Developer CLI Terminal (Hacker Console)", type: "Action", action: () => {
       setTerminalOpen(true);
-    }},
-    { name: "Toggle Developer Debug Mode (Dev vs Design Layout)", type: "Action", action: () => {
-      toggleDeveloperMode();
     }}
   ];
 
@@ -212,19 +209,6 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
             <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[9px] bg-white/10 rounded-md text-slate-400 font-sans border border-white/5 uppercase font-medium">Ctrl K</kbd>
           </button>
 
-          {/* Dev/Design Toggle */}
-          <button
-            onClick={toggleDeveloperMode}
-            className={`hidden xl:flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono transition-all duration-300 cursor-pointer ${
-              isDeveloperMode 
-                ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]' 
-                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-            }`}
-            title="Toggle Developer Debug Mode"
-          >
-            <span>{'</>'}</span>
-            <span>{isDeveloperMode ? 'DEV' : 'DESIGN'}</span>
-          </button>
 
           <a
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"

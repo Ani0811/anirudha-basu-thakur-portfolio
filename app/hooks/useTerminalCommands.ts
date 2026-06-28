@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export function useTerminalCommands() {
-  const { toggleDeveloperMode, setTerminalOpen } = usePortfolio();
+  const { setTerminalOpen } = usePortfolio();
   
   const [history, setHistory] = useState<string[]>([
     "ANIRUDHA OS [Version 10.0.41]",
@@ -47,7 +47,6 @@ export function useTerminalCommands() {
         "  projects        - Navigate to projects section",
         "  skills          - Navigate to skills section",
         "  contact         - Navigate to contact section",
-        "  toggle-dev      - Toggle developer debug mode",
         "  roast           - Navigate to AI Code Roast tool",
         "  github          - Open GitHub profile",
         "  linkedin        - Open LinkedIn profile",
@@ -85,9 +84,6 @@ export function useTerminalCommands() {
       } else {
         setHistory(prev => [...prev, "Error: Section not found.", ""]);
       }
-    } else if (mainCommand === 'toggle-dev') {
-      toggleDeveloperMode();
-      setHistory(prev => [...prev, "Toggled Developer Debug Mode.", ""]);
     } else if (mainCommand === 'github') {
       window.open("https://github.com/Ani0811", "_blank");
       setHistory(prev => [...prev, "Opening GitHub profile...", ""]);

@@ -39,7 +39,8 @@ export default function HeroSection() {
 
     const updateCanvasSize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      // Cap DPR at 2 for performance, especially on high-DPI mobile devices
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       canvasSize.current = { width: canvas.width, height: canvas.height, dpr };
@@ -54,7 +55,7 @@ export default function HeroSection() {
       // Step calculation to match the preloading logic in useScrollAnimation
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
+      const step = isMobileDevice || isTabletDevice ? 2 : 1;
       
       const frameIndex = step === 1 ? rawFrameIndex : Math.floor(rawFrameIndex / step) * step;
       
@@ -65,33 +66,35 @@ export default function HeroSection() {
       const imgWidth = img.width;
       const imgHeight = img.height;
 
-      // Fit width on mobile/tablet to match desktop zoom level relative to screen width
-      let scale;
-      if (isMobileDevice || isTabletDevice) {
-        scale = canvasWidth / imgWidth;
-      } else {
-        scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
-      }
+      // Cover scaling on all devices to fill the screen nicely without letterboxing
+      const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
 
       const x = (canvasWidth / 2) - (imgWidth / 2) * scale;
-      const y = (canvasHeight / 2) - (imgHeight / 2) * scale;
+      // Position vertical focal center at 30% height on mobile/tablet to center character nicely
+      let y = (canvasHeight / 2) - (imgHeight / 2) * scale;
+      if (isMobileDevice || isTabletDevice) {
+        const preferredY = (canvasHeight * 0.3) - (imgHeight / 2) * scale;
+        const minY = canvasHeight - imgHeight * scale;
+        const maxY = 0;
+        y = Math.max(minY, Math.min(maxY, preferredY));
+      }
 
       // Clear the canvas to support transparency
       context.clearRect(0, 0, canvasWidth, canvasHeight);
 
       context.drawImage(img, x, y, imgWidth * scale, imgHeight * scale);
 
-      // Fade the top and bottom of the frame to transparent so the page background gradient shows through
+      // Fade the top and bottom of the visible canvas to transparent so it blends with background gradients
       if (isMobileDevice || isTabletDevice) {
-        const grad = context.createLinearGradient(0, y, 0, y + imgHeight * scale);
+        const grad = context.createLinearGradient(0, 0, 0, canvasHeight);
         grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        grad.addColorStop(0.18, 'rgba(0, 0, 0, 1)');
-        grad.addColorStop(0.82, 'rgba(0, 0, 0, 1)');
+        grad.addColorStop(0.15, 'rgba(0, 0, 0, 1)');
+        grad.addColorStop(0.85, 'rgba(0, 0, 0, 1)');
         grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         context.globalCompositeOperation = 'destination-in';
         context.fillStyle = grad;
-        context.fillRect(0, y - 2, canvasWidth, imgHeight * scale + 4);
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
         context.globalCompositeOperation = 'source-over';
       }
     };

@@ -19,7 +19,6 @@ const RainBackground = dynamic(() => import("./components/effects/RainBackground
 const ScrollToTopButton = dynamic(() => import("./components/ui/ScrollToTopButton"), { ssr: false });
 const TerminalOverlay = dynamic(() => import("@/app/components/ui/TerminalOverlay"), { ssr: false }); // Developer CLI
 const SandboxSection = dynamic(() => import("@/app/components/sections/SandboxSection"), { ssr: false }); // Interactive Sandbox
-const DebugWidget = dynamic(() => import("@/app/components/ui/DebugWidget"), { ssr: false }); // Performance Monitor
 const TerminalWidget = dynamic(() => import("@/app/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
 
 import { PortfolioProvider } from "./context/PortfolioContext";
@@ -139,7 +138,6 @@ export default function PortfolioClient() {
       <ScrollToTopButton />
       <TerminalOverlay />
       <TerminalWidget />
-      <DebugWidget />
 
       {/* Global custom animations */}
       <style

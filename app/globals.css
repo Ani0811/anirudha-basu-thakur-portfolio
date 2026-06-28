@@ -963,54 +963,7 @@ a {
   }
 }
 
-/* Developer Mode Diagnostics Controls */
-body.inspect-components #home,
-body.inspect-components #about,
-body.inspect-components #skills,
-body.inspect-components #projects,
-body.inspect-components #sandbox,
-body.inspect-components #contact {
-  outline: 2px solid #06b6d4 !important;
-  outline-offset: -2px;
-  position: relative !important;
-}
 
-body.inspect-components #home::before { content: "<HeroSection />"; }
-body.inspect-components #about::before { content: "<AboutSection />"; }
-body.inspect-components #skills::before { content: "<SkillsSection />"; }
-body.inspect-components #projects::before { content: "<ProjectsSection />"; }
-body.inspect-components #sandbox::before { content: "<SandboxSection />"; }
-body.inspect-components #contact::before { content: "<ContactSection />"; }
 
-body.inspect-components #home::before,
-body.inspect-components #about::before,
-body.inspect-components #skills::before,
-body.inspect-components #projects::before,
-body.inspect-components #sandbox::before,
-body.inspect-components #contact::before {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: #06b6d4 !important;
-  color: #000000 !important;
-  font-family: monospace !important;
-  font-size: 10px !important;
-  font-weight: bold !important;
-  padding: 3px 8px !important;
-  border-radius: 4px !important;
-  z-index: 50 !important;
-  pointer-events: none !important;
-  letter-spacing: 0.05em !important;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
-}
 
-body.baseline-grid::after {
-  content: "" !important;
-  position: fixed !important;
-  inset: 0 !important;
-  background-image: linear-gradient(rgba(6, 182, 212, 0.08) 1px, transparent 1px) !important;
-  background-size: 100% 24px !important;
-  pointer-events: none !important;
-  z-index: 9998 !important;
-}
 

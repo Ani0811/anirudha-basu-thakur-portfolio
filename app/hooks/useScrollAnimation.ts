@@ -104,12 +104,11 @@ export function useScrollAnimation(): ScrollValues {
       setHeroStartFrameIndex(detectedStart);
       setFrameIndex(detectedStart);
 
-      // Determine step based on device capability (simple heuristic)
-      // Mobile: Load every 3rd frame (roughly 24 frames total)
-      // Tablet: Load every 2nd frame
+      // Use step = 2 on mobile/tablet for much higher frame density (ultra-smooth animation),
+      // and step = 1 on desktop. This matches preloading with rendering budget.
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
+      const step = isMobileDevice || isTabletDevice ? 2 : 1;
 
       const loadSingleFrame = (index: number, src: string) => {
         return new Promise<void>((resolve) => {
@@ -215,7 +214,7 @@ export function useScrollAnimation(): ScrollValues {
       // Find the nearest available index (stepping backward to find the last loaded one)
       const isMobileDevice = window.innerWidth < 640;
       const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice ? 5 : isTabletDevice ? 3 : 1;
+      const step = isMobileDevice || isTabletDevice ? 2 : 1;
       
       const adjustedIndex = step === 1 ? nextIndex : Math.floor(nextIndex / step) * step;
       
