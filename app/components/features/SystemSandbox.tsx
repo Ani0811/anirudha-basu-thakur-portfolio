@@ -47,6 +47,24 @@ export default function SystemSandbox() {
   const [credits, setCredits] = useState(0);
   const [dbHealth, setDbHealth] = useState(100);
   const [timer, setTimer] = useState(45); // Defense duration: 45s
+
+  // Telemetry Sparkline & Logging States
+  const [qpsHistory, setQpsHistory] = useState<number[]>(Array(15).fill(0));
+  const [latencyHistory, setLatencyHistory] = useState<number[]>(Array(15).fill(0));
+  const [cacheHistory, setCacheHistory] = useState<number[]>(Array(15).fill(0));
+  const [sysLogs, setSysLogs] = useState<string[]>([
+    `[SYSTEM] ${new Date().toLocaleTimeString()} - Security firewall: Standby. Ready for connection request.`
+  ]);
+
+  const addLog = (tag: 'SYSTEM' | 'GATEWAY' | 'CACHE' | 'DB' | 'UPGRADE', message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logStr = `[${tag}] ${timestamp} - ${message}`;
+    setSysLogs(prev => {
+      const updated = [...prev, logStr];
+      if (updated.length > 6) updated.shift();
+      return updated;
+    });
+  };
   
   // Upgrades states
   const [upgrades, setUpgrades] = useState({
@@ -82,7 +100,7 @@ export default function SystemSandbox() {
   const dbCapacity = upgrades.dbReplica ? 10 : 4;
   const isDbOverloaded = activeDbRequests > dbCapacity;
 
-  // Handle Game Timer
+  // Handle Game Timer & Telemetry updates
   useEffect(() => {
     if (gameState !== 'defending') return;
 
@@ -95,10 +113,34 @@ export default function SystemSandbox() {
         }
         return prev - 1;
       });
+
+      // Update telemetry history arrays
+      const currentTrafficRate = timer > 30 ? 12 : timer > 15 ? 24 : 42;
+      const currentQps = currentTrafficRate + Math.floor(Math.random() * 5 - 2);
+      const currentLatency = Math.max(15, 15 + activeDbRequests * (upgrades.serverScale ? 22 : 48) + Math.floor(Math.random() * 6 - 3));
+      const currentCacheRate = (upgrades.cache ? 75 : 15) + Math.floor(Math.random() * 8 - 4);
+
+      setQpsHistory(prev => [...prev.slice(1), currentQps]);
+      setLatencyHistory(prev => [...prev.slice(1), Math.max(15, currentLatency)]);
+      setCacheHistory(prev => [...prev.slice(1), Math.max(0, Math.min(100, currentCacheRate))]);
+
+      // Dynamic log sampling
+      const sampleChance = Math.random();
+      if (sampleChance < 0.35) {
+        if (isDbOverloaded) {
+          addLog('DB', `ALERT: db_connection_pool saturated (${activeDbRequests}/${dbCapacity} QPS). Throttling connections.`);
+        } else if (upgrades.rateLimiter && Math.random() < 0.5) {
+          addLog('GATEWAY', 'Rate Limiter dropped suspicious package from 192.168.1.85.');
+        } else if (upgrades.cache && Math.random() < 0.6) {
+          addLog('CACHE', 'Served content from memory cache. Response time: 2ms.');
+        } else {
+          addLog('SYSTEM', `Routing incoming traffic. DB load at ${activeDbRequests}/${dbCapacity} QPS.`);
+        }
+      }
     }, 1000);
 
     return () => clearInterval(gameInterval);
-  }, [gameState]);
+  }, [gameState, timer, activeDbRequests, upgrades, dbCapacity, isDbOverloaded]);
 
   // Main animation / simulation loop
   useEffect(() => {
@@ -257,6 +299,13 @@ export default function SystemSandbox() {
     setCredits(0);
     setTimer(45);
     setParticles([]);
+    setQpsHistory(Array(15).fill(0));
+    setLatencyHistory(Array(15).fill(0));
+    setCacheHistory(Array(15).fill(0));
+    setSysLogs([
+      `[SYSTEM] ${new Date().toLocaleTimeString()} - Security firewall: Activated. Distributing load tables.`,
+      `[SYSTEM] ${new Date().toLocaleTimeString()} - Standing by for incoming requests...`
+    ]);
     setUpgrades({
       rateLimiter: false,
       cache: false,
@@ -275,6 +324,12 @@ export default function SystemSandbox() {
     setDbHealth(100);
     setCredits(0);
     setParticles([]);
+    setQpsHistory(Array(15).fill(0));
+    setLatencyHistory(Array(15).fill(0));
+    setCacheHistory(Array(15).fill(0));
+    setSysLogs([
+      `[SYSTEM] ${new Date().toLocaleTimeString()} - Security firewall: Standby. Ready for connection request.`
+    ]);
     setUpgrades({
       rateLimiter: false,
       cache: false,
@@ -288,6 +343,17 @@ export default function SystemSandbox() {
     if (credits >= cost && !upgrades[type]) {
       setCredits(prev => prev - cost);
       setUpgrades(prev => ({ ...prev, [type]: true }));
+
+      // Add syslog entry for the purchase
+      if (type === 'rateLimiter') {
+        addLog('UPGRADE', 'Purchased Gateway Rate Limiter. Drop spam threshold: 70%.');
+      } else if (type === 'cache') {
+        addLog('UPGRADE', 'Upgraded Edge Caching Layer. Bypass DB rate: 75%.');
+      } else if (type === 'serverScale') {
+        addLog('UPGRADE', 'Enabled Auto-scale Server Pods. Request throughput: 2.0x.');
+      } else if (type === 'dbReplica') {
+        addLog('UPGRADE', 'Deployed Database Read Replicas. DB capacity QPS: +150%.');
+      }
     }
   };
 
@@ -513,142 +579,265 @@ export default function SystemSandbox() {
         </button>
       </div>
 
-      {/* SVG Animation Canvas */}
-      <div className="w-full overflow-hidden rounded-2xl border border-cyan-500/20 bg-[#060c14] shadow-[inset_0_0_60px_rgba(34,211,238,0.06)] flex items-center justify-center p-4 relative">
-        {/* Background Alert Ambient Pulse */}
-        {gameState === 'defending' && isDbOverloaded && (
-          <div className="absolute inset-0 bg-red-500/3 animate-pulse pointer-events-none z-0" />
-        )}
-
-        <svg viewBox={isMobileFlow ? "0 0 320 440" : "0 0 800 300"} className="w-full max-w-4xl h-auto relative z-10" style={{ minHeight: isMobileFlow ? '440px' : '300px' }}>
-          {/* Connection Lines */}
-          <line x1={positions.client.x} y1={positions.client.y} x2={positions.gateway.x} y2={positions.gateway.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
-          <line x1={positions.gateway.x} y1={positions.gateway.y} x2={positions.cache.x} y2={positions.cache.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
-          <line x1={positions.gateway.x} y1={positions.gateway.y} x2={positions.server.x} y2={positions.server.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
-          <line x1={positions.server.x} y1={positions.server.y} x2={positions.db.x} y2={positions.db.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
-
-          {/* Crossover line from cache back to gateway */}
-          <path d={isMobileFlow
-            ? `M ${positions.cache.x} ${positions.cache.y} Q ${(positions.cache.x + positions.gateway.x)/2 - 20} ${(positions.cache.y + positions.gateway.y)/2} ${positions.gateway.x} ${positions.gateway.y}`
-            : `M ${positions.cache.x} ${positions.cache.y} Q ${(positions.cache.x + positions.gateway.x)/2} ${(positions.cache.y + positions.gateway.y)/2 - 20} ${positions.gateway.x} ${positions.gateway.y}`
-          } fill="none" stroke="rgba(168,85,247,0.15)" strokeWidth="1.5" strokeDasharray="3,3" />
-
-          {/* Traffic Particles */}
-          {particles.map(p => {
-            const pos = getParticlePos(p);
-            
-            // Color mapping based on status
-            let color = '#22d3ee'; // standard (cyan)
-            if (p.status === 'spam') color = '#ef4444'; // spam/attack (red)
-            else if (p.status === 'blocked') color = '#f97316'; // blocked/diverted (orange)
-            else if (p.route.includes('cache')) color = '#a855f7'; // cached query (purple)
-
-            return (
-              <circle 
-                key={p.id} 
-                cx={pos.x} 
-                cy={pos.y} 
-                r={p.status === 'spam' ? '4.5' : '3.5'} 
-                fill={color} 
-                style={{ filter: `drop-shadow(0 0 6px ${color})` }}
-              />
-            );
-          })}
-
-          {/* Client Node */}
-          <g transform={`translate(${positions.client.x}, ${positions.client.y})`}>
-            <circle r="26" fill="#040813" stroke="#22d3ee" strokeWidth="2" />
-            <path d="M -10 -7 L 10 -7 L 10 5 L -10 5 Z" fill="none" stroke="#22d3ee" strokeWidth="1.8" />
-            <path d="M -4 5 L -6 10 L 6 10 L 4 5" fill="none" stroke="#22d3ee" strokeWidth="1.8" />
-            <text x="0" y="-38" textAnchor="middle" fill="#22d3ee" fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">CLIENT</text>
-          </g>
-
-          {/* Gateway Node with glowing shield if rate limiter active */}
-          <g transform={`translate(${positions.gateway.x}, ${positions.gateway.y})`}>
-            {upgrades.rateLimiter && (
-              <circle r="34" fill="none" stroke="#f97316" strokeWidth="1.5" strokeDasharray="4,4" className="animate-spin" style={{ animationDuration: '8s' }} />
-            )}
-            <circle r="26" fill="#040813" stroke={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} strokeWidth="2" />
-            <path d="M -8 -8 L 8 -8 L 8 -3 C 8 3 0 9 -8 3 L -8 -8 Z" fill="none" stroke={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} strokeWidth="1.8" />
-            <text x="0" y="38" textAnchor="middle" fill={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">GATEWAY</text>
-            {upgrades.rateLimiter && (
-              <path d="M-6,-15 L6,-15 L6,-11 C6,-5 0,-1 -6,-11 Z" fill="none" stroke="#f97316" strokeWidth="1" transform="scale(0.6)" />
-            )}
-          </g>
-
-          {/* Cache Node */}
-          <g transform={`translate(${positions.cache.x}, ${positions.cache.y})`}>
-            {upgrades.cache && (
-              <circle r="32" fill="none" stroke="#a855f7" strokeWidth="1" opacity="0.6" className="animate-pulse" />
-            )}
-            <circle r="26" fill="#040813" stroke={upgrades.cache ? '#a855f7' : '#22d3ee'} strokeWidth="2" />
-            <path d="M 2 -9 L -8 0 L -1 0 L -3 9 L 7 0 L 0 0 Z" fill="none" stroke={upgrades.cache ? '#a855f7' : '#22d3ee'} strokeWidth="1.8" />
-            <text x="0" y="-38" textAnchor="middle" fill={upgrades.cache ? '#a855f7' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">CACHE</text>
-          </g>
-
-          {/* Server Node (stacked pod visuals if scaled) */}
-          <g transform={`translate(${positions.server.x}, ${positions.server.y})`}>
-            {upgrades.serverScale && (
-              <>
-                <circle cx="-8" cy="8" r="23" fill="#030712" stroke="#3b82f6" strokeWidth="1.5" opacity="0.5" />
-                <circle cx="8" cy="-8" r="23" fill="#030712" stroke="#3b82f6" strokeWidth="1.5" opacity="0.5" />
-              </>
-            )}
-            <circle r="26" fill="#040813" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="2" />
-            <g transform="translate(0, -1)">
-              <rect x="-10" y="-8" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
-              <circle cx="-5" cy="-5.5" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
-              <rect x="-10" y="-2.5" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
-              <circle cx="-5" cy="0" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
-              <rect x="-10" y="3" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
-              <circle cx="-5" cy="5.5" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
-            </g>
-            <text x="0" y="38" textAnchor="middle" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">SERVERS</text>
-          </g>
-
-          {/* DB Node (cylinder stacked visuals if replica active) */}
-          <g transform={`translate(${positions.db.x}, ${positions.db.y})`}>
-            {upgrades.dbReplica && (
-              <g transform="translate(14, -14)" opacity="0.6">
-                <ellipse cx="0" cy="-14" rx="20" ry="6" fill="#0b1329" stroke="#10b981" strokeWidth="1.5" />
-                <path d="M -20 -14 L -20 14 A 20 6 0 0 0 20 14 L 20 -14" fill="#0b1329" stroke="#10b981" strokeWidth="1.5" />
-                <ellipse cx="0" cy="0" rx="20" ry="6" fill="none" stroke="#10b981" strokeWidth="1.5" />
-                <ellipse cx="0" cy="14" rx="20" ry="6" fill="none" stroke="#10b981" strokeWidth="1.5" />
-              </g>
-            )}
-            
-            {/* Primary DB Cylinder */}
-            <g>
-              <ellipse cx="0" cy="-14" rx="22" ry="6" fill="#040813" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
-              <path d="M -22 -14 L -22 14 A 22 6 0 0 0 22 14 L 22 -14" fill="#040813" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
-              <ellipse cx="0" cy="0" rx="22" ry="6" fill="none" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="1.5" />
-              <ellipse cx="0" cy="14" rx="22" ry="6" fill="none" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
-            </g>
-            <text x="0" y="38" textAnchor="middle" fill={isDbOverloaded ? '#ef4444' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">DATABASE</text>
-
-            {/* Overload Alert overlay indicator */}
-            {isDbOverloaded && gameState === 'defending' && (
-              <g transform="translate(0, -32)">
-                <rect x="-35" y="-10" width="70" height="14" rx="3" fill="#dc2626" />
-                <text x="0" y="0" textAnchor="middle" fill="#ffffff" fontSize="8" className="font-bold tracking-widest animate-pulse">OVERLOAD</text>
-              </g>
-            )}
-          </g>
-        </svg>
+      {/* Simulation & Telemetry Split */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
         
-        {/* Connection Counts Overlay */}
-        {gameState === 'defending' && (
-          <div className="absolute top-4 right-4 bg-slate-950/80 border border-white/5 p-2 px-3 rounded-lg text-[9px] text-slate-400 space-y-0.5">
-            <div className="flex justify-between gap-6">
-              <span>DB ACTIVE LOAD:</span>
-              <span className={`font-bold ${isDbOverloaded ? 'text-red-400' : 'text-cyan-400'}`}>{activeDbRequests} / {dbCapacity} QPS</span>
+        {/* SVG Canvas (Left column, takes 2 cols on lg) */}
+        <div className={`lg:col-span-2 overflow-hidden rounded-2xl border bg-[#060c14] p-4 relative flex items-center justify-center transition-all duration-300 ${
+          gameState === 'defending' && dbHealth < 35 
+            ? 'border-red-500/50 shadow-[inset_0_0_60px_rgba(239,68,68,0.1)]' 
+            : 'border-cyan-500/20 shadow-[inset_0_0_60px_rgba(34,211,238,0.06)]'
+        }`}>
+          {/* Background Alert Ambient Pulse / alarm siren strobe */}
+          {gameState === 'defending' && isDbOverloaded && (
+            <div className="absolute inset-0 bg-red-500/3 animate-pulse pointer-events-none z-0" />
+          )}
+          {gameState === 'defending' && dbHealth < 35 && (
+            <div className="absolute inset-0 bg-red-600/5 animate-[pulse_1.2s_infinite] pointer-events-none z-0" />
+          )}
+
+          <svg viewBox={isMobileFlow ? "0 0 320 440" : "0 0 800 300"} className="w-full max-w-4xl h-auto relative z-10" style={{ minHeight: isMobileFlow ? '440px' : '300px' }}>
+            {/* Connection Lines */}
+            <line x1={positions.client.x} y1={positions.client.y} x2={positions.gateway.x} y2={positions.gateway.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
+            <line x1={positions.gateway.x} y1={positions.gateway.y} x2={positions.cache.x} y2={positions.cache.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
+            <line x1={positions.gateway.x} y1={positions.gateway.y} x2={positions.server.x} y2={positions.server.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
+            <line x1={positions.server.x} y1={positions.server.y} x2={positions.db.x} y2={positions.db.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
+
+            {/* Crossover line from cache back to gateway */}
+            <path d={isMobileFlow
+              ? `M ${positions.cache.x} ${positions.cache.y} Q ${(positions.cache.x + positions.gateway.x)/2 - 20} ${(positions.cache.y + positions.gateway.y)/2} ${positions.gateway.x} ${positions.gateway.y}`
+              : `M ${positions.cache.x} ${positions.cache.y} Q ${(positions.cache.x + positions.gateway.x)/2} ${(positions.cache.y + positions.gateway.y)/2 - 20} ${positions.gateway.x} ${positions.gateway.y}`
+            } fill="none" stroke="rgba(168,85,247,0.15)" strokeWidth="1.5" strokeDasharray="3,3" />
+
+            {/* Traffic Particles */}
+            {particles.map(p => {
+              const pos = getParticlePos(p);
+              
+              // Color mapping based on status
+              let color = '#22d3ee'; // standard (cyan)
+              if (p.status === 'spam') color = '#ef4444'; // spam/attack (red)
+              else if (p.status === 'blocked') color = '#f97316'; // blocked/diverted (orange)
+              else if (p.route.includes('cache')) color = '#a855f7'; // cached query (purple)
+
+              return (
+                <circle 
+                  key={p.id} 
+                  cx={pos.x} 
+                  cy={pos.y} 
+                  r={p.status === 'spam' ? '4.5' : '3.5'} 
+                  fill={color} 
+                  style={{ filter: `drop-shadow(0 0 6px ${color})` }}
+                />
+              );
+            })}
+
+            {/* Client Node */}
+            <g transform={`translate(${positions.client.x}, ${positions.client.y})`}>
+              <circle r="26" fill="#040813" stroke="#22d3ee" strokeWidth="2" />
+              <path d="M -10 -7 L 10 -7 L 10 5 L -10 5 Z" fill="none" stroke="#22d3ee" strokeWidth="1.8" />
+              <path d="M -4 5 L -6 10 L 6 10 L 4 5" fill="none" stroke="#22d3ee" strokeWidth="1.8" />
+              <text x="0" y="-38" textAnchor="middle" fill="#22d3ee" fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">CLIENT</text>
+            </g>
+
+            {/* Gateway Node with glowing shield if rate limiter active */}
+            <g transform={`translate(${positions.gateway.x}, ${positions.gateway.y})`}>
+              {upgrades.rateLimiter && (
+                <circle r="34" fill="none" stroke="#f97316" strokeWidth="1.5" strokeDasharray="4,4" className="animate-spin" style={{ animationDuration: '8s' }} />
+              )}
+              <circle r="26" fill="#040813" stroke={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} strokeWidth="2" />
+              <path d="M -8 -8 L 8 -8 L 8 -3 C 8 3 0 9 -8 3 L -8 -8 Z" fill="none" stroke={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} strokeWidth="1.8" />
+              <text x="0" y="38" textAnchor="middle" fill={upgrades.rateLimiter ? '#f97316' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">GATEWAY</text>
+              {upgrades.rateLimiter && (
+                <path d="M-6,-15 L6,-15 L6,-11 C6,-5 0,-1 -6,-11 Z" fill="none" stroke="#f97316" strokeWidth="1" transform="scale(0.6)" />
+              )}
+            </g>
+
+            {/* Cache Node */}
+            <g transform={`translate(${positions.cache.x}, ${positions.cache.y})`}>
+              {upgrades.cache && (
+                <circle r="32" fill="none" stroke="#a855f7" strokeWidth="1" opacity="0.6" className="animate-pulse" />
+              )}
+              <circle r="26" fill="#040813" stroke={upgrades.cache ? '#a855f7' : '#22d3ee'} strokeWidth="2" />
+              <path d="M 2 -9 L -8 0 L -1 0 L -3 9 L 7 0 L 0 0 Z" fill="none" stroke={upgrades.cache ? '#a855f7' : '#22d3ee'} strokeWidth="1.8" />
+              <text x="0" y="-38" textAnchor="middle" fill={upgrades.cache ? '#a855f7' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">CACHE</text>
+            </g>
+
+            {/* Server Node (stacked pod visuals if scaled) */}
+            <g transform={`translate(${positions.server.x}, ${positions.server.y})`}>
+              {upgrades.serverScale && (
+                <>
+                  <circle cx="-8" cy="8" r="23" fill="#030712" stroke="#3b82f6" strokeWidth="1.5" opacity="0.5" />
+                  <circle cx="8" cy="-8" r="23" fill="#030712" stroke="#3b82f6" strokeWidth="1.5" opacity="0.5" />
+                </>
+              )}
+              <circle r="26" fill="#040813" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="2" />
+              <g transform="translate(0, -1)">
+                <rect x="-10" y="-8" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
+                <circle cx="-5" cy="-5.5" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
+                <rect x="-10" y="-2.5" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
+                <circle cx="-5" cy="0" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
+                <rect x="-10" y="3" width="20" height="5" rx="1" fill="none" stroke={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} strokeWidth="1.5" />
+                <circle cx="-5" cy="5.5" r="0.8" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} />
+              </g>
+              <text x="0" y="38" textAnchor="middle" fill={upgrades.serverScale ? '#3b82f6' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">SERVERS</text>
+            </g>
+
+            {/* DB Node (cylinder stacked visuals if replica active) */}
+            <g transform={`translate(${positions.db.x}, ${positions.db.y})`}>
+              {upgrades.dbReplica && (
+                <g transform="translate(14, -14)" opacity="0.6">
+                  <ellipse cx="0" cy="-14" rx="20" ry="6" fill="#0b1329" stroke="#10b981" strokeWidth="1.5" />
+                  <path d="M -20 -14 L -20 14 A 20 6 0 0 0 20 14 L 20 -14" fill="#0b1329" stroke="#10b981" strokeWidth="1.5" />
+                  <ellipse cx="0" cy="0" rx="20" ry="6" fill="none" stroke="#10b981" strokeWidth="1.5" />
+                  <ellipse cx="0" cy="14" rx="20" ry="6" fill="none" stroke="#10b981" strokeWidth="1.5" />
+                </g>
+              )}
+              
+              {/* Primary DB Cylinder */}
+              <g>
+                <ellipse cx="0" cy="-14" rx="22" ry="6" fill="#040813" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
+                <path d="M -22 -14 L -22 14 A 22 6 0 0 0 22 14 L 22 -14" fill="#040813" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
+                <ellipse cx="0" cy="0" rx="22" ry="6" fill="none" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="1.5" />
+                <ellipse cx="0" cy="14" rx="22" ry="6" fill="none" stroke={isDbOverloaded ? '#ef4444' : '#22d3ee'} strokeWidth="2" />
+              </g>
+              <text x="0" y="38" textAnchor="middle" fill={isDbOverloaded ? '#ef4444' : '#22d3ee'} fontSize="9" className="font-bold tracking-widest font-mono select-none" opacity="0.8">DATABASE</text>
+
+              {/* Overload Alert overlay indicator */}
+              {isDbOverloaded && gameState === 'defending' && (
+                <g transform="translate(0, -32)">
+                  <rect x="-35" y="-10" width="70" height="14" rx="3" fill="#dc2626" />
+                  <text x="0" y="0" textAnchor="middle" fill="#ffffff" fontSize="8" className="font-bold tracking-widest animate-pulse">OVERLOAD</text>
+                </g>
+              )}
+            </g>
+          </svg>
+          
+          {/* Connection Counts Overlay */}
+          {gameState === 'defending' && (
+            <div className="absolute top-4 right-4 bg-slate-950/80 border border-white/5 p-2 px-3 rounded-lg text-[9px] text-slate-400 space-y-0.5 z-20">
+              <div className="flex justify-between gap-6">
+                <span>DB ACTIVE LOAD:</span>
+                <span className={`font-bold ${isDbOverloaded ? 'text-red-400' : 'text-cyan-400'}`}>{activeDbRequests} / {dbCapacity} QPS</span>
+              </div>
+              <div className="flex justify-between gap-6">
+                <span>RATE LIMIT SHIELD:</span>
+                <span className="font-bold text-orange-400">{upgrades.rateLimiter ? 'ON (70%)' : 'OFF'}</span>
+              </div>
             </div>
-            <div className="flex justify-between gap-6">
-              <span>RATE LIMIT SHIELD:</span>
-              <span className="font-bold text-orange-400">{upgrades.rateLimiter ? 'ON (70%)' : 'OFF'}</span>
+          )}
+        </div>
+
+        {/* Telemetry Dashboard & Logs (Right column, takes 1 col on lg) */}
+        <div className="lg:col-span-1 flex flex-col gap-4">
+          
+          {/* Metrics Section */}
+          <div className={`p-4 rounded-2xl border bg-[#060c14] space-y-3.5 flex-1 flex flex-col justify-between transition-all duration-300 ${
+            gameState === 'defending' && dbHealth < 35 
+              ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.15)] animate-[pulse_1.2s_infinite]'
+              : 'border-cyan-500/10'
+          }`}>
+            <div className="flex justify-between items-center text-[10px] font-bold border-b border-white/5 pb-2 tracking-wider">
+              <span>📊 SYSTEM TELEMETRY</span>
+              {gameState === 'defending' && dbHealth < 35 && (
+                <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-red-600 text-white animate-pulse">CRITICAL</span>
+              )}
+            </div>
+
+            {/* QPS Metric */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-[9px] text-slate-400 font-bold">
+                <span>TRAFFIC LOAD</span>
+                <span className="text-cyan-400">
+                  {gameState === 'defending' ? `${qpsHistory[qpsHistory.length - 1]} QPS` : '2 QPS'}
+                </span>
+              </div>
+              {/* Sparkline Bar Chart */}
+              <div className="flex items-end gap-0.5 h-8 w-full bg-black/45 border border-white/5 rounded-md p-1 overflow-hidden">
+                {qpsHistory.map((val, idx) => {
+                  const heightPercent = Math.min(100, Math.max(5, (val / 55) * 100));
+                  return (
+                    <div 
+                      key={idx} 
+                      className="flex-1 bg-cyan-500/70 rounded-t-xs transition-all duration-300" 
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Latency Metric */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-[9px] text-slate-400 font-bold">
+                <span>DATABASE LATENCY</span>
+                <span className={gameState === 'defending' && latencyHistory[latencyHistory.length - 1] > 200 ? 'text-red-400 font-black animate-pulse' : 'text-purple-400'}>
+                  {gameState === 'defending' ? `${latencyHistory[latencyHistory.length - 1]} ms` : '15 ms'}
+                </span>
+              </div>
+              {/* Sparkline Bar Chart */}
+              <div className="flex items-end gap-0.5 h-8 w-full bg-black/45 border border-white/5 rounded-md p-1 overflow-hidden">
+                {latencyHistory.map((val, idx) => {
+                  const heightPercent = Math.min(100, Math.max(5, (val / 350) * 100));
+                  const isHigh = val > 200;
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`flex-1 rounded-t-xs transition-all duration-300 ${isHigh ? 'bg-red-500/70' : 'bg-purple-500/70'}`} 
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Cache Hit Rate Metric */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-[9px] text-slate-400 font-bold">
+                <span>CACHE BYPASS HIT</span>
+                <span className="text-emerald-400">
+                  {gameState === 'defending' ? `${cacheHistory[cacheHistory.length - 1]}%` : '15%'}
+                </span>
+              </div>
+              {/* Sparkline Bar Chart */}
+              <div className="flex items-end gap-0.5 h-8 w-full bg-black/45 border border-white/5 rounded-md p-1 overflow-hidden">
+                {cacheHistory.map((val, idx) => {
+                  const heightPercent = Math.min(100, Math.max(5, (val / 100) * 100));
+                  return (
+                    <div 
+                      key={idx} 
+                      className="flex-1 bg-emerald-500/70 rounded-t-xs transition-all duration-300" 
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
-        )}
+
+          {/* Syslog console logs */}
+          <div className="p-3 rounded-2xl border border-white/5 bg-black/50 text-[9px] font-mono leading-normal flex-1 flex flex-col justify-between min-h-[140px]">
+            <div className="flex justify-between items-center text-slate-500 font-bold border-b border-white/5 pb-1 select-none">
+              <span>📋 ARCHITECTURE EVENT LOG</span>
+              <span className="text-[7px] bg-white/5 border border-white/10 rounded px-1 animate-pulse text-slate-400">LIVE SYSLOG</span>
+            </div>
+            <div className="flex-1 flex flex-col gap-1.5 text-slate-400 justify-end overflow-hidden mt-2">
+              {sysLogs.map((log, idx) => {
+                let logColor = 'text-slate-400';
+                if (log.includes('[ALERT]') || log.includes('saturated')) logColor = 'text-red-400 font-semibold';
+                else if (log.includes('[UPGRADE]')) logColor = 'text-amber-400 font-bold';
+                else if (log.includes('[CACHE]')) logColor = 'text-purple-400';
+                else if (log.includes('[GATEWAY]')) logColor = 'text-orange-400';
+                
+                return (
+                  <div key={idx} className={`whitespace-pre-wrap truncate ${logColor}`}>
+                    {log}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
