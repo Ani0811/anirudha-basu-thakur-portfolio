@@ -77,6 +77,6 @@ graph TD
 
 Explore the following articles to understand how each specialized sub-system operates:
 
-* 🧠 [AI Integrations & Personality Engines](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/AI_INTEGRATION.md) - Details `/api/ai/chat`, `/api/ai/roast`, and `/api/ai/roast-github`.
-* 🛡️ [DDoS Sandbox & Telemetry Systems](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/DDOS_SIMULATOR.md) - Details the rendering loop, syslog aggregator, and latency formulas.
-* ⌨️ [CLI Hacker Shell & Graphics](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/CLI_SHELL.md) - Details terminal commands, canvas Matrix drops, and Snake game logic.
+* 🧠 [AI Integrations & Personality Engines](./AI_INTEGRATION.md) - Details `/api/ai/chat`, `/api/ai/roast`, and `/api/ai/roast-github`.
+* 🛡️ [DDoS Sandbox & Telemetry Systems](./DDOS_SIMULATOR.md) - Details the rendering loop, syslog aggregator, and latency formulas.
+* ⌨️ [CLI Hacker Shell & Graphics](./CLI_SHELL.md) - Details terminal commands, canvas Matrix drops, and Snake game logic.

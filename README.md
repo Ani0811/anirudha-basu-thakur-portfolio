@@ -79,11 +79,11 @@ npm run build
 ---
 
 ## 📖 Systems Architecture
-For deep-dive descriptions, sequence flows, and logic details, explore the [Root Architecture Folder](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/README.md).
+For deep-dive descriptions, sequence flows, and logic details, explore the [Root Architecture Folder](./architecture).
 
-* [AI Integrations & Personalities](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/AI_INTEGRATION.md)
-* [DDoS Simulator & Telemetry Engine](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/DDOS_SIMULATOR.md)
-* [CLI Shell & Canvas Graphics](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/CLI_SHELL.md)
+* [AI Integrations & Personalities](./architecture/AI_INTEGRATION.md)
+* [DDoS Simulator & Telemetry Engine](./architecture/DDOS_SIMULATOR.md)
+* [CLI Shell & Canvas Graphics](./architecture/CLI_SHELL.md)
 
 ---
 Built with 🔥 by Anirudha Basu Thakur.
