@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { usePortfolio } from "../../context/PortfolioContext";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 interface Props {
   isMobileMenuOpen: boolean;

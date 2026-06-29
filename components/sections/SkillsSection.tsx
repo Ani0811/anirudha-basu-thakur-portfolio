@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { FaGraduationCap, FaSchool, FaBook, FaCode, FaReact, FaServer, FaDatabase, FaCloud, FaTools, FaJava, FaGitAlt, FaPlug, FaLock, FaCreditCard, FaCss3Alt } from "react-icons/fa";
 import { 
   SiJavascript, SiTypescript, SiPython, SiNextdotjs, SiTailwindcss, SiHtml5, 

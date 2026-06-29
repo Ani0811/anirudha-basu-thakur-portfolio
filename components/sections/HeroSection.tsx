@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { useScrollAnimation, getCachedImage, frameSources } from "../../hooks/useScrollAnimation";
+import { useScrollAnimation, getCachedImage, frameSources } from "@/hooks/useScrollAnimation";
 
 export default function HeroSection() {
   const scrollValues = useScrollAnimation();

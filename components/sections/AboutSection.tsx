@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import GithubStats from "../features/GithubStats";
+import GithubStats from "@/components/features/GithubStats";
 import { FaCode, FaServer, FaPaintBrush, FaCreditCard, FaCogs, FaRobot } from "react-icons/fa";
 
 const badges = [

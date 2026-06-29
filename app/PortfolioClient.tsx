@@ -2,26 +2,26 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import LoadingScreen from "./components/ui/LoadingScreen";
-import Navbar from "./components/ui/Navbar";
-import CustomCursor from "./components/ui/CustomCursor";
+import LoadingScreen from "@/components/ui/LoadingScreen";
+import Navbar from "@/components/ui/Navbar";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 // Dynamic imports for sections below the fold to improve LCP and TBT
-const HeroSection = dynamic(() => import("./components/sections/HeroSection"), { ssr: true });
-const AboutSection = dynamic(() => import("./components/sections/AboutSection"), { ssr: true });
-const SkillsSection = dynamic(() => import("./components/sections/SkillsSection"), { ssr: false });
-const ProjectsSection = dynamic(() => import("./components/sections/ProjectsSection"), { ssr: false });
-const CurrentWorkSection = dynamic(() => import("./components/sections/CurrentWorkSection"), { ssr: false });
-const ContactSection = dynamic(() => import("./components/sections/ContactSection"), { ssr: false });
-const Footer = dynamic(() => import("./components/ui/Footer"), { ssr: true });
-const UpdateNotification = dynamic(() => import("./components/ui/UpdateNotification"), { ssr: false });
-const RainBackground = dynamic(() => import("./components/effects/RainBackground"), { ssr: false });
-const ScrollToTopButton = dynamic(() => import("./components/ui/ScrollToTopButton"), { ssr: false });
-const TerminalOverlay = dynamic(() => import("@/app/components/ui/TerminalOverlay"), { ssr: false }); // Developer CLI
-const SandboxSection = dynamic(() => import("@/app/components/sections/SandboxSection"), { ssr: false }); // Interactive Sandbox
-const TerminalWidget = dynamic(() => import("@/app/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
+const HeroSection = dynamic(() => import("@/components/sections/HeroSection"), { ssr: true });
+const AboutSection = dynamic(() => import("@/components/sections/AboutSection"), { ssr: true });
+const SkillsSection = dynamic(() => import("@/components/sections/SkillsSection"), { ssr: false });
+const ProjectsSection = dynamic(() => import("@/components/sections/ProjectsSection"), { ssr: false });
+const CurrentWorkSection = dynamic(() => import("@/components/sections/CurrentWorkSection"), { ssr: false });
+const ContactSection = dynamic(() => import("@/components/sections/ContactSection"), { ssr: false });
+const Footer = dynamic(() => import("@/components/ui/Footer"), { ssr: true });
+const UpdateNotification = dynamic(() => import("@/components/ui/UpdateNotification"), { ssr: false });
+const RainBackground = dynamic(() => import("@/components/effects/RainBackground"), { ssr: false });
+const ScrollToTopButton = dynamic(() => import("@/components/ui/ScrollToTopButton"), { ssr: false });
+const TerminalOverlay = dynamic(() => import("@/components/ui/TerminalOverlay"), { ssr: false }); // Developer CLI
+const SandboxSection = dynamic(() => import("@/components/sections/SandboxSection"), { ssr: false }); // Interactive Sandbox
+const TerminalWidget = dynamic(() => import("@/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
 
-import { PortfolioProvider } from "./context/PortfolioContext";
+import { PortfolioProvider } from "@/context/PortfolioContext";
 
 const bootCategories = [
   [

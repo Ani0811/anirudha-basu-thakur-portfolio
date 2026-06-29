@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
-import SystemSandbox from '../features/SystemSandbox';
-import RoastMyCode from '../features/RoastMyCode';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import SystemSandbox from '@/components/features/SystemSandbox';
+import RoastMyCode from '@/components/features/RoastMyCode';
 
 export default function SandboxSection() {
   const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });

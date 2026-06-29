@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { usePortfolio } from '../../context/PortfolioContext';
-import { useTerminalCommands } from '../../hooks/useTerminalCommands';
+import { usePortfolio } from '@/context/PortfolioContext';
+import { useTerminalCommands } from '@/hooks/useTerminalCommands';
 
 export default function TerminalOverlay() {
   const { isTerminalOpen, setTerminalOpen } = usePortfolio();

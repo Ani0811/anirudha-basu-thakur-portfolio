@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePortfolio } from '../../context/PortfolioContext';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 export default function TerminalWidget() {
   const { isTerminalOpen, setTerminalOpen } = usePortfolio();

@@ -1,56 +1,66 @@
-# Anirudha Basu Thakur - Premium Portfolio 2026
+# Anirudha Basu Thakur - Premium Interactive Portfolio
 
-Welcome to the source code of my high-performance, cinematic portfolio. Built with a focus on immersive aesthetics and technical excellence, this project showcases modern web development patterns and deep-level performance optimizations.
+Welcome to the source code of my high-performance, interactive developer portfolio. Built with a focus on immersive, aesthetic UI, playful AI integrations, and real-time simulations, this project showcases modern React, Next.js page routers, and custom performance optimization patterns.
 
-## 🚀 Key Features
+---
 
-- **Cinematic Hero Animation**: A frame-by-frame background animation synchronized with the user's scroll.
-- **Live GitHub Activity Stream**: A real-time "Currently Working On" timeline that fetches and resolves commit messages via a two-stage API system.
-- **Metric-Driven Projects**: Featured work descriptions enhanced with quantifiable metrics (load time reductions, transaction processing speeds, etc.) to demonstrate real-world impact.
-- **Glassmorphism UI**: A consistent design language using frosted-glass effects, blurred backdrops, and vibrant glows.
-- **AI-Powered "Roast My Code"**: Integration with Gemini AI to provide playful, real-time feedback on project codebases.
-- **Storytelling UX**: A refined "About" section focusing on the narrative journey and problem-solving mindset.
+## 🕹️ Interactive Features
+
+### 1. Standalone AI Code Roast Station
+* **What it does:** Paste any raw JavaScript, TypeScript, or Python code snippet to receive funny, savage, yet constructively educational code reviews.
+* **Selectable Personalities:**
+  * **Toxic Senior Dev ☠️:** Hyper-critical analysis pointing out code smells and naming violations.
+  * **Gordon Ramsay 👨‍🍳:** Yells in caps using cooking metaphors (*"THIS CALLBACK HELL IS RAW!"*).
+  * **Sarcastic Dev 🙄:** Deeply unimpressed and passive-aggressive senior developer feedback.
+  * **Cyberpunk Hacker ⚡:** Netrunner review highlighting security flaws and megacorp standards.
+
+### 2. DDoS Sandbox Telemetry Dashboard
+* **DDoS Game:** Slide values and purchase infrastructure upgrades (Rate Limiter, Edge Cache, Pod Auto-scaling, Read Replicas) to protect database health from escalating DDoS traffic.
+* **Sparklines Panel:** Real-time visual metrics tracking **Traffic Load (QPS)**, **Database Latency (ms)**, and **Cache Hit Rate (%)**.
+* **Syslog Terminal:** Aggregate streaming log files outputting cache hits, packet drops, database loads, and upgrade reports.
+* **Alarm Siren:** Glowing strobe border alerts that flash across the panel when database health drops below 35%.
+
+### 3. Developer CLI Console Hacking Modes
+* Access via the floating widget or press the backtick (`` ` ``) key to open the interactive shell.
+* **Commands:**
+  * `help` - Show available commands.
+  * `matrix` - Launch a retro cyan Matrix rain cascading visual canvas overlay. Press any key to exit.
+  * `snake` - Launch a fully playable WASD/Arrow key retro Snake game directly in the console. Exiting logs your score.
+  * `roast-github [user/repo]` - Resolves a user or repository, analyzes the code files/README, and streams a custom AI roast to the shell.
+  * `personality [professional | sarcastic | cyberpunk]` - Toggle Anirudha's AI Twin personality mode.
+  * `ask [question]` - Query Anirudha's dynamic AI Twin clone.
+
+---
+
+## 📂 Optimized Folder Structure
+
+To align with Next.js App Router guidelines and improve Turbopack route indexing performance, non-routing folders have been moved to the root level. All relative paths have been refactored to use absolute path aliases:
+
+* `components/` - Glassmorphism sections, effects, and reusable UI nodes.
+* `hooks/` - Custom rendering hooks, scroll animations, and terminal command parsers.
+* `context/` - Context providers (e.g. `PortfolioContext` for terminal overlay state).
+* `app/` - Dedicated strictly to layouts, sitemaps, page segments, and API routes (`/api/ai/*`, `/api/github/*`, `/api/contact`).
+* `public/` - Media files, project thumbnails, and resume documents.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js](https://nextjs.org/) (React 19)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Logic**: TypeScript
-- **Animations**: Custom `requestAnimationFrame` hooks & CSS Transitions
-- **Backend**: Next.js Server Actions & API Routes (GitHub & Gemini AI Integration)
+* **Framework:** Next.js (React 19, App Router)
+* **Styling:** Tailwind CSS v4 (Vanilla CSS tokens, custom gradients)
+* **Logic:** TypeScript
+* **Animations:** Custom `requestAnimationFrame` canvas rendering, CSS Transitions
+* **APIs:** Gemini API (`gemini-2.5-flash`), GitHub REST APIs, Nodemailer
+
+---
 
 ## ⚡ Technical Achievements
 
-### 1. The Scroll Animation Engine
-Achieving 60FPS fluid motion while loading high-quality image frames required a custom-built rendering engine using Decoupled Rendering (RAF Loop), Linear Interpolation (Lerping), and Intelligent Asset Caching with `img.decode()`.
+1. **60FPS Scroll Animation Engine:** A Decoupled RAF loop that bypasses React's render/reconciliation cycle to draw frames directly to canvas with Linear Interpolation (lerping) and image pre-decoding.
+2. **Two-Stage GitHub Activity Resolution:** Discovery stage queries the public GitHub event feed, then triggers parallel secondary lookups to the Commits API to resolve full messages.
+3. **Telemetry & Log Pipelines:** Zero-bloat CSS sparkline charts and throttled event logging to ensure the DDoS game runs smoothly at 60FPS.
 
-### 2. Two-Stage GitHub Activity Resolution
-To handle the "Currently Working On" section, we implemented a sophisticated fetching logic:
-- **Stage 1 (Discovery)**: Fetches the public GitHub events feed.
-- **Stage 2 (Resolution)**: Identifies `PushEvent` items where GitHub omits commit data and performs parallel secondary lookups to the Commits API to resolve full messages.
-- **Result**: A live, descriptive activity stream that shows specific commit messages even when the default feed is truncated.
-
-The standout feature of this portfolio is the Hero background animation. Achieving 60FPS fluid motion while loading high-quality image frames required a custom-built rendering engine.
-
-### 1. Decoupled Rendering (The RAF Loop)
-Unlike traditional React-based animations that rely on state updates (which trigger re-renders and React reconciliation overhead), this portfolio uses a **Direct DOM/Canvas Injection** approach.
-- Scroll values are tracked via `window.scrollY`.
-- A recursive `requestAnimationFrame` loop in the `HeroSection` bypasses React's render cycle to draw frames directly to a `<canvas>`.
-- This ensures that even high-frequency scrolling doesn't "jitter" or lag due to React's scheduler.
-
-### 2. Linear Interpolation (Lerping)
-To create a weighted, cinematic feel, we implemented **Lerp** logic:
-`currentScroll = currentScroll + (targetScroll - currentScroll) * lerpFactor`
-- The animation "follows" your scroll with a smooth easing effect.
-- This smooths out jerky mouse-wheel inputs and provides a professional "momentum" feel.
-
-### 3. Intelligent Asset Caching
-- **Frame Pre-decoding**: Every frame uses `img.decode()` before being cached, ensuring that the GPU is ready to draw without blocking the main browser thread.
-- **Global Memory Map**: Images are stored in a singleton `imageCache` to survive component remounts and prevent redundant memory allocations.
-- **End-Frame Detection**: The engine automatically scans for dark/empty trailing frames to ensure the animation maps perfectly to the visual content.
-
-### 4. Synchronization
-- All UI elements (zoom level, text reveals, frame progression) are unified under a single `HERO_SCROLL_RANGE_FACTOR`. Adjusting this one constant scales the entire cinematic experience.
+---
 
 ## ⚙️ Development
 
@@ -61,12 +71,19 @@ npm install
 
 # Run the development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-### Adjusting Animation "Weight"
-You can tune the "weight" of the scroll animation in `app/hooks/useScrollAnimation.ts`:
-- Lower `lerpFactor` (e.g., `0.08`): More "heavy/cinematic" momentum.
-- Higher `lerpFactor` (e.g., `0.2`): More "snappy/instant" response.
+---
+
+## 📖 Systems Architecture
+For deep-dive descriptions, sequence flows, and logic details, explore the [Root Architecture Folder](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/README.md).
+
+* [AI Integrations & Personalities](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/AI_INTEGRATION.md)
+* [DDoS Simulator & Telemetry Engine](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/DDOS_SIMULATOR.md)
+* [CLI Shell & Canvas Graphics](file:///c:/GitHub/anirudha-basu-thakur-portfolio/architecture/CLI_SHELL.md)
 
 ---
 Built with 🔥 by Anirudha Basu Thakur.
