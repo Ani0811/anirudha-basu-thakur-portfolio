@@ -1,45 +1,51 @@
 "use client";
 
-import { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import Navbar from "@/components/ui/Navbar";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-// Dynamic imports for sections below the fold to improve LCP and TBT
+// Dynamic imports for core layout elements and LCP sections
 const HeroSection = dynamic(() => import("@/components/sections/HeroSection"), { ssr: true });
 const AboutSection = dynamic(() => import("@/components/sections/AboutSection"), { ssr: true });
-
-// Standard React lazy imports to prevent Next.js from prefetching them on initial page load
-const SkillsSection = lazy(() => import("@/components/sections/SkillsSection"));
-const ProjectsSection = lazy(() => import("@/components/sections/ProjectsSection"));
-const CurrentWorkSection = lazy(() => import("@/components/sections/CurrentWorkSection"));
-const ContactSection = lazy(() => import("@/components/sections/ContactSection"));
-const SandboxSection = lazy(() => import("@/components/sections/SandboxSection"));
-
 const Footer = dynamic(() => import("@/components/ui/Footer"), { ssr: true });
 
-const UpdateNotification = lazy(() => import("@/components/ui/UpdateNotification"));
-const RainBackground = lazy(() => import("@/components/effects/RainBackground"));
-const ScrollToTopButton = lazy(() => import("@/components/ui/ScrollToTopButton"));
-const TerminalOverlay = lazy(() => import("@/components/ui/TerminalOverlay"));
-const TerminalWidget = lazy(() => import("@/components/ui/TerminalWidget"));
+// Dynamic imports for auxiliary widgets (ssr: false, deferred)
+const UpdateNotification = dynamic(() => import("@/components/ui/UpdateNotification"), { ssr: false });
+const RainBackground = dynamic(() => import("@/components/effects/RainBackground"), { ssr: false });
+const ScrollToTopButton = dynamic(() => import("@/components/ui/ScrollToTopButton"), { ssr: false });
+const TerminalOverlay = dynamic(() => import("@/components/ui/TerminalOverlay"), { ssr: false });
+const TerminalWidget = dynamic(() => import("@/components/ui/TerminalWidget"), { ssr: false });
 
 import { PortfolioProvider } from "@/context/PortfolioContext";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
-// Lazy section helper component to avoid mounting sections below the fold immediately
-function LazySection({ children, minHeight }: { children: React.ReactNode; minHeight: string }) {
+// Lazy section helper component to avoid prefetching and mounting sections below the fold immediately
+function LazySection<T extends object>({ 
+  importFunc, 
+  minHeight,
+  componentProps
+}: { 
+  importFunc: () => Promise<{ default: React.ComponentType<T> }>; 
+  minHeight: string;
+  componentProps?: T;
+}) {
   const [ref, isVisible] = useIntersectionObserver({ threshold: 0.01, rootMargin: "300px", triggerOnce: true });
+  const [Component, setComponent] = useState<React.ComponentType<T> | null>(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      importFunc().then((mod) => {
+        setComponent(() => mod.default);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
+
   return (
     <div ref={ref as React.RefObject<HTMLDivElement | null>} style={{ minHeight }} className="w-full">
-      {isVisible ? (
-        <Suspense fallback={<div className="w-full" style={{ minHeight }} />}>
-          {children}
-        </Suspense>
-      ) : (
-        <div className="w-full" style={{ minHeight }} />
-      )}
+      {Component ? <Component {...(componentProps || {} as T)} /> : <div className="w-full" style={{ minHeight }} />}
     </div>
   );
 }
@@ -158,11 +164,7 @@ export default function PortfolioClient() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_40%,#000_20%,transparent_100%)] opacity-30" />
         
         {/* Dynamic Rain Effect (Deferred) */}
-        {mountWidgets && (
-          <Suspense fallback={null}>
-            <RainBackground />
-          </Suspense>
-        )}
+        {mountWidgets && <RainBackground />}
       </div>
 
       <Navbar
@@ -174,35 +176,41 @@ export default function PortfolioClient() {
         <HeroSection />
         <AboutSection />
         
-        <LazySection minHeight="600px">
-          <SkillsSection />
-        </LazySection>
+        <LazySection 
+          importFunc={() => import("@/components/sections/SkillsSection")} 
+          minHeight="600px" 
+        />
         
-        <LazySection minHeight="600px">
-          <ProjectsSection />
-        </LazySection>
+        <LazySection 
+          importFunc={() => import("@/components/sections/ProjectsSection")} 
+          minHeight="600px" 
+        />
         
-        <LazySection minHeight="500px">
-          <SandboxSection />
-        </LazySection>
+        <LazySection 
+          importFunc={() => import("@/components/sections/SandboxSection")} 
+          minHeight="500px" 
+        />
         
-        <LazySection minHeight="400px">
-          <CurrentWorkSection />
-        </LazySection>
+        <LazySection 
+          importFunc={() => import("@/components/sections/CurrentWorkSection")} 
+          minHeight="400px" 
+        />
         
-        <LazySection minHeight="500px">
-          <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
-        </LazySection>
+        <LazySection 
+          importFunc={() => import("@/components/sections/ContactSection")} 
+          minHeight="500px" 
+          componentProps={{ terminalMode, setTerminalMode }}
+        />
       </main>
 
       <Footer />
       {mountWidgets && (
-        <Suspense fallback={null}>
+        <>
           <UpdateNotification />
           <ScrollToTopButton />
           <TerminalOverlay />
           <TerminalWidget />
-        </Suspense>
+        </>
       )}
 
       {/* Global custom animations */}
