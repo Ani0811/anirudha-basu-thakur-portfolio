@@ -8,12 +8,14 @@ const displayFont = Orbitron({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["500", "700"],
+  display: "swap",
 });
 
 const bodyFont = Rajdhani({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://anirudha-basu-thakur-portfolio.vercel.app";
@@ -86,6 +88,19 @@ export default function RootLayout({
       lang="en"
       className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://api.github.com" />
+        <link rel="preconnect" href="https://raw.githubusercontent.com" />
+        <link rel="dns-prefetch" href="https://api.github.com" />
+        <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
+        <link rel="preload" as="image" href="/hero-frames/008.webp" type="image/webp" />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <link rel="preconnect" href="https://www.googletagmanager.com" />
+            <link rel="preconnect" href="https://www.google-analytics.com" />
+          </>
+        )}
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <SpeedInsights />
