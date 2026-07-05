@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import Navbar from "@/components/ui/Navbar";
@@ -9,17 +9,21 @@ import CustomCursor from "@/components/ui/CustomCursor";
 // Dynamic imports for sections below the fold to improve LCP and TBT
 const HeroSection = dynamic(() => import("@/components/sections/HeroSection"), { ssr: true });
 const AboutSection = dynamic(() => import("@/components/sections/AboutSection"), { ssr: true });
-const SkillsSection = dynamic(() => import("@/components/sections/SkillsSection"), { ssr: false });
-const ProjectsSection = dynamic(() => import("@/components/sections/ProjectsSection"), { ssr: false });
-const CurrentWorkSection = dynamic(() => import("@/components/sections/CurrentWorkSection"), { ssr: false });
-const ContactSection = dynamic(() => import("@/components/sections/ContactSection"), { ssr: false });
+
+// Standard React lazy imports to prevent Next.js from prefetching them on initial page load
+const SkillsSection = lazy(() => import("@/components/sections/SkillsSection"));
+const ProjectsSection = lazy(() => import("@/components/sections/ProjectsSection"));
+const CurrentWorkSection = lazy(() => import("@/components/sections/CurrentWorkSection"));
+const ContactSection = lazy(() => import("@/components/sections/ContactSection"));
+const SandboxSection = lazy(() => import("@/components/sections/SandboxSection"));
+
 const Footer = dynamic(() => import("@/components/ui/Footer"), { ssr: true });
-const UpdateNotification = dynamic(() => import("@/components/ui/UpdateNotification"), { ssr: false });
-const RainBackground = dynamic(() => import("@/components/effects/RainBackground"), { ssr: false });
-const ScrollToTopButton = dynamic(() => import("@/components/ui/ScrollToTopButton"), { ssr: false });
-const TerminalOverlay = dynamic(() => import("@/components/ui/TerminalOverlay"), { ssr: false }); // Developer CLI
-const SandboxSection = dynamic(() => import("@/components/sections/SandboxSection"), { ssr: false }); // Interactive Sandbox
-const TerminalWidget = dynamic(() => import("@/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
+
+const UpdateNotification = lazy(() => import("@/components/ui/UpdateNotification"));
+const RainBackground = lazy(() => import("@/components/effects/RainBackground"));
+const ScrollToTopButton = lazy(() => import("@/components/ui/ScrollToTopButton"));
+const TerminalOverlay = lazy(() => import("@/components/ui/TerminalOverlay"));
+const TerminalWidget = lazy(() => import("@/components/ui/TerminalWidget"));
 
 import { PortfolioProvider } from "@/context/PortfolioContext";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -29,7 +33,13 @@ function LazySection({ children, minHeight }: { children: React.ReactNode; minHe
   const [ref, isVisible] = useIntersectionObserver({ threshold: 0.01, rootMargin: "300px", triggerOnce: true });
   return (
     <div ref={ref as React.RefObject<HTMLDivElement | null>} style={{ minHeight }} className="w-full">
-      {isVisible ? children : <div className="w-full" style={{ minHeight }} />}
+      {isVisible ? (
+        <Suspense fallback={<div className="w-full" style={{ minHeight }} />}>
+          {children}
+        </Suspense>
+      ) : (
+        <div className="w-full" style={{ minHeight }} />
+      )}
     </div>
   );
 }
@@ -148,7 +158,11 @@ export default function PortfolioClient() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_40%,#000_20%,transparent_100%)] opacity-30" />
         
         {/* Dynamic Rain Effect (Deferred) */}
-        {mountWidgets && <RainBackground />}
+        {mountWidgets && (
+          <Suspense fallback={null}>
+            <RainBackground />
+          </Suspense>
+        )}
       </div>
 
       <Navbar
@@ -183,12 +197,12 @@ export default function PortfolioClient() {
 
       <Footer />
       {mountWidgets && (
-        <>
+        <Suspense fallback={null}>
           <UpdateNotification />
           <ScrollToTopButton />
           <TerminalOverlay />
           <TerminalWidget />
-        </>
+        </Suspense>
       )}
 
       {/* Global custom animations */}
