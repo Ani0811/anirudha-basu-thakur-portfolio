@@ -2,8 +2,25 @@
 
 import { useState } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import SystemSandbox from '@/components/features/SystemSandbox';
-import RoastMyCode from '@/components/features/RoastMyCode';
+import dynamic from 'next/dynamic';
+
+const SystemSandbox = dynamic(() => import('@/components/features/SystemSandbox'), {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse bg-white/5 border border-white/10 rounded-2xl h-[400px] flex items-center justify-center font-mono text-cyan-400">
+      &gt; BOOTING DEFENDER SIMULATOR...
+    </div>
+  )
+});
+
+const RoastMyCode = dynamic(() => import('@/components/features/RoastMyCode'), {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse bg-white/5 border border-white/10 rounded-2xl h-[400px] flex items-center justify-center font-mono text-orange-400">
+      &gt; WARMING UP AI ROAST BURNERS...
+    </div>
+  )
+});
 
 export default function SandboxSection() {
   const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
@@ -20,9 +37,9 @@ export default function SandboxSection() {
         {/* Section Header */}
         <div className="mb-10 text-center space-y-4 relative z-10">
           <div className="inline-flex flex-col items-center">
-            <h3 className={`text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+            <span className={`text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
               {activeTab === 'simulator' ? 'ARCHITECTURE' : 'CRITIC PLAYGROUND'}
-            </h3>
+            </span>
             <div className={`h-px w-full mt-2 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
           </div>
           

@@ -62,8 +62,9 @@ export default function DigitalTwinChat() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-linear-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-[0_0_25px_rgba(34,211,238,0.4)] transition-transform duration-300 hover:scale-110 ${isOpen ? 'rotate-90 scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
+        aria-label="Open AI Copilot Chat"
       >
-        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
       </button>
@@ -91,8 +92,9 @@ export default function DigitalTwinChat() {
           <button 
             onClick={() => setIsOpen(false)}
             className="p-2 text-slate-400 hover:text-white transition-colors"
+            aria-label="Close AI Copilot Chat"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -137,8 +139,9 @@ export default function DigitalTwinChat() {
             type="submit"
             disabled={!input.trim() || isLoading}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/40 disabled:opacity-50 transition-colors"
+            aria-label="Send message"
           >
-            <svg className="w-5 h-5 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>

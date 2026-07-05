@@ -22,6 +22,17 @@ const SandboxSection = dynamic(() => import("@/components/sections/SandboxSectio
 const TerminalWidget = dynamic(() => import("@/components/ui/TerminalWidget"), { ssr: false }); // Terminal Floating Button
 
 import { PortfolioProvider } from "@/context/PortfolioContext";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+
+// Lazy section helper component to avoid mounting sections below the fold immediately
+function LazySection({ children, minHeight }: { children: React.ReactNode; minHeight: string }) {
+  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.01, rootMargin: "300px", triggerOnce: true });
+  return (
+    <div ref={ref as React.RefObject<HTMLDivElement | null>} style={{ minHeight }} className="w-full">
+      {isVisible ? children : <div className="w-full" style={{ minHeight }} />}
+    </div>
+  );
+}
 
 const bootCategories = [
   [
@@ -68,6 +79,14 @@ export default function PortfolioClient() {
   ]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [terminalMode, setTerminalMode] = useState(false);
+  const [mountWidgets, setMountWidgets] = useState(false);
+
+  // Check sessionStorage to skip boot animation on repeat visits
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("booted")) {
+      setLoading(false);
+    }
+  }, []);
 
   // Generate randomized messages on mount to prevent SSR hydration mismatch
   useEffect(() => {
@@ -75,16 +94,30 @@ export default function PortfolioClient() {
     setBootMessages(randomized);
   }, []);
 
-  // Boot animation sequence
+  // Boot animation sequence (accelerated from 300ms to 150ms per step)
   useEffect(() => {
+    if (loading === false) return;
     if (bootText < bootMessages.length) {
-      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), 300);
+      const timer = setTimeout(() => setBootText((prev: number) => prev + 1), 150);
       return () => clearTimeout(timer);
     } else {
-      const timer = setTimeout(() => setLoading(false), 300);
+      const timer = setTimeout(() => {
+        setLoading(false);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("booted", "true");
+        }
+      }, 150);
       return () => clearTimeout(timer);
     }
-  }, [bootText, bootMessages]);
+  }, [bootText, bootMessages, loading]);
+
+  // Delay mounting of floating widgets to keep initial hydration extremely fast
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => setMountWidgets(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
   // Lock body scroll while mobile menu is open
   useEffect(() => {
@@ -114,8 +147,8 @@ export default function PortfolioClient() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full mix-blend-screen" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_40%,#000_20%,transparent_100%)] opacity-30" />
         
-        {/* Dynamic Rain Effect */}
-        <RainBackground />
+        {/* Dynamic Rain Effect (Deferred) */}
+        {mountWidgets && <RainBackground />}
       </div>
 
       <Navbar
@@ -126,18 +159,37 @@ export default function PortfolioClient() {
       <main className="relative z-10 flex flex-col gap-12 sm:gap-16 pb-24 sm:pb-32">
         <HeroSection />
         <AboutSection />
-        <SkillsSection />
-        <ProjectsSection />
-        <SandboxSection />
-        <CurrentWorkSection />
-        <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
+        
+        <LazySection minHeight="600px">
+          <SkillsSection />
+        </LazySection>
+        
+        <LazySection minHeight="600px">
+          <ProjectsSection />
+        </LazySection>
+        
+        <LazySection minHeight="500px">
+          <SandboxSection />
+        </LazySection>
+        
+        <LazySection minHeight="400px">
+          <CurrentWorkSection />
+        </LazySection>
+        
+        <LazySection minHeight="500px">
+          <ContactSection terminalMode={terminalMode} setTerminalMode={setTerminalMode} />
+        </LazySection>
       </main>
 
       <Footer />
-      <UpdateNotification />
-      <ScrollToTopButton />
-      <TerminalOverlay />
-      <TerminalWidget />
+      {mountWidgets && (
+        <>
+          <UpdateNotification />
+          <ScrollToTopButton />
+          <TerminalOverlay />
+          <TerminalWidget />
+        </>
+      )}
 
       {/* Global custom animations */}
       <style

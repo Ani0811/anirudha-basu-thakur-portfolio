@@ -84,6 +84,73 @@ export function useScrollAnimation(): ScrollValues {
   // Preload all frames into cache with skipping on mobile
   useEffect(() => {
     let isCancelled = false;
+    let remainingLoaded = false;
+    
+    const isMobileDevice = window.innerWidth < 640;
+    const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
+    const step = isMobileDevice || isTabletDevice ? 2 : 1;
+
+    const loadSingleFrame = (index: number, src: string) => {
+      return new Promise<void>((resolve) => {
+        if (imageCache.has(index)) {
+          resolve();
+          return;
+        }
+        const img = new Image();
+        img.onload = async () => {
+          try {
+            if ('decode' in img) await img.decode();
+          } catch (e) {
+            console.warn("Failed to decode image:", src);
+          }
+          imageCache.set(index, img);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = src;
+      });
+    };
+
+    const loadRemaining = async () => {
+      if (remainingLoaded || isCancelled) return;
+      remainingLoaded = true;
+
+      // 2. Identify remaining frames to load progressively
+      const remainingIndices: number[] = [];
+      for (let i = 0; i < frameSources.length; i += step) {
+        if (i !== 0) {
+          remainingIndices.push(i);
+        }
+      }
+
+      // Load remaining frames in batches, yielding to the browser
+      const batchSize = isMobileDevice ? 5 : 10;
+      const idleTimeout = isMobileDevice ? 200 : 100;
+      const fallbackDelay = isMobileDevice ? 100 : 50;
+
+      for (let j = 0; j < remainingIndices.length; j += batchSize) {
+        if (isCancelled) break;
+        const batch = remainingIndices.slice(j, j + batchSize);
+        await Promise.all(batch.map(idx => loadSingleFrame(idx, frameSources[idx])));
+        
+        // Yield to main thread
+        await new Promise<void>((resolve) => {
+          if (typeof window !== "undefined" && 'requestIdleCallback' in window) {
+            window.requestIdleCallback(() => resolve(), { timeout: idleTimeout });
+          } else {
+            setTimeout(resolve, fallbackDelay);
+          }
+        });
+      }
+    };
+
+    const handleTrigger = () => {
+      loadRemaining();
+      if (typeof window !== "undefined") {
+        window.removeEventListener("scroll", handleTrigger);
+        window.removeEventListener("touchstart", handleTrigger);
+      }
+    };
 
     const bootstrapFrames = async () => {
       if (globalIsLoaded) {
@@ -94,7 +161,6 @@ export function useScrollAnimation(): ScrollValues {
       }
 
       // Pre-calculated values to avoid expensive brightness detection on every mount
-      // These should match the frames known to be non-black
       const detectedStart = 0; 
       globalHeroStartFrameIndex = 0;
       globalHeroEndFrameIndex = 72;
@@ -104,81 +170,27 @@ export function useScrollAnimation(): ScrollValues {
       setHeroStartFrameIndex(detectedStart);
       setFrameIndex(detectedStart);
 
-      // Use step = 2 on mobile/tablet for much higher frame density (ultra-smooth animation),
-      // and step = 1 on desktop. This matches preloading with rendering budget.
-      const isMobileDevice = window.innerWidth < 640;
-      const isTabletDevice = window.innerWidth < 1024 && window.innerWidth >= 640;
-      const step = isMobileDevice || isTabletDevice ? 2 : 1;
-
-      const loadSingleFrame = (index: number, src: string) => {
-        return new Promise<void>((resolve) => {
-          if (imageCache.has(index)) {
-            resolve();
-            return;
-          }
-          const img = new Image();
-          img.onload = async () => {
-            try {
-              if ('decode' in img) await img.decode();
-            } catch (e) {
-              console.warn("Failed to decode image:", src);
-            }
-            imageCache.set(index, img);
-            resolve();
-          };
-          img.onerror = () => resolve();
-          img.src = src;
-        });
-      };
-
-      // 1. Identify first 5 critical frames for initial render
-      const criticalIndices: number[] = [];
-      for (let i = 0; i < frameSources.length && criticalIndices.length < 5; i += step) {
-        criticalIndices.push(i);
-      }
-
-      // Preload critical frames first
-      const criticalPromises = criticalIndices.map(idx => loadSingleFrame(idx, frameSources[idx]));
-      await Promise.all(criticalPromises);
+      // Preload the very first frame first (main LCP element)
+      await loadSingleFrame(0, frameSources[0]);
 
       if (isCancelled) return;
 
-      // Mark page as loaded once critical frames are ready to render
+      // Mark page as loaded once the first frame is ready to render
       setIsLoaded(true);
       globalIsLoaded = true;
 
-      // 2. Identify remaining frames to load progressively
-      const remainingIndices: number[] = [];
-      for (let i = 0; i < frameSources.length; i += step) {
-        if (!criticalIndices.includes(i)) {
-          remainingIndices.push(i);
-        }
+      // Listen for scroll/touch to start loading the rest
+      if (typeof window !== "undefined") {
+        window.addEventListener("scroll", handleTrigger, { passive: true });
+        window.addEventListener("touchstart", handleTrigger, { passive: true });
       }
-
-      // Load remaining frames in batches of 10, yielding to the browser
-      const batchSize = 10;
-      const loadBatches = async () => {
-        for (let j = 0; j < remainingIndices.length; j += batchSize) {
-          if (isCancelled) break;
-          const batch = remainingIndices.slice(j, j + batchSize);
-          await Promise.all(batch.map(idx => loadSingleFrame(idx, frameSources[idx])));
-          
-          // Yield to main thread
-          await new Promise<void>((resolve) => {
-            if (typeof window !== "undefined" && 'requestIdleCallback' in window) {
-              window.requestIdleCallback(() => resolve(), { timeout: 100 });
-            } else {
-              setTimeout(resolve, 50);
-            }
-          });
-        }
-      };
-      
-      loadBatches();
     };
 
     bootstrapFrames();
     
+    // Fallback timer: load the remaining frames after 3.5 seconds anyway
+    const fallbackTimeout = setTimeout(loadRemaining, 3500);
+
     const safetyTimeout = setTimeout(() => {
       if (!isCancelled && !isLoaded) setIsLoaded(true);
     }, 1500);
@@ -186,6 +198,11 @@ export function useScrollAnimation(): ScrollValues {
     return () => {
       isCancelled = true;
       clearTimeout(safetyTimeout);
+      clearTimeout(fallbackTimeout);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("scroll", handleTrigger);
+        window.removeEventListener("touchstart", handleTrigger);
+      }
     };
   }, []);
 

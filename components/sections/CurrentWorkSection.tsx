@@ -55,9 +55,9 @@ export default function CurrentWorkSection() {
       <div className="flex flex-col gap-12 relative z-10">
         <div className="flex flex-col gap-3">
           <div className="inline-flex flex-col">
-            <h3 className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+            <span className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
               LIVE STREAM
-            </h3>
+            </span>
             <div className={`h-px w-full mt-2 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
           </div>
           <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>

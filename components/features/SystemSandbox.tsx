@@ -596,7 +596,7 @@ export default function SystemSandbox() {
             <div className="absolute inset-0 bg-red-600/5 animate-[pulse_1.2s_infinite] pointer-events-none z-0" />
           )}
 
-          <svg viewBox={isMobileFlow ? "0 0 320 440" : "0 0 800 300"} className="w-full max-w-4xl h-auto relative z-10" style={{ minHeight: isMobileFlow ? '440px' : '300px' }}>
+          <svg viewBox={isMobileFlow ? "0 0 320 440" : "0 0 800 300"} className="w-full max-w-4xl h-auto relative z-10" style={{ minHeight: isMobileFlow ? '440px' : '300px' }} role="img" aria-label="Interactive DDoS defender network diagram">
             {/* Connection Lines */}
             <line x1={positions.client.x} y1={positions.client.y} x2={positions.gateway.x} y2={positions.gateway.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />
             <line x1={positions.gateway.x} y1={positions.gateway.y} x2={positions.cache.x} y2={positions.cache.y} stroke="rgba(34,211,238,0.2)" strokeWidth="2" strokeDasharray="5,5" />

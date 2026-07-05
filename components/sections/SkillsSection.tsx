@@ -124,7 +124,7 @@ const workflowSteps = [
     subtitle: "Listen First, Code Later",
     description: "Every great solution starts with truly understanding the problem. I dig into requirements, ask the uncomfortable questions, and map out the real user needs—not just what's written in the spec.",
     icon: (
-      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10" />
         <path d="M12 16v-4" />
         <path d="M12 8h.01" />
@@ -138,7 +138,7 @@ const workflowSteps = [
     subtitle: "Think in Systems",
     description: "Before writing a single line, I sketch the blueprint. Data flows, component structures, API contracts—getting the architecture right means less refactoring and more shipping.",
     icon: (
-      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -153,7 +153,7 @@ const workflowSteps = [
     subtitle: "Code with Intent",
     description: "Clean, readable, and maintainable—that's the goal. I write code that future-me (or any teammate) will thank present-me for. Comments where needed, TypeScript where possible.",
     icon: (
-      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
         <line x1="12" y1="2" x2="12" y2="22" />
@@ -166,7 +166,7 @@ const workflowSteps = [
     subtitle: "Break It Before Users Do",
     description: "If I didn't write a test for it, did it even work? I automate the boring stuff, edge-case the critical paths, and sleep better knowing my code won't blow up at 3 AM.",
     icon: (
-      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
       </svg>
     )
@@ -177,7 +177,7 @@ const workflowSteps = [
     subtitle: "Deploy with Confidence",
     description: "The finish line isn't just pushing to prod—it's monitoring, iterating, and continuously improving. CI/CD pipelines, feature flags, and zero-downtime deployments are the way.",
     icon: (
-      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M22 2 11 13" />
         <path d="M22 2 15 22l-4-9-9-4 20-7z" />
       </svg>
@@ -276,9 +276,9 @@ export default function SkillsSection() {
       {/* LEARNING JOURNEY */}
       <section ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 w-full relative pt-12 sm:pt-20">
         <div className="flex flex-col items-center mb-16 sm:mb-20">
-          <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+          <h2 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
             LEARNING JOURNEY
-          </h3>
+          </h2>
           <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
         </div>
         <p className="max-w-2xl mx-auto -mt-12 sm:-mt-14 mb-12 sm:mb-16 text-center text-sm sm:text-base text-slate-400 leading-relaxed">
@@ -380,9 +380,9 @@ export default function SkillsSection() {
                             {milestone.year}
                           </span>
 
-                          <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-linear-to-r from-white via-cyan-100 to-white bg-clip-text group-hover/card:from-cyan-200 group-hover/card:via-white group-hover/card:to-cyan-200 transition-all duration-500 px-2">
+                          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-linear-to-r from-white via-cyan-100 to-white bg-clip-text group-hover/card:from-cyan-200 group-hover/card:via-white group-hover/card:to-cyan-200 transition-all duration-500 px-2">
                             {milestone.title}
-                          </h4>
+                          </h3>
 
                           <div className="flex items-center gap-2 text-xs text-cyan-400/60 font-mono group-hover/card:text-cyan-400 transition-colors">
                             <span>Click to reveal details</span>
@@ -423,7 +423,7 @@ export default function SkillsSection() {
                             </span>
                           </div>
 
-                          <h4 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover/back:text-cyan-100 transition-colors">{milestone.title}</h4>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover/back:text-cyan-100 transition-colors">{milestone.title}</h3>
 
                           <p className="text-sm sm:text-base text-slate-300 leading-relaxed group-hover/back:text-white transition-colors">{milestone.desc}</p>
 
@@ -462,9 +462,9 @@ export default function SkillsSection() {
       {/* TECH STACK */}
       <section id="skills" className="max-w-6xl mx-auto px-4 sm:px-6 w-full pt-12 sm:pt-20">
         <div className="flex flex-col items-center mb-16 sm:mb-20">
-          <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
-            TECH STACK
-          </h3>
+          <h2 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] text-center flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
+            TECHNICAL EXPERTISE
+          </h2>
           <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.4s' }} />
         </div>
         <p className="max-w-3xl mx-auto -mt-12 sm:-mt-14 mb-12 sm:mb-16 text-center text-sm sm:text-base text-slate-400 leading-relaxed">
@@ -495,9 +495,9 @@ export default function SkillsSection() {
                     {group.icon}
                   </div>
                   <div>
-                    <h4 className="text-2xl sm:text-3xl font-bold text-white group-hover/skillcard:text-cyan-100 transition-colors">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white group-hover/skillcard:text-cyan-100 transition-colors">
                       {group.category}
-                    </h4>
+                    </h3>
                     <p className="text-sm text-slate-400 font-medium">{group.description}</p>
                   </div>
                 </div>
@@ -576,9 +576,9 @@ export default function SkillsSection() {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <div className="flex flex-col items-center mb-8">
-            <h3 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${workingProcessVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
-              HOW I WORK
-            </h3>
+            <h2 className={`text-sm sm:text-base font-mono text-cyan-400 tracking-[0.2em] sm:tracking-[0.25em] flex items-center justify-center gap-4 sm:gap-6 before:h-px before:w-12 sm:before:w-20 before:bg-linear-to-r before:from-transparent before:to-cyan-500/50 after:h-px after:w-12 sm:after:w-20 after:bg-linear-to-l after:from-transparent after:to-cyan-500/50 ${workingProcessVisible ? 'animate-h-reveal' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
+              WORKING PROCESS
+            </h2>
             <div className={`h-px w-32 mt-4 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${workingProcessVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} style={{ animationDelay: '0.6s' }} />
           </div>
           <p className={`text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ${workingProcessVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -669,9 +669,9 @@ export default function SkillsSection() {
                   className="flex-1 text-center max-w-50"
                   style={{ animation: `fadeInUp 0.6s ease-out ${i * 0.1 + 0.3}s both` }}
                 >
-                  <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
                     {process.title}
-                  </h4>
+                  </h3>
                   <p className="text-sm font-mono mb-3 text-cyan-400 bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text font-semibold">
                     {process.subtitle}
                   </p>
@@ -727,9 +727,9 @@ export default function SkillsSection() {
 
                 {/* Text Content */}
                 <div className="flex flex-col sm:pt-4">
-                  <h4 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
                     {process.title}
-                  </h4>
+                  </h3>
                   <p className="text-sm font-mono mb-3 text-cyan-400 font-semibold">
                     {process.subtitle}
                   </p>
