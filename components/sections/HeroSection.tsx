@@ -99,33 +99,56 @@ export default function HeroSection() {
       }
     };
 
+    let isRunning = false;
+
     const animate = () => {
-      // Linear interpolation (lerping) for ultra-smooth movement
-      // factor: Higher for mobile to reduce CPU usage frequency
       const isMobileDevice = window.innerWidth < 640;
       const lerpFactor = isMobileDevice ? 0.18 : 0.12; 
       const targetScroll = window.scrollY;
       
       currentScrollY.current += (targetScroll - currentScrollY.current) * lerpFactor;
       
-      // Only redraw if the interpolated scroll has moved significantly
-      // Mobile has higher threshold to reduce draw calls
       const threshold = isMobileDevice ? 0.5 : 0.1;
+      const delta = Math.abs(currentScrollY.current - lastScrollY.current);
+      const distToTarget = Math.abs(targetScroll - currentScrollY.current);
       
-      if (Math.abs(currentScrollY.current - lastScrollY.current) > threshold || lastScrollY.current === 0) {
+      if (delta > threshold || lastScrollY.current === 0) {
         drawFrame(currentScrollY.current);
         lastScrollY.current = currentScrollY.current;
       }
 
-      rafId.current = requestAnimationFrame(animate);
+      if (distToTarget > threshold || delta > threshold) {
+        rafId.current = requestAnimationFrame(animate);
+      } else {
+        // Snap to exact target and pause RAF
+        drawFrame(targetScroll);
+        lastScrollY.current = targetScroll;
+        currentScrollY.current = targetScroll;
+        isRunning = false;
+        rafId.current = null;
+      }
+    };
+
+    const wakeUpAnimation = () => {
+      if (!isRunning) {
+        isRunning = true;
+        rafId.current = requestAnimationFrame(animate);
+      }
+    };
+
+    const handleResize = () => {
+      updateCanvasSize();
+      wakeUpAnimation();
     };
 
     updateCanvasSize();
-    window.addEventListener("resize", updateCanvasSize);
-    rafId.current = requestAnimationFrame(animate);
+    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("scroll", wakeUpAnimation, { passive: true });
+    wakeUpAnimation();
 
     return () => {
-      window.removeEventListener("resize", updateCanvasSize);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", wakeUpAnimation);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
   }, [isLoaded, heroStartFrameIndex]);

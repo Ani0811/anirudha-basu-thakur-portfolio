@@ -6,24 +6,20 @@ export default function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const aboutSection = document.getElementById("about");
-      if (aboutSection) {
-        // Show button when scrolled into or past the about section
-        const aboutTop = aboutSection.getBoundingClientRect().top + window.scrollY;
-        // Adding a slight offset or just trigger when about section reaches top of viewport
-        if (window.scrollY >= aboutTop - window.innerHeight / 2) {
-          setIsVisible(true);
-        } else {
-          setIsVisible(false);
-        }
-      } else {
-        // Fallback
-        if (window.scrollY > window.innerHeight) {
-          setIsVisible(true);
-        } else {
-          setIsVisible(false);
-        }
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const aboutSection = document.getElementById("about");
+          if (aboutSection) {
+            const aboutTop = aboutSection.getBoundingClientRect().top + window.scrollY;
+            setIsVisible(window.scrollY >= aboutTop - window.innerHeight / 2);
+          } else {
+            setIsVisible(window.scrollY > window.innerHeight);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 

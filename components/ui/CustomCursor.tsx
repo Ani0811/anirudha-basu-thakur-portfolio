@@ -21,46 +21,61 @@ export default function CustomCursor() {
     let mouseY = 0;
     let glowX = 0;
     let glowY = 0;
-    let rafId: number;
+    let rafId: number | null = null;
+    let isAnimating = false;
     let onMouseMove: (e: MouseEvent) => void;
     let onMouseOver: (e: MouseEvent) => void;
     let onMouseLeave: () => void;
     let onMouseEnter: () => void;
 
     if (mediaQuery.matches) {
-      onMouseMove = (e: MouseEvent) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      };
-
       const updateGlow = () => {
-        const delay = 10; // Smooth delay trailing factor
+        const delay = 10;
         glowX += (mouseX - glowX) / delay;
         glowY += (mouseY - glowY) / delay;
 
         if (glowRef.current) {
-          // Offset by half of orb width (350px / 2 = 175px) to center it
           glowRef.current.style.transform = `translate3d(${glowX - 175}px, ${glowY - 175}px, 0)`;
         }
-        rafId = requestAnimationFrame(updateGlow);
+
+        // Idle check: stop loop when glow settles near target
+        if (Math.abs(mouseX - glowX) > 0.1 || Math.abs(mouseY - glowY) > 0.1) {
+          rafId = requestAnimationFrame(updateGlow);
+        } else {
+          isAnimating = false;
+          rafId = null;
+        }
       };
 
-      window.addEventListener("mousemove", onMouseMove);
-      rafId = requestAnimationFrame(updateGlow);
+      const startAnimation = () => {
+        if (!isAnimating) {
+          isAnimating = true;
+          rafId = requestAnimationFrame(updateGlow);
+        }
+      };
 
-      // Hover states for interactive elements to shift the ambient glow color/brightness
+      onMouseMove = (e: MouseEvent) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        startAnimation();
+      };
+
+      window.addEventListener("mousemove", onMouseMove, { passive: true });
+      startAnimation();
+
+      // Fast selector-based hover check without forced layout reflow (no getComputedStyle)
       onMouseOver = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         if (!target) return;
         
-        const isClickable = 
+        const isClickable = !!(
           target.tagName === 'A' || 
           target.tagName === 'BUTTON' || 
-          target.closest('a') || 
-          target.closest('button') || 
-          target.closest('[role="button"]') ||
-          target.classList.contains('cursor-pointer') ||
-          window.getComputedStyle(target).cursor === 'pointer';
+          target.tagName === 'INPUT' || 
+          target.tagName === 'SELECT' || 
+          target.tagName === 'TEXTAREA' || 
+          target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, [data-cursor-hover]')
+        );
 
         if (isClickable) {
           glowRef.current?.classList.add("hovered");
@@ -69,7 +84,7 @@ export default function CustomCursor() {
         }
       };
 
-      window.addEventListener("mouseover", onMouseOver);
+      window.addEventListener("mouseover", onMouseOver, { passive: true });
 
       // Fade out when leaving the document
       onMouseLeave = () => {
@@ -94,7 +109,7 @@ export default function CustomCursor() {
         window.removeEventListener("mouseover", onMouseOver);
         document.removeEventListener("mouseleave", onMouseLeave);
         document.removeEventListener("mouseenter", onMouseEnter);
-        cancelAnimationFrame(rafId);
+        if (rafId !== null) cancelAnimationFrame(rafId);
       }
     };
   }, []);

@@ -47,16 +47,23 @@ export async function POST(req: NextRequest) {
       let title = '';
       let detail = '';
 
+      let eventUrl = `https://github.com/${event.repo.name}`;
+
       switch (event.type) {
         case 'PushEvent':
           title = 'Pushed to repository';
           const pushCommits = event.payload.commits || [];
           
           if (pushCommits.length > 0) {
-            // Take the last commit message from the payload if present
-            detail = pushCommits[pushCommits.length - 1].message;
+            const lastCommit = pushCommits[pushCommits.length - 1];
+            detail = lastCommit.message;
+            if (lastCommit.sha) {
+              eventUrl = `https://github.com/${event.repo.name}/commit/${lastCommit.sha}`;
+            } else if (event.payload.head) {
+              eventUrl = `https://github.com/${event.repo.name}/commit/${event.payload.head}`;
+            }
           } else if (event.payload.head) {
-            // Secondary lookup: Fetch the specific commit details using the head SHA
+            eventUrl = `https://github.com/${event.repo.name}/commit/${event.payload.head}`;
             try {
               const commitResponse = await fetch(
                 `https://api.github.com/repos/${event.repo.name}/commits/${event.payload.head}`,
@@ -80,14 +87,21 @@ export async function POST(req: NextRequest) {
         case 'PullRequestEvent':
           title = `${event.payload.action} pull request`;
           detail = event.payload.pull_request?.title || '';
+          eventUrl = event.payload.pull_request?.html_url || `https://github.com/${event.repo.name}`;
           break;
         case 'CreateEvent':
           title = `Created ${event.payload.ref_type}`;
           detail = event.payload.ref || event.repo.name;
+          if (event.payload.ref && event.payload.ref_type === 'branch') {
+            eventUrl = `https://github.com/${event.repo.name}/tree/${event.payload.ref}`;
+          } else if (event.payload.ref && event.payload.ref_type === 'tag') {
+            eventUrl = `https://github.com/${event.repo.name}/releases/tag/${event.payload.ref}`;
+          }
           break;
         case 'IssuesEvent':
           title = `${event.payload.action} issue`;
           detail = event.payload.issue?.title || '';
+          eventUrl = event.payload.issue?.html_url || `https://github.com/${event.repo.name}`;
           break;
         default:
           title = 'GitHub activity';
@@ -101,7 +115,7 @@ export async function POST(req: NextRequest) {
         title,
         detail,
         timestamp: event.created_at,
-        url: `https://github.com/${event.repo.name}`,
+        url: eventUrl,
       };
     }));
 

@@ -44,9 +44,14 @@ export default function SystemSandbox() {
   }, []);
 
   const positions = isMobileFlow ? mobilePositions : desktopPositions;
-  const [credits, setCredits] = useState(0);
+  const [credits, setCredits] = useState(120); // Initial starter budget to buy defenses
   const [dbHealth, setDbHealth] = useState(100);
   const [timer, setTimer] = useState(45); // Defense duration: 45s
+
+  // Tactical active defense states
+  const [purgeCooldown, setPurgeCooldown] = useState(0);
+  const [firewallBoostTimer, setFirewallBoostTimer] = useState(0);
+  const [firewallBoostCooldown, setFirewallBoostCooldown] = useState(0);
 
   // Telemetry Sparkline & Logging States
   const [qpsHistory, setQpsHistory] = useState<number[]>(Array(15).fill(0));
@@ -97,7 +102,7 @@ export default function SystemSandbox() {
           (p.route[p.segmentIndex] === 'db' && p.route[p.segmentIndex + 1] === 'server'))
   ).length;
 
-  const dbCapacity = upgrades.dbReplica ? 10 : 4;
+  const dbCapacity = upgrades.dbReplica ? 14 : 6;
   const isDbOverloaded = activeDbRequests > dbCapacity;
 
   // Handle Game Timer & Telemetry updates
@@ -114,10 +119,15 @@ export default function SystemSandbox() {
         return prev - 1;
       });
 
+      // Cooldown & Boost decrement ticks
+      setPurgeCooldown(prev => Math.max(0, prev - 1));
+      setFirewallBoostTimer(prev => Math.max(0, prev - 1));
+      setFirewallBoostCooldown(prev => Math.max(0, prev - 1));
+
       // Update telemetry history arrays
-      const currentTrafficRate = timer > 30 ? 12 : timer > 15 ? 24 : 42;
-      const currentQps = currentTrafficRate + Math.floor(Math.random() * 5 - 2);
-      const currentLatency = Math.max(15, 15 + activeDbRequests * (upgrades.serverScale ? 22 : 48) + Math.floor(Math.random() * 6 - 3));
+      const currentTrafficRate = timer > 30 ? 5 : timer > 15 ? 14 : 28;
+      const currentQps = currentTrafficRate + Math.floor(Math.random() * 3 - 1);
+      const currentLatency = Math.max(15, 15 + activeDbRequests * (upgrades.serverScale ? 18 : 36) + Math.floor(Math.random() * 6 - 3));
       const currentCacheRate = (upgrades.cache ? 75 : 15) + Math.floor(Math.random() * 8 - 4);
 
       setQpsHistory(prev => [...prev.slice(1), currentQps]);
@@ -156,19 +166,19 @@ export default function SystemSandbox() {
       let cacheHitRate = upgrades.cache ? 75 : 15;
 
       if (gameState === 'defending') {
-        // Ramp up difficulty based on timer
+        // Ramp up difficulty gradually based on timer
         if (timer > 30) {
-          // Phase 1: 15 req/s, 25% spam
-          trafficRate = 12;
-          spamChance = 0.25;
+          // Phase 1: 5 req/s, 20% spam
+          trafficRate = 5;
+          spamChance = 0.20;
         } else if (timer > 15) {
-          // Phase 2: 25 req/s, 50% spam
-          trafficRate = 24;
-          spamChance = 0.50;
+          // Phase 2: 14 req/s, 45% spam
+          trafficRate = 14;
+          spamChance = 0.45;
         } else {
-          // Phase 3: 45 req/s, 80% spam
-          trafficRate = 42;
-          spamChance = 0.80;
+          // Phase 3: 28 req/s, 70% spam
+          trafficRate = 28;
+          spamChance = 0.70;
         }
       }
 
@@ -195,13 +205,17 @@ export default function SystemSandbox() {
           route,
           progress: 0,
           segmentIndex: 0,
-          speed: 0.0012, // slightly faster travel
+          speed: 0.0012,
           status,
         };
 
-        // Edge Rate Limiting Filter logic
-        if (upgrades.rateLimiter && isSpam && Math.random() < 0.70) {
-          // Intercepted and blocked at Gateway (70% filter rate)
+        // Edge Rate Limiting Filter & Active Strict Firewall Boost logic
+        const effectiveFilterRate = firewallBoostTimer > 0 
+          ? (upgrades.rateLimiter ? 0.90 : 0.80) 
+          : (upgrades.rateLimiter ? 0.70 : 0);
+
+        if (isSpam && Math.random() < effectiveFilterRate) {
+          // Intercepted and blocked at Gateway
           newParticle.status = 'blocked';
           newParticle.route = ['client', 'gateway', 'client'];
         }
@@ -213,8 +227,8 @@ export default function SystemSandbox() {
       if (gameState === 'defending') {
         if (isDbOverloaded) {
           const overloadDegree = activeDbRequests - dbCapacity;
-          // Drain rate increases with size of overload
-          const drainRate = 0.008 * overloadDegree; 
+          // Fairer drain rate so DB doesn't crash instantly
+          const drainRate = 0.0015 * overloadDegree; 
           setDbHealth(prev => {
             const next = prev - (drainRate * dt);
             if (next <= 0) {
@@ -224,8 +238,8 @@ export default function SystemSandbox() {
             return next;
           });
         } else {
-          // Slow passive healing when not overloaded
-          setDbHealth(prev => Math.min(100, prev + (0.002 * dt)));
+          // Passive healing when under capacity
+          setDbHealth(prev => Math.min(100, prev + (0.003 * dt)));
         }
       }
 
@@ -244,7 +258,7 @@ export default function SystemSandbox() {
           // DB Latency slow-down if DB is overloaded
           if (currentTarget === 'db' || currentSource === 'db') {
             const loadRatio = activeDbRequests / dbCapacity;
-            speedMultiplier = Math.max(0.15, 1.2 - (loadRatio * 0.25));
+            speedMultiplier = Math.max(0.2, 1.2 - (loadRatio * 0.2));
           }
 
           let nextProgress = p.progress + (p.speed * speedMultiplier * dt);
@@ -260,11 +274,9 @@ export default function SystemSandbox() {
             if (nextSegment === p.route.length - 1) {
               if (p.status === 'blocked') {
                 setStats(s => ({ ...s, blocked: s.blocked + 1 }));
-                // Blocked malicious queries don't earn money, but protect DB
               } else {
                 nextStatus = 'success';
                 setStats(s => ({ ...s, handled: s.handled + 1 }));
-                // Successfully completed queries earn credits
                 setCredits(c => c + 5);
               }
             }
@@ -290,20 +302,42 @@ export default function SystemSandbox() {
     return () => {
       cancelAnimationFrame(requestAnimationFrameRef.current);
     };
-  }, [gameState, timer, upgrades, activeDbRequests, dbCapacity, isDbOverloaded]);
+  }, [gameState, timer, upgrades, activeDbRequests, dbCapacity, isDbOverloaded, firewallBoostTimer]);
+
+  // Active Tactical Actions
+  const triggerPurge = () => {
+    if (credits >= 40 && gameState === 'defending' && purgeCooldown === 0) {
+      setCredits(prev => prev - 40);
+      setPurgeCooldown(8);
+      setParticles(prev => prev.filter(p => p.status !== 'spam'));
+      addLog('GATEWAY', 'EMERGENCY PURGE: Dropped all active spam queries from pipeline!');
+    }
+  };
+
+  const triggerFirewallBoost = () => {
+    if (credits >= 50 && gameState === 'defending' && firewallBoostCooldown === 0) {
+      setCredits(prev => prev - 50);
+      setFirewallBoostTimer(5);
+      setFirewallBoostCooldown(12);
+      addLog('GATEWAY', 'STRICT FIREWALL BOOST: Intercepting 80%+ spam traffic for 5 seconds.');
+    }
+  };
 
   // Handle game start/restart
   const startDefense = () => {
     setGameState('defending');
     setDbHealth(100);
-    setCredits(0);
+    setCredits(120); // Provide 120 initial compute credits
     setTimer(45);
     setParticles([]);
+    setPurgeCooldown(0);
+    setFirewallBoostTimer(0);
+    setFirewallBoostCooldown(0);
     setQpsHistory(Array(15).fill(0));
     setLatencyHistory(Array(15).fill(0));
     setCacheHistory(Array(15).fill(0));
     setSysLogs([
-      `[SYSTEM] ${new Date().toLocaleTimeString()} - Security firewall: Activated. Distributing load tables.`,
+      `[SYSTEM] ${new Date().toLocaleTimeString()} - Security firewall: Activated. 120 Cr starter budget provisioned.`,
       `[SYSTEM] ${new Date().toLocaleTimeString()} - Standing by for incoming requests...`
     ]);
     setUpgrades({
@@ -322,8 +356,11 @@ export default function SystemSandbox() {
   const resetGame = () => {
     setGameState('idle');
     setDbHealth(100);
-    setCredits(0);
+    setCredits(120);
     setParticles([]);
+    setPurgeCooldown(0);
+    setFirewallBoostTimer(0);
+    setFirewallBoostCooldown(0);
     setQpsHistory(Array(15).fill(0));
     setLatencyHistory(Array(15).fill(0));
     setCacheHistory(Array(15).fill(0));
@@ -488,23 +525,71 @@ export default function SystemSandbox() {
         )}
       </div>
 
+      {/* Active Tactical Defense Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-900/60 border border-cyan-500/20 rounded-2xl text-xs">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-cyan-400 tracking-wider flex items-center gap-1.5">
+            <span className="text-base">⚡</span> ACTIVE DEFENSE ACTIONS
+          </span>
+          {firewallBoostTimer > 0 && (
+            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md font-mono text-[10px] animate-pulse">
+              STRICT FIREWALL ACTIVE ({firewallBoostTimer}s)
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Emergency Purge */}
+          <button
+            disabled={gameState !== 'defending' || credits < 40 || purgeCooldown > 0}
+            onClick={triggerPurge}
+            className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all duration-200 select-none ${
+              purgeCooldown > 0
+                ? 'bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed'
+                : credits >= 40 && gameState === 'defending'
+                ? 'bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500 hover:text-black cursor-pointer active:scale-95 shadow-[0_0_12px_rgba(239,68,68,0.2)]'
+                : 'bg-black/20 border border-white/5 text-slate-600 cursor-not-allowed'
+            }`}
+          >
+            <span>💥 PURGE SPAM QUEUE</span>
+            <span className="font-mono text-[10px] opacity-80">{purgeCooldown > 0 ? `${purgeCooldown}s` : '40 Cr'}</span>
+          </button>
+
+          {/* Strict Firewall Boost */}
+          <button
+            disabled={gameState !== 'defending' || credits < 50 || firewallBoostCooldown > 0}
+            onClick={triggerFirewallBoost}
+            className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all duration-200 select-none ${
+              firewallBoostCooldown > 0
+                ? 'bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed'
+                : credits >= 50 && gameState === 'defending'
+                ? 'bg-amber-500/20 border border-amber-500/50 text-amber-300 hover:bg-amber-500 hover:text-black cursor-pointer active:scale-95 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                : 'bg-black/20 border border-white/5 text-slate-600 cursor-not-allowed'
+            }`}
+          >
+            <span>🛡 STRICT FIREWALL BOOST</span>
+            <span className="font-mono text-[10px] opacity-80">{firewallBoostCooldown > 0 ? `${firewallBoostCooldown}s` : '50 Cr'}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Upgrade Shop Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {/* Rate Limiter */}
         <button
-          disabled={credits < 120 || upgrades.rateLimiter || gameState !== 'defending'}
-          onClick={() => purchaseUpgrade('rateLimiter', 120)}
+          disabled={credits < 100 || upgrades.rateLimiter || gameState !== 'defending'}
+          onClick={() => purchaseUpgrade('rateLimiter', 100)}
           className={`flex flex-col items-start text-left p-4 rounded-xl border text-xs gap-1.5 transition-all select-none duration-300 relative ${
             upgrades.rateLimiter 
               ? 'bg-orange-950/20 border-orange-500/40 text-orange-300' 
-              : credits >= 120 && gameState === 'defending'
+              : credits >= 100 && gameState === 'defending'
               ? 'bg-slate-900/40 border-cyan-500/30 hover:border-cyan-400 text-slate-200 cursor-pointer hover:scale-[1.03] active:scale-95'
               : 'bg-black/10 border-white/5 text-slate-600 cursor-not-allowed'
           }`}
         >
           <div className="flex justify-between w-full font-bold">
             <span>🛡 RATE LIMITER</span>
-            {!upgrades.rateLimiter && <span className="text-cyan-400/90 font-mono">120 Cr</span>}
+            {!upgrades.rateLimiter && <span className="text-cyan-400/90 font-mono">100 Cr</span>}
           </div>
           <p className="text-[10px] leading-relaxed text-slate-400">
             Filters and drops 70% of malicious requests (red dots) at the Gateway node.
@@ -514,19 +599,19 @@ export default function SystemSandbox() {
 
         {/* Cache Expansion */}
         <button
-          disabled={credits < 100 || upgrades.cache || gameState !== 'defending'}
-          onClick={() => purchaseUpgrade('cache', 100)}
+          disabled={credits < 120 || upgrades.cache || gameState !== 'defending'}
+          onClick={() => purchaseUpgrade('cache', 120)}
           className={`flex flex-col items-start text-left p-4 rounded-xl border text-xs gap-1.5 transition-all select-none duration-300 relative ${
             upgrades.cache 
               ? 'bg-purple-950/20 border-purple-500/40 text-purple-300' 
-              : credits >= 100 && gameState === 'defending'
+              : credits >= 120 && gameState === 'defending'
               ? 'bg-slate-900/40 border-cyan-500/30 hover:border-cyan-400 text-slate-200 cursor-pointer hover:scale-[1.03] active:scale-95'
               : 'bg-black/10 border-white/5 text-slate-600 cursor-not-allowed'
           }`}
         >
           <div className="flex justify-between w-full font-bold">
             <span>💾 CACHE UPGRADE</span>
-            {!upgrades.cache && <span className="text-cyan-400/90 font-mono">100 Cr</span>}
+            {!upgrades.cache && <span className="text-cyan-400/90 font-mono">120 Cr</span>}
           </div>
           <p className="text-[10px] leading-relaxed text-slate-400">
             Bumps caching rate from 15% to 75%, diverting queries (purple dots) from DB.
@@ -558,19 +643,19 @@ export default function SystemSandbox() {
 
         {/* Database Read Replica */}
         <button
-          disabled={credits < 200 || upgrades.dbReplica || gameState !== 'defending'}
-          onClick={() => purchaseUpgrade('dbReplica', 200)}
+          disabled={credits < 180 || upgrades.dbReplica || gameState !== 'defending'}
+          onClick={() => purchaseUpgrade('dbReplica', 180)}
           className={`flex flex-col items-start text-left p-4 rounded-xl border text-xs gap-1.5 transition-all select-none duration-300 relative ${
             upgrades.dbReplica 
               ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' 
-              : credits >= 200 && gameState === 'defending'
+              : credits >= 180 && gameState === 'defending'
               ? 'bg-slate-900/40 border-cyan-500/30 hover:border-cyan-400 text-slate-200 cursor-pointer hover:scale-[1.03] active:scale-95'
               : 'bg-black/10 border-white/5 text-slate-600 cursor-not-allowed'
           }`}
         >
           <div className="flex justify-between w-full font-bold">
             <span>🗄 READ REPLICAS</span>
-            {!upgrades.dbReplica && <span className="text-cyan-400/90 font-mono">200 Cr</span>}
+            {!upgrades.dbReplica && <span className="text-cyan-400/90 font-mono">180 Cr</span>}
           </div>
           <p className="text-[10px] leading-relaxed text-slate-400">
             Doubles DB parallel query threshold before load starts draining database health.

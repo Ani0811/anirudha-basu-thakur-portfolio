@@ -51,10 +51,15 @@ export function useScrollAnimation(): ScrollValues {
   const scrollRef = useRef<number>(0);
   const rafId = useRef<number | null>(null);
 
-  // Listen to scroll and resize with RAF throttling
+  // Listen to scroll and resize with RAF and time throttling
   useEffect(() => {
+    let lastScrollTime = 0;
     const updateScroll = () => {
-      setScrollY(window.scrollY);
+      const now = performance.now();
+      if (now - lastScrollTime >= 32) { // Throttle React state updates to ~30fps max
+        setScrollY(window.scrollY);
+        lastScrollTime = now;
+      }
       rafId.current = null;
     };
 
@@ -69,7 +74,7 @@ export function useScrollAnimation(): ScrollValues {
     if (typeof window !== "undefined") {
       handleResize();
       window.addEventListener("scroll", handleScroll, { passive: true });
-      window.addEventListener("resize", handleResize);
+      window.addEventListener("resize", handleResize, { passive: true });
     }
 
     return () => {
@@ -101,7 +106,7 @@ export function useScrollAnimation(): ScrollValues {
           try {
             if ('decode' in img) await img.decode();
           } catch (e) {
-            console.warn("Failed to decode image:", src);
+            // Ignore decoding error fallback
           }
           imageCache.set(index, img);
           resolve();
@@ -115,7 +120,7 @@ export function useScrollAnimation(): ScrollValues {
       if (remainingLoaded || isCancelled) return;
       remainingLoaded = true;
 
-      // 2. Identify remaining frames to load progressively
+      // Identify remaining frames to load progressively
       const remainingIndices: number[] = [];
       for (let i = 0; i < frameSources.length; i += step) {
         if (i !== 0) {
@@ -123,10 +128,10 @@ export function useScrollAnimation(): ScrollValues {
         }
       }
 
-      // Load remaining frames in batches, yielding to the browser
-      const batchSize = isMobileDevice ? 5 : 10;
-      const idleTimeout = isMobileDevice ? 200 : 100;
-      const fallbackDelay = isMobileDevice ? 100 : 50;
+      // Load remaining frames in smaller batches (3-4 at a time) to prevent network/CPU congestion
+      const batchSize = isMobileDevice ? 2 : 4;
+      const idleTimeout = isMobileDevice ? 300 : 150;
+      const fallbackDelay = isMobileDevice ? 150 : 80;
 
       for (let j = 0; j < remainingIndices.length; j += batchSize) {
         if (isCancelled) break;

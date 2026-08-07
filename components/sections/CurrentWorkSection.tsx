@@ -139,7 +139,7 @@ export default function CurrentWorkSection() {
                           rel="noopener noreferrer"
                           className="px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-[11px] font-bold text-cyan-400 hover:bg-cyan-500 hover:text-black transition-all duration-300"
                         >
-                          VIEW COMMIT
+                          {event.type === 'PushEvent' ? 'VIEW COMMIT' : event.type === 'PullRequestEvent' ? 'VIEW PR' : event.type === 'IssuesEvent' ? 'VIEW ISSUE' : 'VIEW REPO'}
                         </a>
                       </div>
                     </div>

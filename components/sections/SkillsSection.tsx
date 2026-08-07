@@ -238,33 +238,39 @@ export default function SkillsSection() {
     // Only run expensive scroll tracking on desktop
     if (window.innerWidth < 768) return;
 
+    let ticking = false;
     const handleScroll = () => {
-      if (!isVisible || cardRefs.current.length === 0) return;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (isVisible && cardRefs.current.length > 0) {
+            const scrollY = window.scrollY;
+            const viewportCenter = scrollY + window.innerHeight / 2;
 
-      const scrollY = window.scrollY;
-      const viewportCenter = scrollY + window.innerHeight / 2;
+            let closestIndex = 0;
+            let minDistance = Infinity;
 
-      // Find which card is closest to viewport center
-      let closestIndex = 0;
-      let minDistance = Infinity;
+            cardRefs.current.forEach((card, index) => {
+              if (card) {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = scrollY + cardRect.top + cardRect.height / 2;
+                const distance = Math.abs(viewportCenter - cardCenter);
 
-      cardRefs.current.forEach((card, index) => {
-        if (card) {
-          const cardRect = card.getBoundingClientRect();
-          const cardCenter = scrollY + cardRect.top + cardRect.height / 2;
-          const distance = Math.abs(viewportCenter - cardCenter);
+                if (distance < minDistance) {
+                  minDistance = distance;
+                  closestIndex = index;
+                }
+              }
+            });
 
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestIndex = index;
+            setActiveIndex(closestIndex);
           }
-        }
-      });
-
-      setActiveIndex(closestIndex);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     // Small delay to ensure cards are rendered
     setTimeout(handleScroll, 100);
 
