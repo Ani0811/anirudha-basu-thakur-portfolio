@@ -15,6 +15,7 @@ interface GithubEvent {
 
 export default function CurrentWorkSection() {
   const [events, setEvents] = useState<GithubEvent[]>([]);
+  const [portfolioCommits, setPortfolioCommits] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.1 });
@@ -30,7 +31,13 @@ export default function CurrentWorkSection() {
 
         if (!response.ok) throw new Error('Failed to fetch activity');
         const data = await response.json();
-        setEvents(data);
+        
+        if (Array.isArray(data)) {
+          setEvents(data);
+        } else {
+          setEvents(data.events || []);
+          setPortfolioCommits(data.portfolioCommits || 0);
+        }
       } catch (err) {
         setError('Could not load recent activity');
         console.error(err);
@@ -55,9 +62,17 @@ export default function CurrentWorkSection() {
       <div className="flex flex-col gap-12 relative z-10">
         <div className="flex flex-col gap-3">
           <div className="inline-flex flex-col">
-            <span className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
-              LIVE STREAM
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`text-xs sm:text-sm font-mono text-cyan-400 tracking-[0.25em] uppercase font-semibold transition-all ${isVisible ? 'animate-h-reveal' : 'opacity-0'}`}>
+                LIVE STREAM
+              </span>
+              {portfolioCommits > 0 && (
+                <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs font-mono text-cyan-300 font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(34,211,238,0.15)] animate-fade-in-up">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  {portfolioCommits} COMMITS TO THIS PORTFOLIO
+                </span>
+              )}
+            </div>
             <div className={`h-px w-full mt-2 bg-linear-to-r from-transparent via-cyan-500 to-transparent transition-all duration-1000 ${isVisible ? 'animate-u-grow' : 'scale-x-0 opacity-0'}`} />
           </div>
           <h2 className={`text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -166,6 +181,12 @@ export default function CurrentWorkSection() {
                   I believe the best way to learn is by doing. I'm constantly pushing code to explore new patterns, optimize performance, and solve complex problems.
                 </p>
                 <div className="flex flex-col gap-3">
+                  {portfolioCommits > 0 && (
+                    <div className="flex items-center gap-3 text-xs font-mono text-cyan-300 font-bold bg-cyan-500/10 border border-cyan-500/30 px-3 py-2 rounded-xl">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                      {portfolioCommits} TOTAL COMMITS ON THIS REPO
+                    </div>
+                  )}
                   <div className="flex items-center gap-3 text-xs font-mono text-cyan-500/80">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> 
                     COMMITTING DAILY

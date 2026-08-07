@@ -119,7 +119,34 @@ export async function POST(req: NextRequest) {
       };
     }));
 
-    return NextResponse.json(formattedEvents);
+    // Fetch total commits count for this portfolio repo
+    let portfolioCommits = 0;
+    try {
+      const repoCommitsRes = await fetch(
+        `https://api.github.com/repos/Ani0811/anirudha-basu-thakur-portfolio/commits?per_page=1`,
+        { headers, cache: 'no-store' }
+      );
+      if (repoCommitsRes.ok) {
+        const linkHeader = repoCommitsRes.headers.get('Link');
+        if (linkHeader) {
+          const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+          if (match) {
+            portfolioCommits = parseInt(match[1], 10);
+          }
+        }
+        if (!portfolioCommits) {
+          const data = await repoCommitsRes.json();
+          portfolioCommits = Array.isArray(data) ? data.length : 0;
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching portfolio commit count:', err);
+    }
+
+    return NextResponse.json({
+      events: formattedEvents,
+      portfolioCommits,
+    });
   } catch (error) {
     console.error('Error fetching GitHub activity:', error);
     return NextResponse.json(
