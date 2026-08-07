@@ -21,13 +21,13 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       // Don't intercept if user is typing in an input or textarea
       if (
         ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
-        e.key !== '\`' && e.key !== 'Escape'
+        e.key !== '`' && e.key !== 'Escape'
       ) {
         return;
       }
 
       // Toggle terminal with backtick (`)
-      if (e.key === '\`') {
+      if (e.key === '`') {
         e.preventDefault();
         setTerminalOpen(prev => !prev);
       }

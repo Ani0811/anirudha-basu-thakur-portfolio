@@ -41,12 +41,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
     { name: "Middleware Development Specialist", type: "Skill", targetId: "skills" },
     { name: "AI Development Specialist", type: "Skill", targetId: "skills" },
     // Links / Actions
-    { name: "Download Resume PDF", type: "Action", action: () => {
-      const link = document.createElement('a');
-      link.href = "/docs/Anirudha_Basu_Thakur_Resume.pdf";
-      link.download = "Anirudha_Basu_Thakur_Resume.pdf";
-      link.click();
-    }},
+    { name: "View Resume PDF", type: "Link", url: "/docs/Anirudha_Basu_Thakur_Resume.pdf" },
     { name: "GitHub Profile Link", type: "Link", url: "https://github.com/Ani0811" },
     { name: "LinkedIn Profile Link", type: "Link", url: "https://linkedin.com/in/anirudha-basu-thakur-686aa8253" },
     { name: "Roast My Code Tool", type: "Action", action: () => {
@@ -222,7 +217,7 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
           <a
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
             target="_blank"
-            download="Anirudha_Basu_Thakur_Resume.pdf"
+            rel="noopener noreferrer"
             className="hidden xl:flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-semibold rounded-full
               bg-white/5 backdrop-blur-md border border-white/10 text-slate-200
               shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]
@@ -328,7 +323,8 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
 
           <a
             href="/docs/Anirudha_Basu_Thakur_Resume.pdf"
-            download="Anirudha_Basu_Thakur_Resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setIsMobileMenuOpen(false)}
             className="w-full py-4 text-center text-base font-semibold rounded-2xl
               bg-white/5 backdrop-blur-md

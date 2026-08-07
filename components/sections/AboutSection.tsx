@@ -3,7 +3,6 @@
 import React from "react";
 import GithubStats from "@/components/features/GithubStats";
 import { FaCode, FaServer, FaPaintBrush, FaCreditCard, FaCogs, FaRobot } from "react-icons/fa";
-
 const badges = [
   { label: "Full-Stack Development", icon: <FaCode /> },
   { label: "Backend Architecture", icon: <FaServer /> },
@@ -86,10 +85,14 @@ export default function AboutSection() {
           }`}>
             <a 
               href="/docs/Anirudha_Basu_Thakur_Resume.pdf" 
-              download="Anirudha_Basu_Thakur_Resume.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer" 
               className="group px-6 py-3 bg-linear-to-r from-cyan-500 to-blue-500 rounded-lg hover:shadow-lg hover:shadow-cyan-500/30 transition-all text-white font-semibold relative overflow-hidden hover:scale-105 active:scale-95"
             >
-              <span className="relative z-10">Download Resume</span>
+              <span className="relative z-10 flex items-center gap-2">
+                <span>View Resume</span>
+                <span className="text-xs font-mono bg-white/20 px-1.5 py-0.5 rounded">PDF</span>
+              </span>
               <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </a>
             <a 
