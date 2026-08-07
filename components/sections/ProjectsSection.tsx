@@ -9,10 +9,11 @@ const PROJECTS_PER_PAGE = 4;
 const liveProjects = [
   {
     title: "Mission Control",
-    desc: "An advanced, real-time AI gaming assistant that provides tactical coaching, vision-based detection, story tracking, autonomous co-pilot capabilities, and live web-powered game intelligence — all running locally on NVIDIA GPUs.",
-    tags: ["Python", "Next.js", "Electron", "SQLite", "Supabase", "CUDA", "TensorRT"],
+    desc: "An advanced, real-time AI gaming assistant desktop application that provides tactical coaching, vision-based detection, story tracking, autonomous co-pilot capabilities, and live web-powered game intelligence — all running locally on NVIDIA GPUs. Paired with a live web portal for documentation and desktop app distribution.",
+    tags: ["Desktop App", "Python", "Next.js", "Electron", "SQLite", "Supabase", "CUDA", "TensorRT"],
     github: "https://github.com/Ani0811/Mission-Control",
     live: "https://mission-control-roan-seven.vercel.app/",
+    liveLabel: "Docs & Download",
     image: "/projects/MissionControl.jpeg"
   },
   {
@@ -266,7 +267,7 @@ export default function ProjectsSection() {
                     rel="noopener noreferrer"
                     className="flex-1 py-3 px-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg font-medium text-cyan-300 hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all duration-300 text-center backdrop-blur-sm hover:shadow-[0_0_30px_rgba(34,211,238,0.3)]"
                   >
-                    Live Demo
+                    {proj.liveLabel || "Live Demo"}
                   </a>
                 )}
               </>
