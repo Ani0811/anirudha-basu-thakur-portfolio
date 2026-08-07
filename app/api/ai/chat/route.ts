@@ -3,12 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BIO_CONTEXT = `- Software Engineer & Full-Stack Developer based in Kolkata, India.
 - Works at G-One Media (digital agency).
-- Specialties: React.js, Next.js, Node.js, Express.js, MongoDB, Supabase, Generative AI (Gemini), REST APIs.
+- Specialties: React.js, Next.js, Electron, Python, Node.js, Express.js, MongoDB, Supabase, Generative AI (Gemini), CUDA, TensorRT, REST APIs.
 - Key Projects:
-  1. This Portfolio: Features a custom 60FPS canvas scroll animation engine, Gemini AI integration, glassmorphism UI.
-  2. Foodie Frenzy: A high-performance food ordering platform.
-  3. Rimberio Real Estate: A modern property listing platform.
-  4. Console BMS: A bank management system.`;
+  1. Mission Control: An advanced, real-time AI gaming assistant with tactical coaching, vision-based detection, story tracking, autonomous co-pilot, and live game intelligence running locally on NVIDIA GPUs (Python, Next.js, Electron, SQLite, Supabase, CUDA, TensorRT).
+  2. This Portfolio: Features a custom 60FPS canvas scroll animation engine, Gemini AI integration, glassmorphism UI.
+  3. G-One Media: Official agency portal for full-stack web solutions.
+  4. Foodie Frenzy: A high-performance food ordering platform.
+  5. Rimberio Real Estate: A modern property listing platform.
+  6. Console BMS: A bank management system.`;
 
 export async function POST(req: NextRequest) {
   try {

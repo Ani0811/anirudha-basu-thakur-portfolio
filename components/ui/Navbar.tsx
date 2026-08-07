@@ -27,6 +27,8 @@ export default function Navbar({ isMobileMenuOpen, setIsMobileMenuOpen }: Props)
     { name: "Contact Section", type: "Section", targetId: "contact" },
     { name: "Feedback (Rate Portfolio)", type: "Section", targetId: "rate-portfolio" },
     // Projects
+    { name: "Mission Control AI Assistant Project", type: "Project", targetId: "project-mission-control" },
+    { name: "G-One Media Agency Portal", type: "Project", targetId: "project-g-one-media" },
     { name: "Foodie Frenzy Project", type: "Project", targetId: "project-foodie-frenzy" },
     { name: "Rimberio Real Estate Project", type: "Project", targetId: "project-rimberio-real-estate" },
     { name: "Console BMS Project", type: "Project", targetId: "project-console-bms-bank-management-system" },

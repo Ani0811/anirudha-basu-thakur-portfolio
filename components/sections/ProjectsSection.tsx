@@ -8,6 +8,14 @@ const PROJECTS_PER_PAGE = 4;
 
 const liveProjects = [
   {
+    title: "Mission Control",
+    desc: "An advanced, real-time AI gaming assistant that provides tactical coaching, vision-based detection, story tracking, autonomous co-pilot capabilities, and live web-powered game intelligence — all running locally on NVIDIA GPUs.",
+    tags: ["Python", "Next.js", "Electron", "SQLite", "Supabase", "CUDA", "TensorRT"],
+    github: "https://github.com/Ani0811/Mission-Control",
+    live: "https://mission-control-roan-seven.vercel.app/",
+    image: "/projects/MissionControl.jpeg"
+  },
+  {
     title: "G-One Media",
     desc: "Co-founded and developed the official agency portal for G-One Media, designed to craft high-performance, modern websites for local businesses and corporate clients. Features responsive UI layouts and streamlined branding services.",
     tags: ["React.js", "Node.js", "Supabase", "Razorpay"],
